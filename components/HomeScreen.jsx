@@ -7,7 +7,14 @@ export default function HomeScreen() {
     return (
         <View style={styles.container}>
             {/* De MapView vult nu de beschikbare ruimte binnen de container */}
-            <MapView style={styles.map} />
+            <MapView
+                initialRegion={{
+                    latitude: 51.9173619,
+                    longitude: 4.4839952,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                }}
+                style={styles.map} />
         </View>
     );
 }
