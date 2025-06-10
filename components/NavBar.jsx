@@ -1,4 +1,9 @@
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
+import {Ionicons} from '@expo/vector-icons';
+import MapScreen from "../screens/MapScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import CameraScreen from "../screens/CameraScreen";
+import LocationsScreen from "../screens/LocationsScreen";
 
 const Tab = createBottomTabNavigator()
 
