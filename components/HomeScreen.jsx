@@ -1,6 +1,5 @@
-// HomeScreen.jsx
 import React, { useState } from 'react';
-import MapView, { Polygon } from 'react-native-maps';
+import MapView, { Polygon, Marker } from 'react-native-maps'; // Importeer Marker
 import { StyleSheet, View, Text, Modal, Pressable } from 'react-native';
 import waterCoordinates from '../assets/waterCoordinates.json';
 
@@ -8,46 +7,75 @@ export default function HomeScreen() {
     const [selectedWaterInfo, setSelectedWaterInfo] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
 
+    // Functie om het middelpunt van een reeks coördinaten te berekenen
+    const getCenterOfPolygon = (coords) => {
+        let latSum = 0;
+        let lonSum = 0;
+        for (let i = 0; i < coords.length; i++) {
+            latSum += coords[i].latitude;
+            lonSum += coords[i].longitude;
+        }
+        return {
+            latitude: latSum / coords.length,
+            longitude: lonSum / coords.length,
+        };
+    };
+
     const waterPolygons = waterCoordinates.elements
         .filter(element => element.type === "way" && element.tags && element.tags.natural === "water")
-        .map(element => ({
-            id: element.id,
-            coordinates: element.geometry.map(coord => ({
+        .map(element => {
+            const coords = element.geometry.map(coord => ({
                 latitude: coord.lat,
                 longitude: coord.lon,
-            })),
-            name: element.tags.name || `Water Area ${element.id}`,
-            // Voeg andere relevante tags toe die je wilt weergeven
-            wikidata: element.tags.wikidata,
-            wikipedia: element.tags.wikipedia,
-            waterType: element.tags.water, // bijv. "harbour"
-        }));
+            }));
+            return {
+                id: element.id,
+                coordinates: coords,
+                center: getCenterOfPolygon(coords), // Bereken het middelpunt
+                name: element.tags.name || `Water Area ${element.id}`,
+                wikidata: element.tags.wikidata,
+                wikipedia: element.tags.wikipedia,
+                waterType: element.tags.water,
+            };
+        });
+
     const handlePolygonPress = (polygon) => {
         setSelectedWaterInfo(polygon);
         setModalVisible(true);
     };
+
     const initialRegion = {
         latitude: 51.9173619,
         longitude: 4.4839952,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
-    }
+    };
 
     return (
         <View style={styles.container}>
-            {/* De MapView vult nu de beschikbare ruimte binnen de container */}
             <MapView
                 initialRegion={initialRegion}
-                style={styles.map} >
+                style={styles.map}
+            >
                 {waterPolygons.map((polygon) => (
-                    <Polygon
-                        key={polygon.id}
-                        coordinates={polygon.coordinates}
-                        strokeColor="#000"
-                        fillColor="rgba(0, 0, 255, 0.5)"
-                        strokeWidth={1}
-                        onPress={() => handlePolygonPress(polygon)} // Voeg de onPress handler toe
-                    />
+                    <React.Fragment key={polygon.id}>
+                        <Polygon
+                            coordinates={polygon.coordinates}
+                            strokeColor="#000"
+                            fillColor="rgba(0, 0, 255, 0.5)"
+                            strokeWidth={1}
+                        // onPress={() => handlePolygonPress(polygon)} // We gebruiken nu de marker voor clicks
+                        />
+                        {/* Voeg een transparante marker toe voor klikbaarheid */}
+                        <Marker
+                            coordinate={polygon.center}
+                            onPress={() => handlePolygonPress(polygon)}
+                            opacity={0} // Maak de marker onzichtbaar
+                        >
+                            {/* De View binnen de Marker is nog steeds nodig om een klikbaar gebied te garanderen */}
+                            <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
+                        </Marker>
+                    </React.Fragment>
                 ))}
             </MapView>
 
@@ -87,19 +115,18 @@ export default function HomeScreen() {
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 80,
         paddingBottom: 50,
-        // Voeg hier de gewenste padding toe
-        backgroundColor: 'lightblue', // Optioneel: om de padding te visualiseren
+        backgroundColor: 'lightblue',
     },
     map: {
-        flex: 1, // Zorgt ervoor dat de MapView de beschikbare ruimte vult
-        // Let op: StyleSheet.absoluteFill hier niet gebruiken als je padding op de container hebt
+        flex: 1,
     },
-    enteredView: {
+    centeredView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
