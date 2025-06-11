@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MapView, { Polygon, Marker } from 'react-native-maps'; // Importeer Marker
 import { StyleSheet, View, Text, Modal, Pressable } from 'react-native';
-import waterCoordinatesOne from '../assets/waterCoordinatesOne.json';
+import waterCoordinatesThree from '../assets/waterCoordinatesThree.json';
 import waterCoordinatesTwo from '../assets/waterCoordinatesTwo.json';
 
 export default function HomeScreen() {
@@ -22,7 +22,7 @@ export default function HomeScreen() {
         };
     };
 
-    const waterPolygonsOne = waterCoordinatesOne.elements
+    const waterPolygonsOne = waterCoordinatesThree.elements
         .filter(element => element.type === "way" && element.tags && element.tags.natural === "water")
         .map(element => {
             const coords = element.geometry.map(coord => ({
@@ -81,14 +81,13 @@ export default function HomeScreen() {
                             coordinates={polygon.coordinates}
                             strokeColor="#000"
                             fillColor="rgba(0, 0, 255, 0.5)"
-                            strokeWidth={1}
-                        // onPress={() => handlePolygonPress(polygon)} // We gebruiken nu de marker voor clicks
+                            strokeWidth={0.5}
                         />
                         {/* Voeg een transparante marker toe voor klikbaarheid */}
                         <Marker
                             coordinate={polygon.center}
                             onPress={() => handlePolygonPress(polygon)}
-                            opacity={0} // Maak de marker onzichtbaar
+                            opacity={0}
                         >
                             {/* De View binnen de Marker is nog steeds nodig om een klikbaar gebied te garanderen */}
                             <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
@@ -101,14 +100,13 @@ export default function HomeScreen() {
                             coordinates={polygon.coordinates}
                             strokeColor="#000"
                             fillColor="rgba(230, 38, 0, 0.85)"
-                            strokeWidth={1}
-                        // onPress={() => handlePolygonPress(polygon)} // We gebruiken nu de marker voor clicks
+                            strokeWidth={0.5}
                         />
                         {/* Voeg een transparante marker toe voor klikbaarheid */}
                         <Marker
                             coordinate={polygon.center}
                             onPress={() => handlePolygonPress(polygon)}
-                            opacity={0} // Maak de marker onzichtbaar
+                            opacity={0}
                         >
                             {/* De View binnen de Marker is nog steeds nodig om een klikbaar gebied te garanderen */}
                             <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
