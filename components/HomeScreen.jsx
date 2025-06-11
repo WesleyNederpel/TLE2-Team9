@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import { StyleSheet, View, Text, Modal, Pressable } from 'react-native';
-import waterCoordinatesThree from '../assets/waterCoordinatesThree.json';
+import waterCoordinatesTwo from '../assets/waterCoordinatesTwo.json';
+import waterCoordinatesOne from '../assets/waterCoordinatesOne.json';
 
 export default function HomeScreen() {
     const [selectedWaterInfo, setSelectedWaterInfo] = useState(null);
@@ -67,7 +68,12 @@ export default function HomeScreen() {
         );
     };
 
-    const waterPolygons = waterCoordinatesThree.elements
+    const waterPolygonsOne = waterCoordinatesOne.elements
+        .filter(isWaterFeature)
+        .map(parseWaterElement)
+        .filter(Boolean);
+
+    const waterPolygonsTwo = waterCoordinatesTwo.elements
         .filter(isWaterFeature)
         .map(parseWaterElement)
         .filter(Boolean);
@@ -87,12 +93,29 @@ export default function HomeScreen() {
     return (
         <View style={styles.container}>
             <MapView initialRegion={initialRegion} style={styles.map}>
-                {waterPolygons.map(polygon => (
+                {waterPolygonsOne.map(polygon => (
                     <React.Fragment key={polygon.id}>
                         <Polygon
                             coordinates={polygon.coordinates}
-                            strokeColor="#000"
-                            fillColor="rgba(0, 0, 255, 0.5)"
+                            fillColor="rgba(5, 150, 254, 0.5)"
+                            strokeColor="rgba(0, 150, 255, 0.8)"
+                            strokeWidth={0.5}
+                        />
+                        <Marker
+                            coordinate={polygon.center}
+                            onPress={() => handlePolygonPress(polygon)}
+                            opacity={0}
+                        >
+                            <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
+                        </Marker>
+                    </React.Fragment>
+                ))}
+                {waterPolygonsTwo.map(polygon => (
+                    <React.Fragment key={polygon.id}>
+                        <Polygon
+                            coordinates={polygon.coordinates}
+                            fillColor="rgba(5, 150, 254, 0.5)"
+                            strokeColor="rgba(0, 150, 255, 0.8)"
                             strokeWidth={0.5}
                         />
                         <Marker
