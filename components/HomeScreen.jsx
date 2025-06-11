@@ -1,61 +1,76 @@
 import React, { useState } from 'react';
-import MapView, { Polygon, Marker } from 'react-native-maps'; // Importeer Marker
+import MapView, { Polygon, Marker } from 'react-native-maps';
 import { StyleSheet, View, Text, Modal, Pressable } from 'react-native';
 import waterCoordinatesThree from '../assets/waterCoordinatesThree.json';
-import waterCoordinatesTwo from '../assets/waterCoordinatesTwo.json';
 
 export default function HomeScreen() {
     const [selectedWaterInfo, setSelectedWaterInfo] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
 
-    // Functie om het middelpunt van een reeks coördinaten te berekenen
     const getCenterOfPolygon = (coords) => {
+        if (!coords || coords.length === 0) return { latitude: 0, longitude: 0 };
         let latSum = 0;
         let lonSum = 0;
-        for (let i = 0; i < coords.length; i++) {
-            latSum += coords[i].latitude;
-            lonSum += coords[i].longitude;
-        }
+        coords.forEach(coord => {
+            latSum += coord.latitude;
+            lonSum += coord.longitude;
+        });
         return {
             latitude: latSum / coords.length,
             longitude: lonSum / coords.length,
         };
     };
 
-    const waterPolygonsOne = waterCoordinatesThree.elements
-        .filter(element => element.type === "way" && element.tags && element.tags.natural === "water")
-        .map(element => {
-            const coords = element.geometry.map(coord => ({
+    const parseWaterElement = (element) => {
+        const tags = element.tags || {};
+        let coordinates = [];
+
+        if (element.type === 'way' && Array.isArray(element.geometry)) {
+            coordinates = element.geometry.map(coord => ({
                 latitude: coord.lat,
                 longitude: coord.lon,
             }));
-            return {
-                id: element.id,
-                coordinates: coords,
-                center: getCenterOfPolygon(coords), // Bereken het middelpunt
-                name: element.tags.name || `Water Area ${element.id}`,
-                wikidata: element.tags.wikidata,
-                wikipedia: element.tags.wikipedia,
-                waterType: element.tags.water,
-            };
-        });
-    const waterPolygonsTwo = waterCoordinatesTwo.elements
-        .filter(element => element.type === "way" && element.tags && element.tags.natural === "water")
-        .map(element => {
-            const coords = element.geometry.map(coord => ({
-                latitude: coord.lat,
-                longitude: coord.lon,
-            }));
-            return {
-                id: element.id,
-                coordinates: coords,
-                center: getCenterOfPolygon(coords), // Bereken het middelpunt
-                name: element.tags.name || `Water Area ${element.id}`,
-                wikidata: element.tags.wikidata,
-                wikipedia: element.tags.wikipedia,
-                waterType: element.tags.water,
-            };
-        });
+        }
+
+        if (element.type === 'relation' && Array.isArray(element.members)) {
+            coordinates = element.members
+                .filter(m => m.role === 'outer' && Array.isArray(m.geometry))
+                .flatMap(m => m.geometry.map(coord => ({
+                    latitude: coord.lat,
+                    longitude: coord.lon,
+                })));
+        }
+
+        if (coordinates.length === 0) return null;
+
+        return {
+            id: element.id,
+            coordinates,
+            center: getCenterOfPolygon(coordinates),
+            name: tags.name || `Water Area ${element.id}`,
+            wikidata: tags.wikidata,
+            wikipedia: tags.wikipedia,
+            waterType: tags.water || tags.waterway || tags.natural,
+        };
+    };
+
+    const isWaterFeature = (element) => {
+        const tags = element.tags || {};
+        return (
+            (element.type === 'way' || element.type === 'relation') &&
+            (
+                tags.natural === 'water' ||
+                tags.water === 'river' ||
+                tags.waterway === 'riverbank' ||
+                tags.waterway === 'river'
+            )
+        );
+    };
+
+    const waterPolygons = waterCoordinatesThree.elements
+        .filter(isWaterFeature)
+        .map(parseWaterElement)
+        .filter(Boolean);
 
     const handlePolygonPress = (polygon) => {
         setSelectedWaterInfo(polygon);
@@ -63,19 +78,16 @@ export default function HomeScreen() {
     };
 
     const initialRegion = {
-        latitude: 51.9173619,
-        longitude: 4.4839952,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        latitude: 51.927, // iets noordelijker dan voorheen
+        longitude: 4.51,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.15,
     };
 
     return (
         <View style={styles.container}>
-            <MapView
-                initialRegion={initialRegion}
-                style={styles.map}
-            >
-                {waterPolygonsOne.map((polygon) => (
+            <MapView initialRegion={initialRegion} style={styles.map}>
+                {waterPolygons.map(polygon => (
                     <React.Fragment key={polygon.id}>
                         <Polygon
                             coordinates={polygon.coordinates}
@@ -83,32 +95,11 @@ export default function HomeScreen() {
                             fillColor="rgba(0, 0, 255, 0.5)"
                             strokeWidth={0.5}
                         />
-                        {/* Voeg een transparante marker toe voor klikbaarheid */}
                         <Marker
                             coordinate={polygon.center}
                             onPress={() => handlePolygonPress(polygon)}
                             opacity={0}
                         >
-                            {/* De View binnen de Marker is nog steeds nodig om een klikbaar gebied te garanderen */}
-                            <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
-                        </Marker>
-                    </React.Fragment>
-                ))}
-                {waterPolygonsTwo.map((polygon) => (
-                    <React.Fragment key={polygon.id}>
-                        <Polygon
-                            coordinates={polygon.coordinates}
-                            strokeColor="#000"
-                            fillColor="rgba(230, 38, 0, 0.85)"
-                            strokeWidth={0}
-                        />
-                        {/* Voeg een transparante marker toe voor klikbaarheid */}
-                        <Marker
-                            coordinate={polygon.center}
-                            onPress={() => handlePolygonPress(polygon)}
-                            opacity={0}
-                        >
-                            {/* De View binnen de Marker is nog steeds nodig om een klikbaar gebied te garanderen */}
                             <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
                         </Marker>
                     </React.Fragment>
@@ -119,9 +110,7 @@ export default function HomeScreen() {
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}
-                onRequestClose={() => {
-                    setModalVisible(!modalVisible);
-                }}
+                onRequestClose={() => setModalVisible(!modalVisible)}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
@@ -175,10 +164,7 @@ const styles = StyleSheet.create({
         padding: 35,
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
