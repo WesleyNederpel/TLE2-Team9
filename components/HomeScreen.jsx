@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import MapView, { Polygon, Marker } from 'react-native-maps'; // Importeer Marker
 import { StyleSheet, View, Text, Modal, Pressable } from 'react-native';
-import waterCoordinates from '../assets/waterCoordinates.json';
+import waterCoordinatesOne from '../assets/waterCoordinatesOne.json';
+import waterCoordinatesTwo from '../assets/waterCoordinatesTwo.json';
 
 export default function HomeScreen() {
     const [selectedWaterInfo, setSelectedWaterInfo] = useState(null);
@@ -21,7 +22,24 @@ export default function HomeScreen() {
         };
     };
 
-    const waterPolygons = waterCoordinates.elements
+    const waterPolygonsOne = waterCoordinatesOne.elements
+        .filter(element => element.type === "way" && element.tags && element.tags.natural === "water")
+        .map(element => {
+            const coords = element.geometry.map(coord => ({
+                latitude: coord.lat,
+                longitude: coord.lon,
+            }));
+            return {
+                id: element.id,
+                coordinates: coords,
+                center: getCenterOfPolygon(coords), // Bereken het middelpunt
+                name: element.tags.name || `Water Area ${element.id}`,
+                wikidata: element.tags.wikidata,
+                wikipedia: element.tags.wikipedia,
+                waterType: element.tags.water,
+            };
+        });
+    const waterPolygonsTwo = waterCoordinatesTwo.elements
         .filter(element => element.type === "way" && element.tags && element.tags.natural === "water")
         .map(element => {
             const coords = element.geometry.map(coord => ({
@@ -57,12 +75,32 @@ export default function HomeScreen() {
                 initialRegion={initialRegion}
                 style={styles.map}
             >
-                {waterPolygons.map((polygon) => (
+                {waterPolygonsOne.map((polygon) => (
                     <React.Fragment key={polygon.id}>
                         <Polygon
                             coordinates={polygon.coordinates}
                             strokeColor="#000"
                             fillColor="rgba(0, 0, 255, 0.5)"
+                            strokeWidth={1}
+                        // onPress={() => handlePolygonPress(polygon)} // We gebruiken nu de marker voor clicks
+                        />
+                        {/* Voeg een transparante marker toe voor klikbaarheid */}
+                        <Marker
+                            coordinate={polygon.center}
+                            onPress={() => handlePolygonPress(polygon)}
+                            opacity={0} // Maak de marker onzichtbaar
+                        >
+                            {/* De View binnen de Marker is nog steeds nodig om een klikbaar gebied te garanderen */}
+                            <View style={{ width: 20, height: 20, backgroundColor: 'transparent' }} />
+                        </Marker>
+                    </React.Fragment>
+                ))}
+                {waterPolygonsTwo.map((polygon) => (
+                    <React.Fragment key={polygon.id}>
+                        <Polygon
+                            coordinates={polygon.coordinates}
+                            strokeColor="#000"
+                            fillColor="rgba(230, 38, 0, 0.85)"
                             strokeWidth={1}
                         // onPress={() => handlePolygonPress(polygon)} // We gebruiken nu de marker voor clicks
                         />
