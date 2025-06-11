@@ -92,7 +92,7 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            <MapView initialRegion={initialRegion} style={styles.map}>
+            <MapView initialRegion={initialRegion} style={styles.map} mapType="standard">
                 {waterPolygonsOne.map(polygon => (
                     <React.Fragment key={polygon.id}>
                         <Polygon
