@@ -100,7 +100,7 @@ export default function HomeScreen() {
                             coordinates={polygon.coordinates}
                             strokeColor="#000"
                             fillColor="rgba(230, 38, 0, 0.85)"
-                            strokeWidth={0.5}
+                            strokeWidth={0}
                         />
                         {/* Voeg een transparante marker toe voor klikbaarheid */}
                         <Marker
