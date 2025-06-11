@@ -4,7 +4,31 @@ import {Pressable, StyleSheet, Image} from 'react-native';
 import MapScreen from "../screens/MapScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import CameraScreen from "../screens/CameraScreen";
-import LocationsScreen from "../screens/LocationsScreen";
+
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LocationsScreen from '../screens/LocationsScreen';
+import WaterInfo from "../screens/waterinfo";
+
+const LocationsStack = createNativeStackNavigator();
+
+function LocationsStackScreen() {
+    return (
+        <LocationsStack.Navigator>
+            <LocationsStack.Screen name="Locations" component={LocationsScreen}  options={{ headerShown: false }}  />
+            <LocationsStack.Screen
+                name="WaterInfo"
+                component={WaterInfo}
+                options={{
+                    title: 'Water Info',
+                    headerStyle: {
+                        height: 50
+                    },
+                }}
+            />
+        </LocationsStack.Navigator>
+    );
+}
+
 
 const Tab = createBottomTabNavigator()
 
@@ -65,7 +89,7 @@ export default function NavBar({navigation}) {
             <Tab.Screen name="Profiel" component={ProfileScreen} />
             <Tab.Screen name="Camera" component={CameraScreen} />
             <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Locaties" component={LocationsScreen} />
+            <Tab.Screen name="Locaties" component={LocationsStackScreen} />
         </Tab.Navigator>
     );
 }
