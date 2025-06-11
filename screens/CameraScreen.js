@@ -1,10 +1,10 @@
 import {Text, View} from 'react-native';
 
-export default function MapsScreen() {
+export default function CameraScreen() {
     return (
         <View>
             <Text>
-                Map
+                Camera
             </Text>
         </View>
     )
