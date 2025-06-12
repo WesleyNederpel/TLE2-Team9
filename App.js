@@ -16,11 +16,6 @@ export default function App() {
                     component={NavBar}
                     options={{ headerShown: false }}
                 />
-                <Stack.Screen
-                    name="WaterInfo"
-                    component={WaterInfo}
-                    options={{ title: 'Water Info' }}
-                />
             </Stack.Navigator>
         </NavigationContainer>
     );

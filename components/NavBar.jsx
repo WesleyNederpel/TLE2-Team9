@@ -19,10 +19,7 @@ function LocationsStackScreen() {
                 name="WaterInfo"
                 component={WaterInfo}
                 options={{
-                    title: 'Water Info',
-                    headerStyle: {
-                        height: 50
-                    },
+                    headerShown: false
                 }}
             />
         </LocationsStack.Navigator>
