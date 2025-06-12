@@ -13,11 +13,16 @@ const MapScreen = () => {
         longitudeDelta: 0.1,
     };
 
-    const convertCoords = (coordsArray) =>
-        coordsArray.map((coord) => ({
+    // Deze functie converteert een enkele lijst van [longitude, latitude] naar { latitude, longitude } objecten
+    const convertCoordsList = (coordsArray) => {
+        if (!coordsArray || coordsArray.length === 0) {
+            return []; // Zorg ervoor dat een lege array wordt teruggegeven bij null/lege input
+        }
+        return coordsArray.map((coord) => ({
             latitude: coord[1],
             longitude: coord[0],
         }));
+    };
 
     const handlePolygonPress = (feature) => {
         setSelectedFeature(feature);
@@ -32,30 +37,47 @@ const MapScreen = () => {
             const { type, coordinates } = feature.geometry;
             const props = feature.properties || {};
 
-            const isTargetFeature = props['@id'] === 'relation/9349950';
-
-            const fillColor = isTargetFeature ? 'transparent' : 'rgba(0, 150, 255, 0.3)';
+            const fillColor = 'rgba(0, 150, 255, 0.3)';
             const strokeColor = 'rgba(0, 150, 255, 0.8)';
 
-            const createPolygon = (coords, key) => (
-                <Polygon
-                    key={key}
-                    coordinates={convertCoords(coords)}
-                    fillColor={fillColor}
-                    strokeWidth={isTargetFeature ? 5 : 1} // dikkere rand voor Boons markt
-                    strokeColor={strokeColor}
-                    tappable={true}
-                    onPress={() => handlePolygonPress(feature)}
-                />
-            );
+            // Functie om een individuele Polygon te renderen, inclusief gaten
+            const renderSinglePolygon = (polygonCoordsArrays, keySuffix) => {
+                // De eerste array is de buitenrand
+                const outerCoordinates = convertCoordsList(polygonCoordsArrays[0]);
+                // Alle volgende arrays zijn de gaten
+                const innerHoles = polygonCoordsArrays.slice(1).map(convertCoordsList);
+
+                // Als de buitenste coördinaten leeg zijn, render dan niets om fouten te voorkomen
+                if (outerCoordinates.length === 0) {
+                    return null;
+                }
+
+                return (
+                    <Polygon
+                        key={`${index}-${keySuffix}`} // Gebruik een unieke key
+                        coordinates={outerCoordinates}
+                        holes={innerHoles.length > 0 ? innerHoles : undefined} // Geef `holes` alleen mee als er daadwerkelijk gaten zijn
+                        fillColor={fillColor}
+                        strokeWidth={1}
+                        strokeColor={strokeColor}
+                        tappable={true}
+                        onPress={() => handlePolygonPress(feature)}
+                    />
+                );
+            };
+
 
             if (type === 'Polygon') {
-                return createPolygon(coordinates[0], index);
+                // Voor een enkel Polygon, geef de volledige `coordinates` array door
+                // die de buitenrand en eventuele gaten bevat
+                return renderSinglePolygon(coordinates, 'single');
             }
 
             if (type === 'MultiPolygon') {
+                // Voor een MultiPolygon, loop over elke individuele polygoon
+                // en render deze met de `renderSinglePolygon` helper
                 return coordinates.map((polygonCoords, polyIndex) =>
-                    createPolygon(polygonCoords[0], `${index}-${polyIndex}`)
+                    renderSinglePolygon(polygonCoords, `multi-${polyIndex}`)
                 );
             }
 
