@@ -65,7 +65,7 @@ const MapScreen = () => {
 
     return (
         <View style={styles.container}>
-            <MapView style={styles.map} initialRegion={region}>
+            <MapView style={styles.map} initialRegion={region} mapType={'satellite'}>
                 {renderPolygons()}
             </MapView>
 
