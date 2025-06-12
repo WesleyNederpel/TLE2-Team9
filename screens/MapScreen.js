@@ -1,11 +1,11 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, View, Modal, Text, TouchableOpacity } from 'react-native';
 import MapView, { Polygon } from 'react-native-maps';
-// Import your GeoJSON data. Adjust the path if necessary.
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
 
 const MapScreen = () => {
-    // Define an initial region for Rotterdam (approximate center)
+    const [selectedFeature, setSelectedFeature] = useState(null);
+
     const region = {
         latitude: 51.9225,
         longitude: 4.47917,
@@ -13,48 +13,50 @@ const MapScreen = () => {
         longitudeDelta: 0.1,
     };
 
-    // Function to convert coordinates from [lng, lat] to {latitude, longitude}
     const convertCoords = (coordsArray) =>
         coordsArray.map((coord) => ({
             latitude: coord[1],
             longitude: coord[0],
         }));
 
-    // Render Polygon overlays for each water body feature in the GeoJSON
+    const handlePolygonPress = (feature) => {
+        setSelectedFeature(feature);
+    };
+
     const renderPolygons = () => {
         if (!waterGeoJSON || !waterGeoJSON.features) {
             return null;
         }
 
         return waterGeoJSON.features.map((feature, index) => {
-            const { type } = feature.geometry;
+            const { type, coordinates } = feature.geometry;
+            const props = feature.properties || {};
 
-            // If the feature is a Polygon, use its first linear ring.
+            const isTargetFeature = props['@id'] === 'relation/9349950';
+
+            const fillColor = isTargetFeature ? 'transparent' : 'rgba(0, 150, 255, 0.3)';
+            const strokeColor = 'rgba(0, 150, 255, 0.8)';
+
+            const createPolygon = (coords, key) => (
+                <Polygon
+                    key={key}
+                    coordinates={convertCoords(coords)}
+                    fillColor={fillColor}
+                    strokeWidth={isTargetFeature ? 5 : 1} // dikkere rand voor Boons markt
+                    strokeColor={strokeColor}
+                    tappable={true}
+                    onPress={() => handlePolygonPress(feature)}
+                />
+            );
+
             if (type === 'Polygon') {
-                const coords = convertCoords(feature.geometry.coordinates[0]);
-                return (
-                    <Polygon
-                        key={index}
-                        coordinates={coords}
-                        fillColor="rgba(0, 150, 255, 0.3)"
-                        strokeColor="rgba(0, 150, 255, 0.8)"
-                    />
-                );
+                return createPolygon(coordinates[0], index);
             }
 
-            // If the feature is a MultiPolygon, iterate over each polygon.
             if (type === 'MultiPolygon') {
-                return feature.geometry.coordinates.map((polygonCoords, polyIndex) => {
-                    const coords = convertCoords(polygonCoords[0]); // using the first ring for each polygon part
-                    return (
-                        <Polygon
-                            key={`${index}-${polyIndex}`}
-                            coordinates={coords}
-                            fillColor="rgba(0, 150, 255, 0.3)"
-                            strokeColor="rgba(0, 150, 255, 0.8)"
-                        />
-                    );
-                });
+                return coordinates.map((polygonCoords, polyIndex) =>
+                    createPolygon(polygonCoords[0], `${index}-${polyIndex}`)
+                );
             }
 
             return null;
@@ -66,6 +68,34 @@ const MapScreen = () => {
             <MapView style={styles.map} initialRegion={region}>
                 {renderPolygons()}
             </MapView>
+
+            {/* Modal met info over waterlichaam */}
+            <Modal
+                visible={!!selectedFeature}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setSelectedFeature(null)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Waterinfo</Text>
+                        {selectedFeature?.properties ? (
+                            <>
+                                {Object.entries(selectedFeature.properties).map(([key, value]) => (
+                                    <Text key={key} style={styles.modalText}>
+                                        <Text style={{ fontWeight: 'bold' }}>{key}: </Text>{value?.toString()}
+                                    </Text>
+                                ))}
+                            </>
+                        ) : (
+                            <Text style={styles.modalText}>Geen eigenschappen beschikbaar</Text>
+                        )}
+                        <TouchableOpacity onPress={() => setSelectedFeature(null)} style={styles.closeButton}>
+                            <Text style={styles.closeButtonText}>Sluiten</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -76,6 +106,38 @@ const styles = StyleSheet.create({
     },
     map: {
         flex: 1,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        maxHeight: '70%',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalText: {
+        marginBottom: 5,
+    },
+    closeButton: {
+        marginTop: 20,
+        backgroundColor: '#007AFF',
+        paddingVertical: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    closeButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 
