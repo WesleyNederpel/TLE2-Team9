@@ -1,6 +1,6 @@
 import {Text, View} from 'react-native';
 
-export default function MapsScreen() {
+export default function MapScreen() {
     return (
         <View>
             <Text>
