@@ -1,79 +1,97 @@
-import React, {useState} from "react";
-import {
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-    Image,
-    ScrollView,
-    FlatList,
-    Modal,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const gevangenVissen = [
-    {
-        id: '1',
-        uri: require("../images/Kralingseplas.png"), // vervang met echte foto's
-    },
-    {
-        id: '2',
-        uri: require("../images/Kralingseplas.png"),
-    },
-];
+const getAfbeelding = (naam) => {
+    const map = {
+        "Kralingseplas.png": require("../images/Kralingseplas.png"),
+        "snoek.png": require("../images/snoek.png"),
+        "baars.png": require("../images/baars.png"),
+        "karper.png": require("../images/karper.png"),
+        // voeg meer afbeeldingen toe als je die gebruikt
+    };
+    return map[naam] || require("../images/Kralingseplas.png"); // fallback afbeelding
+};
 
-const vissoorten = [
-    {
-        id: '1',
-        naam: 'Snoek',
-        afbeelding: require("../images/snoek.png"),
-    },
-    {
-        id: '2',
-        naam: 'Baars',
-        afbeelding: require("../images/baars.png"),
-    },
-    {
-        id: '3',
-        naam: 'Karper',
-        afbeelding: require("../images/karper.png"),
-    },
-];
 
 export default function WaterInfo({ route }) {
+    const locatie = {
+        id: Date.now(),
+        naam: "Kralingseplas",
+        afbeeldingen: "Kralingseplas.png",
+        screen: "WaterInfo",
+    };
 
     const [modalVisible, setModalVisible] = useState(false);
 
-    const handleSave = async (type) => {
-        const locatie = {
-            id: Date.now(),
-            naam: 'Kralingseplas',
-            afbeeldingen: [require("../images/Kralingseplas.png")],
-            screen: 'WaterInfo',
-        };
+    const [checkedItems, setCheckedItems] = useState({
+        favorieten: false,
+        mijnSpots: false,
+        wilIkHeen: false,
+    });
 
+    useEffect(() => {
+        const checkStored = async () => {
+            const keys = ["favorieten", "mijnSpots", "wilIkHeen"];
+            const newChecked = {};
+            for (let key of keys) {
+                try {
+                    const existing = await AsyncStorage.getItem(`@locatie_${key}`);
+                    const lijst = existing ? JSON.parse(existing) : [];
+                    newChecked[key] = lijst.some(item => item.naam === locatie.naam);
+                } catch (e) {
+                    console.error(e);
+                    newChecked[key] = false;
+                }
+            }
+            setCheckedItems(newChecked);
+        };
+        checkStored();
+    }, []);
+
+    const toggleItem = async (type) => {
         try {
             const key = `@locatie_${type}`;
             const existing = await AsyncStorage.getItem(key);
-            const lijst = existing ? JSON.parse(existing) : [];
+            let lijst = existing ? JSON.parse(existing) : [];
 
-            const exists = lijst.some((item) => item.naam === locatie.naam);
-            if (!exists) {
-                lijst.push(locatie);
-                await AsyncStorage.setItem(key, JSON.stringify(lijst));
-                alert(`Opgeslagen in ${type}`);
+            const exists = lijst.some(item => item.naam === locatie.naam);
+
+            if (exists) {
+                lijst = lijst.filter(item => item.naam !== locatie.naam);
             } else {
-                alert(`Locatie staat al in ${type}`);
+                lijst.push({
+                    ...locatie,
+                    afbeeldingen: ["Kralingseplas.png"], // alleen bestandsnaam
+                });
+
             }
+
+            await AsyncStorage.setItem(key, JSON.stringify(lijst));
+
+            setCheckedItems((prev) => ({
+                ...prev,
+                [type]: !exists,
+            }));
         } catch (e) {
-            console.error("Fout bij opslaan:", e);
+            console.error("Fout bij toggle opslaan:", e);
         }
     };
 
+    // Voorbeelddata
+    const gevangenVissen = [
+        // { id: "1", uri: require("../images/vis1.png") },
+        // { id: "2", uri: require("../images/vis2.png") },
+    ];
+
+    const vissoorten = [
+        { id: "1", naam: "Snoek", afbeelding: require("../images/snoek.png") },
+        { id: "2", naam: "Baars", afbeelding: require("../images/baars.png") },
+        { id: "3", naam: "Karpers", afbeelding: require("../images/karper.png") },
+    ];
+
     return (
         <ScrollView style={styles.container}>
-
-            {/* Actieknoppen boven afbeelding */}
             <View style={styles.topButtonsContainer}>
                 <Pressable style={styles.topButton}>
                     <Text style={styles.topButtonText}>Route</Text>
@@ -83,41 +101,28 @@ export default function WaterInfo({ route }) {
                 </Pressable>
             </View>
 
-
-            {/* Header afbeelding */}
             <View style={styles.headerImageContainer}>
-                <Image
-                    source={require("../images/Kralingseplas.png")}
-                    style={styles.headerImage}
-                />
+                <Image source={getAfbeelding(locatie.afbeelding)} style={styles.headerImage} />
             </View>
 
-            {/* Titel en omschrijving */}
             <Text style={styles.h1}>Kralingseplas</Text>
             <View style={styles.underline} />
             <Text style={styles.p}>
-                De Kralingse Plas is een populair recreatiegebied in Rotterdam, gelegen in de wijk Kralingen.
-                Het meer is omgeven door een prachtig park en biedt volop mogelijkheden voor ontspanning,
-                zoals wandelen, fietsen, picknicken, zeilen en zwemmen.
+                De Kralingse Plas is een populair recreatiegebied in Rotterdam...
             </Text>
 
-            {/* Vispas waarschuwing */}
             <View style={styles.vispasContainer}>
-                <Image
-                    source={require("../images/fishpass.png")}
-                    style={styles.fishImage}
-                />
+                <Image source={require("../images/fishpass.png")} style={styles.fishImage} />
                 <Text style={[styles.h1, { marginTop: 10 }]}>Vispas nodig!</Text>
                 <View style={styles.underline} />
                 <Text style={styles.p}>
-                    Voor deze locatie heb je nog niet een geldige vispas, haal de pas hier voordat je gaat vissen!
+                    Voor deze locatie heb je nog niet een geldige vispas...
                 </Text>
                 <Pressable style={styles.button}>
                     <Text style={styles.buttonText}>Vispas aanschaffen</Text>
                 </Pressable>
             </View>
 
-            {/* Gevangen vissen */}
             <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20 }]}>
                 Gevangen kralingseplas <Text style={{ fontSize: 16 }}>2 🎣</Text>
             </Text>
@@ -132,7 +137,6 @@ export default function WaterInfo({ route }) {
                 showsHorizontalScrollIndicator={false}
             />
 
-            {/* Vissoorten lijst */}
             <View style={{ marginBottom: 30 }}>
                 <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20, textAlign: 'center' }]}>
                     Vissen Kralingseplas
@@ -145,60 +149,82 @@ export default function WaterInfo({ route }) {
                             key={vis.id}
                             style={[
                                 styles.visItem,
-                                isEven ? styles.visItemDefault : styles.visItemSelected, // achtergrondkleur wisselt nog steeds
+                                isEven ? styles.visItemDefault : styles.visItemSelected,
                             ]}
                         >
                             {isEven ? (
                                 <>
                                     <Image source={vis.afbeelding} style={styles.visImage} />
-                                    <Text style={[styles.visText, { color: '#1A3A91' }]}>
-                                        {vis.naam}
-                                    </Text>
+                                    <Text style={[styles.visText, { color: '#1A3A91' }]}>{vis.naam}</Text>
                                     <Text style={styles.blueArrow}>{'>'}</Text>
                                 </>
                             ) : (
                                 <>
                                     <Text style={styles.greenArrow}>{'<'}</Text>
-                                    <Text style={[styles.visText, { color: '#4C6D4D' }]}>
-                                        {vis.naam}
-                                    </Text>
-                                    <Image source={vis.afbeelding} style={[styles.visImage, {borderColor: '#4C6D4D'}]} />
+                                    <Text style={[styles.visText, { color: '#4C6D4D' }]}>{vis.naam}</Text>
+                                    <Image source={vis.afbeelding} style={[styles.visImage, { borderColor: '#4C6D4D' }]} />
                                 </>
                             )}
                         </Pressable>
                     );
                 })}
-                <Modal
-                    visible={modalVisible}
-                    transparent={true}
-                    animationType="slide"
-                    onRequestClose={() => setModalVisible(false)}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContainer}>
-                            <Text style={styles.modalTitle}>Opslaan in...</Text>
-                            <Pressable style={styles.modalOption} onPress={() => handleSave('favorieten')}>
-                                <Text style={styles.modalOptionText}>❤️ Favorieten</Text>
-                            </Pressable>
-                            <Pressable style={styles.modalOption} onPress={() => handleSave('mijnSpots')}>
-                                <Text style={styles.modalOptionText}>⭐ Mijn Spots</Text>
-                            </Pressable>
-                            <Pressable style={styles.modalOption} onPress={() => handleSave('wilIkHeen')}>
-                                <Text style={styles.modalOptionText}>🚩 Wil ik heen</Text>
-                            </Pressable>
-                            <Pressable onPress={() => setModalVisible(false)}>
-                                <Text style={{ color: 'red', textAlign: 'center', marginTop: 10 }}>Annuleer</Text>
-                            </Pressable>
-                        </View>
-                    </View>
-                </Modal>
             </View>
 
+            {/* Modal */}
+            <Modal
+                visible={modalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={{ flex: 1, justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)" }}>
+                    <View style={{ backgroundColor: "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
+                        <Text style={[styles.h1, {color:'#1A3A91'}]}>Opslaan in...</Text>
 
+
+                        {["favorieten", "mijnSpots", "wilIkHeen"].map((type) => {
+                            const label =
+                                type === "favorieten" ? "❤️ Favorieten" :
+                                    type === "mijnSpots" ? "⭐ Mijn Spots" :
+                                        "🚩 Wil ik heen";
+
+                            const checked = checkedItems[type];
+
+                            return (
+                                <Pressable
+                                    key={type}
+                                    style={{
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        paddingVertical: 12,
+                                        borderBottomWidth: 1,
+                                        borderColor: "#ccc",
+                                    }}
+                                    onPress={() => toggleItem(type)}
+                                >
+                                    <Text style={styles.checkboxLabel}>{label}</Text>
+                                    <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
+                                        {checked && <Text style={styles.checkmark}>✓</Text>}
+                                    </View>
+                                </Pressable>
+                            );
+                        })}
+
+
+                        <Pressable onPress={() => setModalVisible(false)} style={styles.topButton}>
+                            <Text style={styles.topButtonText}>Sluiten</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
 
         </ScrollView>
     );
 }
+
+// Je styles hier...
+
 
 const styles = StyleSheet.create({
     container: {
@@ -306,7 +332,7 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     topButtonText: {
-        color: '#17589A',
+        color: '#1A3A91',
         fontWeight: '600',
         fontSize: 14,
     },
@@ -335,6 +361,26 @@ const styles = StyleSheet.create({
     modalOptionText: {
         fontSize: 16,
         textAlign: 'center',
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        borderWidth: 2,
+        borderColor: "#E5A83F", // Geelachtig
+        borderRadius: 4,
+        marginLeft: 12,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff", // Zorg dat het wit is als niet aangevinkt
+    },
+    checkboxChecked: {
+        backgroundColor: "#E5A83F", // Gevulde checkbox als hij aangevinkt is
+    },
+    checkmark: {
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 18,
+        lineHeight: 18,
     },
 
 });

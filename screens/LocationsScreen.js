@@ -3,6 +3,21 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LocationsScreen({ navigation }) {
+
+    // useEffect(() => {
+    //     const clearStorage = async () => {
+    //         try {
+    //             await AsyncStorage.clear();
+    //             console.log('✅ AsyncStorage is geleegd.');
+    //         } catch (e) {
+    //             console.error('❌ Fout bij legen van AsyncStorage:', e);
+    //         }
+    //     };
+    //
+    //     clearStorage();
+    // }, []);
+
+
     const [locatieData, setLocatieData] = useState({
         favorieten: [],
         mijnSpots: [],
@@ -50,6 +65,17 @@ export default function LocationsScreen({ navigation }) {
         setVisibleSections((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
+    const getAfbeelding = (filename) => {
+        if (!filename) return null;
+        switch (filename) {
+            case "Kralingseplas.png":
+                return require("../images/Kralingseplas.png");
+            // voeg hier meer bestanden toe als je meerdere afbeeldingen gebruikt
+            default:
+                return null;
+        }
+    };
+
     const renderSpots = (spots) =>
         spots.map((spot) => (
             <Pressable
@@ -59,7 +85,7 @@ export default function LocationsScreen({ navigation }) {
             >
                 <Text style={styles.spotTitle}>{spot.naam}</Text>
                 {spot.afbeeldingen?.length > 0 && (
-                    <Image source={spot.afbeeldingen[0]} style={styles.image} />
+                    <Image source={getAfbeelding(spot.afbeeldingen?.[0])} style={styles.image} />
                 )}
             </Pressable>
         ));
