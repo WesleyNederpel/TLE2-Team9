@@ -2,43 +2,42 @@ import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const getAfbeelding = (naam) => {
+const getImage = (name) => {
     const map = {
         "Kralingseplas.png": require("../images/Kralingseplas.png"),
         "snoek.png": require("../images/snoek.png"),
         "baars.png": require("../images/baars.png"),
         "karper.png": require("../images/karper.png"),
-        // voeg meer afbeeldingen toe als je die gebruikt
+        // add more images if you use them
     };
-    return map[naam] || require("../images/Kralingseplas.png"); // fallback afbeelding
+    return map[name] || require("../images/Kralingseplas.png"); // fallback image
 };
 
-
 export default function WaterInfo({ route }) {
-    const locatie = {
+    const location = {
         id: Date.now(),
-        naam: "Kralingseplas",
-        afbeeldingen: "Kralingseplas.png",
+        name: "Kralingseplas",
+        image: "Kralingseplas.png",
         screen: "WaterInfo",
     };
 
     const [modalVisible, setModalVisible] = useState(false);
 
     const [checkedItems, setCheckedItems] = useState({
-        favorieten: false,
-        mijnSpots: false,
-        wilIkHeen: false,
+        favorites: false,
+        mySpots: false,
+        wantToGo: false,
     });
 
     useEffect(() => {
         const checkStored = async () => {
-            const keys = ["favorieten", "mijnSpots", "wilIkHeen"];
+            const keys = ["favorites", "mySpots", "wantToGo"];
             const newChecked = {};
             for (let key of keys) {
                 try {
-                    const existing = await AsyncStorage.getItem(`@locatie_${key}`);
-                    const lijst = existing ? JSON.parse(existing) : [];
-                    newChecked[key] = lijst.some(item => item.naam === locatie.naam);
+                    const existing = await AsyncStorage.getItem(`@location_${key}`);
+                    const list = existing ? JSON.parse(existing) : [];
+                    newChecked[key] = list.some(item => item.name === location.name);
                 } catch (e) {
                     console.error(e);
                     newChecked[key] = false;
@@ -51,43 +50,42 @@ export default function WaterInfo({ route }) {
 
     const toggleItem = async (type) => {
         try {
-            const key = `@locatie_${type}`;
+            const key = `@location_${type}`;
             const existing = await AsyncStorage.getItem(key);
-            let lijst = existing ? JSON.parse(existing) : [];
+            let list = existing ? JSON.parse(existing) : [];
 
-            const exists = lijst.some(item => item.naam === locatie.naam);
+            const exists = list.some(item => item.name === location.name);
 
             if (exists) {
-                lijst = lijst.filter(item => item.naam !== locatie.naam);
+                list = list.filter(item => item.name !== location.name);
             } else {
-                lijst.push({
-                    ...locatie,
-                    afbeeldingen: ["Kralingseplas.png"], // alleen bestandsnaam
+                list.push({
+                    ...location,
+                    image: ["Kralingseplas.png"], // only filename
                 });
-
             }
 
-            await AsyncStorage.setItem(key, JSON.stringify(lijst));
+            await AsyncStorage.setItem(key, JSON.stringify(list));
 
             setCheckedItems((prev) => ({
                 ...prev,
                 [type]: !exists,
             }));
         } catch (e) {
-            console.error("Fout bij toggle opslaan:", e);
+            console.error("Error saving toggle:", e);
         }
     };
 
-    // Voorbeelddata
-    const gevangenVissen = [
+    // Example data
+    const caughtFish = [
         // { id: "1", uri: require("../images/vis1.png") },
         // { id: "2", uri: require("../images/vis2.png") },
     ];
 
-    const vissoorten = [
-        { id: "1", naam: "Snoek", afbeelding: require("../images/snoek.png") },
-        { id: "2", naam: "Baars", afbeelding: require("../images/baars.png") },
-        { id: "3", naam: "Karpers", afbeelding: require("../images/karper.png") },
+    const fishTypes = [
+        { id: "1", name: "Snoek", image: require("../images/snoek.png") },
+        { id: "2", name: "Baars", image: require("../images/baars.png") },
+        { id: "3", name: "Karpers", image: require("../images/karper.png") },
     ];
 
     return (
@@ -102,7 +100,7 @@ export default function WaterInfo({ route }) {
             </View>
 
             <View style={styles.headerImageContainer}>
-                <Image source={getAfbeelding(locatie.afbeelding)} style={styles.headerImage} />
+                <Image source={getImage(location.image)} style={styles.headerImage} />
             </View>
 
             <Text style={styles.h1}>Kralingseplas</Text>
@@ -111,7 +109,7 @@ export default function WaterInfo({ route }) {
                 De Kralingse Plas is een populair recreatiegebied in Rotterdam...
             </Text>
 
-            <View style={styles.vispasContainer}>
+            <View style={styles.fishPassContainer}>
                 <Image source={require("../images/fishpass.png")} style={styles.fishImage} />
                 <Text style={[styles.h1, { marginTop: 10 }]}>Vispas nodig!</Text>
                 <View style={styles.underline} />
@@ -128,7 +126,7 @@ export default function WaterInfo({ route }) {
             </Text>
             <FlatList
                 horizontal
-                data={gevangenVissen}
+                data={caughtFish}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <Image source={item.uri} style={styles.caughtFishImage} />
@@ -142,27 +140,27 @@ export default function WaterInfo({ route }) {
                     Vissen Kralingseplas
                 </Text>
 
-                {vissoorten.map((vis, index) => {
+                {fishTypes.map((fish, index) => {
                     const isEven = index % 2 === 0;
                     return (
                         <Pressable
-                            key={vis.id}
+                            key={fish.id}
                             style={[
-                                styles.visItem,
-                                isEven ? styles.visItemDefault : styles.visItemSelected,
+                                styles.fishItem,
+                                isEven ? styles.fishItemDefault : styles.fishItemSelected,
                             ]}
                         >
                             {isEven ? (
                                 <>
-                                    <Image source={vis.afbeelding} style={styles.visImage} />
-                                    <Text style={[styles.visText, { color: '#1A3A91' }]}>{vis.naam}</Text>
+                                    <Image source={fish.image} style={styles.fishImageStyle} />
+                                    <Text style={[styles.fishText, { color: '#1A3A91' }]}>{fish.name}</Text>
                                     <Text style={styles.blueArrow}>{'>'}</Text>
                                 </>
                             ) : (
                                 <>
                                     <Text style={styles.greenArrow}>{'<'}</Text>
-                                    <Text style={[styles.visText, { color: '#4C6D4D' }]}>{vis.naam}</Text>
-                                    <Image source={vis.afbeelding} style={[styles.visImage, { borderColor: '#4C6D4D' }]} />
+                                    <Text style={[styles.fishText, { color: '#4C6D4D' }]}>{fish.name}</Text>
+                                    <Image source={fish.image} style={[styles.fishImageStyle, { borderColor: '#4C6D4D' }]} />
                                 </>
                             )}
                         </Pressable>
@@ -181,11 +179,10 @@ export default function WaterInfo({ route }) {
                     <View style={{ backgroundColor: "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
                         <Text style={[styles.h1, {color:'#1A3A91'}]}>Opslaan in...</Text>
 
-
-                        {["favorieten", "mijnSpots", "wilIkHeen"].map((type) => {
+                        {["favorites", "mySpots", "wantToGo"].map((type) => {
                             const label =
-                                type === "favorieten" ? "❤️ Favorieten" :
-                                    type === "mijnSpots" ? "⭐ Mijn Spots" :
+                                type === "favorites" ? "❤️ Favorieten" :
+                                    type === "mySpots" ? "⭐ Mijn Spots" :
                                         "🚩 Wil ik heen";
 
                             const checked = checkedItems[type];
@@ -211,7 +208,6 @@ export default function WaterInfo({ route }) {
                             );
                         })}
 
-
                         <Pressable onPress={() => setModalVisible(false)} style={styles.topButton}>
                             <Text style={styles.topButtonText}>Sluiten</Text>
                         </Pressable>
@@ -223,8 +219,7 @@ export default function WaterInfo({ route }) {
     );
 }
 
-// Je styles hier...
-
+// Styles blijven ongewijzigd
 
 const styles = StyleSheet.create({
     container: {
@@ -256,7 +251,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 10,
     },
-    vispasContainer: {
+    fishPassContainer: {
         marginTop: 20,
     },
     fishImage: {
@@ -282,7 +277,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginRight: 10,
     },
-    visItem: {
+    fishItem: {
         flexDirection: 'row',
         alignItems: 'center',
         marginVertical: 6,
@@ -290,13 +285,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 8,
     },
-    visItemDefault: {
+    fishItemDefault: {
         backgroundColor: '#B9D9F0',
     },
-    visItemSelected: {
+    fishItemSelected: {
         backgroundColor: '#C6E5B6',
     },
-    visImage: {
+    fishImageStyle: {
         width: 50,
         height: 50,
         borderRadius: 50,
@@ -304,7 +299,7 @@ const styles = StyleSheet.create({
         borderColor: '#1A3A91',
         marginRight: 12,
     },
-    visText: {
+    fishText: {
         fontSize: 18,
         fontWeight: '600',
         textAlign: 'center',
@@ -334,53 +329,27 @@ const styles = StyleSheet.create({
     topButtonText: {
         color: '#1A3A91',
         fontWeight: '600',
-        fontSize: 14,
     },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
+    checkboxLabel: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1A3A91',
+    },
+    checkbox: {
+        width: 28,
+        height: 28,
+        borderWidth: 2,
+        borderColor: '#1A3A91',
+        borderRadius: 4,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    modalContainer: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        width: '80%',
-        elevation: 5,
-    },
-    modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    modalOption: {
-        paddingVertical: 10,
-    },
-    modalOptionText: {
-        fontSize: 16,
-        textAlign: 'center',
-    },
-    checkbox: {
-        width: 24,
-        height: 24,
-        borderWidth: 2,
-        borderColor: "#E5A83F", // Geelachtig
-        borderRadius: 4,
-        marginLeft: 12,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#fff", // Zorg dat het wit is als niet aangevinkt
-    },
     checkboxChecked: {
-        backgroundColor: "#E5A83F", // Gevulde checkbox als hij aangevinkt is
+        backgroundColor: '#1A3A91',
     },
     checkmark: {
-        color: "white",
-        fontWeight: "bold",
+        color: '#fff',
+        fontWeight: 'bold',
         fontSize: 18,
-        lineHeight: 18,
     },
-
 });

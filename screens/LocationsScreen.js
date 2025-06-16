@@ -8,51 +8,50 @@ export default function LocationsScreen({ navigation }) {
     //     const clearStorage = async () => {
     //         try {
     //             await AsyncStorage.clear();
-    //             console.log('✅ AsyncStorage is geleegd.');
+    //             console.log('✅ AsyncStorage is cleared.');
     //         } catch (e) {
-    //             console.error('❌ Fout bij legen van AsyncStorage:', e);
+    //             console.error('❌ Error clearing AsyncStorage:', e);
     //         }
     //     };
     //
     //     clearStorage();
     // }, []);
 
-
-    const [locatieData, setLocatieData] = useState({
-        favorieten: [],
-        mijnSpots: [],
-        wilIkHeen: [],
+    const [locationData, setLocationData] = useState({
+        favorites: [],
+        mySpots: [],
+        wantToGo: [],
         rotterdam: Array.from({ length: 7 }, (_, i) => ({
             id: 100 + i,
-            naam: 'Gemeentewater Rotterdam',
-            vereniging: 'HSV Groot Rotterdam',
+            name: 'Gemeentewater Rotterdam',
+            association: 'HSV Groot Rotterdam',
         })),
     });
 
     const [visibleSections, setVisibleSections] = useState({
-        favorieten: true,
-        mijnSpots: false,
-        wilIkHeen: false,
+        favorites: true,
+        mySpots: false,
+        wantToGo: false,
         rotterdam: true,
     });
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                const keys = ['favorieten', 'mijnSpots', 'wilIkHeen'];
+                const keys = ['favorites', 'mySpots', 'wantToGo'];
                 const entries = await Promise.all(
                     keys.map(async (key) => {
-                        const json = await AsyncStorage.getItem(`@locatie_${key}`);
+                        const json = await AsyncStorage.getItem(`@location_${key}`);
                         return [key, json ? JSON.parse(json) : []];
                     })
                 );
 
-                setLocatieData((prev) => ({
+                setLocationData((prev) => ({
                     ...prev,
                     ...Object.fromEntries(entries),
                 }));
             } catch (e) {
-                console.error("Fout bij laden van locaties:", e);
+                console.error("Error loading locations:", e);
             }
         };
 
@@ -65,12 +64,12 @@ export default function LocationsScreen({ navigation }) {
         setVisibleSections((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
-    const getAfbeelding = (filename) => {
+    const getImage = (filename) => {
         if (!filename) return null;
         switch (filename) {
             case "Kralingseplas.png":
                 return require("../images/Kralingseplas.png");
-            // voeg hier meer bestanden toe als je meerdere afbeeldingen gebruikt
+            // add more files here if you use more images
             default:
                 return null;
         }
@@ -81,11 +80,11 @@ export default function LocationsScreen({ navigation }) {
             <Pressable
                 key={spot.id}
                 style={styles.spotRow}
-                onPress={() => spot.screen && navigation.navigate(spot.screen)}
+                onPress={() => spot.screen && navigation.navigate('WaterInfo')}
             >
-                <Text style={styles.spotTitle}>{spot.naam}</Text>
-                {spot.afbeeldingen?.length > 0 && (
-                    <Image source={getAfbeelding(spot.afbeeldingen?.[0])} style={styles.image} />
+                <Text style={styles.spotTitle}>{spot.name}</Text>
+                {spot.images?.length > 0 && (
+                    <Image source={getImage(spot.images?.[0])} style={styles.image} />
                 )}
             </Pressable>
         ));
@@ -93,8 +92,8 @@ export default function LocationsScreen({ navigation }) {
     const renderWaterItems = (items) =>
         items.map((item) => (
             <View key={item.id} style={styles.waterItem}>
-                <Text style={styles.waterTitle}>{item.naam}</Text>
-                <Text style={styles.waterSubtitle}>{item.vereniging}</Text>
+                <Text style={styles.waterTitle}>{item.name}</Text>
+                <Text style={styles.waterSubtitle}>{item.association}</Text>
             </View>
         ));
 
@@ -102,33 +101,33 @@ export default function LocationsScreen({ navigation }) {
         <View style={styles.container}>
             <Text style={styles.title}>Locaties</Text>
 
-            {/* Favorieten */}
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorieten')}>
+            {/* Favorites */}
+            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorites')}>
                 <Text style={styles.sectionIcon}>❤️</Text>
                 <Text style={styles.sectionTitle}>Favorieten</Text>
-                <Text style={styles.arrow}>{visibleSections.favorieten ? '▲' : '▼'}</Text>
+                <Text style={styles.arrow}>{visibleSections.favorites ? '▲' : '▼'}</Text>
             </Pressable>
-            {visibleSections.favorieten && renderSpots(locatieData.favorieten)}
+            {visibleSections.favorites && renderSpots(locationData.favorites)}
 
-            {/* Mijn spots */}
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mijnSpots')}>
+            {/* My Spots */}
+            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mySpots')}>
                 <Text style={styles.sectionIcon}>⭐</Text>
                 <Text style={styles.sectionTitle}>Mijn spots</Text>
-                <Text style={styles.arrow}>{visibleSections.mijnSpots ? '▲' : '▼'}</Text>
+                <Text style={styles.arrow}>{visibleSections.mySpots ? '▲' : '▼'}</Text>
             </Pressable>
-            {visibleSections.mijnSpots && renderSpots(locatieData.mijnSpots)}
+            {visibleSections.mySpots && renderSpots(locationData.mySpots)}
 
-            {/* Wil ik heen */}
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wilIkHeen')}>
+            {/* Want To Go */}
+            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wantToGo')}>
                 <Text style={styles.sectionIcon}>🚩</Text>
                 <Text style={styles.sectionTitle}>Wil ik heen</Text>
-                <Text style={styles.arrow}>{visibleSections.wilIkHeen ? '▲' : '▼'}</Text>
+                <Text style={styles.arrow}>{visibleSections.wantToGo ? '▲' : '▼'}</Text>
             </Pressable>
-            {visibleSections.wilIkHeen && (
-                locatieData.wilIkHeen.length === 0 ? (
+            {visibleSections.wantToGo && (
+                locationData.wantToGo.length === 0 ? (
                     <Text style={styles.emptyText}>(Nog geen plekken toegevoegd)</Text>
                 ) : (
-                    renderSpots(locatieData.wilIkHeen)
+                    renderSpots(locationData.wantToGo)
                 )
             )}
 
@@ -138,7 +137,7 @@ export default function LocationsScreen({ navigation }) {
                 <Text style={styles.sectionTitle}>Rotterdam</Text>
                 <Text style={styles.arrow}>{visibleSections.rotterdam ? '▲' : '▼'}</Text>
             </Pressable>
-            {visibleSections.rotterdam && renderWaterItems(locatieData.rotterdam)}
+            {visibleSections.rotterdam && renderWaterItems(locationData.rotterdam)}
         </View>
     );
 }

@@ -26,6 +26,18 @@ function LocationsStackScreen() {
     );
 }
 
+const MapStack = createNativeStackNavigator();
+
+function MapStackScreen() {
+    return (
+        <MapStack.Navigator>
+            <MapStack.Screen name="MapMain" component={MapScreen} options={{ headerShown: false }} />
+            <MapStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} />
+        </MapStack.Navigator>
+    );
+}
+
+
 
 const Tab = createBottomTabNavigator()
 
@@ -85,7 +97,7 @@ export default function NavBar({navigation}) {
         >
             <Tab.Screen name="Profiel" component={ProfileScreen} />
             <Tab.Screen name="Camera" component={CameraScreen} />
-            <Tab.Screen name="Map" component={MapScreen} />
+            <Tab.Screen name="Map" component={MapStackScreen} />
             <Tab.Screen name="Locaties" component={LocationsStackScreen} />
         </Tab.Navigator>
     );
