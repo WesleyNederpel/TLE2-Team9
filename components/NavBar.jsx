@@ -5,6 +5,7 @@ import MapScreen from "../screens/MapScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import CameraScreen from "../screens/CameraScreen";
 import LocationsScreen from "../screens/LocationsScreen";
+import GalleryScreen from "../screens/GalleryScreen";
 
 const Tab = createBottomTabNavigator()
 
@@ -13,7 +14,8 @@ const getIconName = (routeName, focused) => {
         Profiel: focused ? 'person' : 'person-outline',
         Camera: focused ? 'camera' : 'camera-outline',
         Map: focused ? 'map' : 'map-outline',
-        Locaties: focused ? 'location' : 'location-outline'
+        Locaties: focused ? 'location' : 'location-outline',
+        Gallerij: focused ? 'images' : 'images-outline'
     }
 
     return icons[routeName];
@@ -22,10 +24,10 @@ const getIconName = (routeName, focused) => {
 export default function NavBar({navigation}) {
     return (
         <Tab.Navigator
-            screenOptions={({ route }) => ({
-                tabBarIcon: ({ focused, color }) => {
+            screenOptions={({route}) => ({
+                tabBarIcon: ({focused, color}) => {
                     const iconName = getIconName(route.name, focused);
-                    return <Ionicons name={iconName} size={24} color={color} />;
+                    return <Ionicons name={iconName} size={24} color={color}/>;
                 },
                 tabBarLabelStyle: styles.tabLabel,
                 tabBarStyle: styles.tabBar,
@@ -62,10 +64,11 @@ export default function NavBar({navigation}) {
                 )
             })}
         >
-            <Tab.Screen name="Profiel" component={ProfileScreen} />
-            <Tab.Screen name="Camera" component={CameraScreen} />
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Locaties" component={LocationsScreen} />
+            <Tab.Screen name="Camera" component={CameraScreen}/>
+            <Tab.Screen name="Gallerij" component={GalleryScreen}/>
+            <Tab.Screen name="Map" component={MapScreen}/>
+            <Tab.Screen name="Locaties" component={LocationsScreen}/>
+            <Tab.Screen name="Profiel" component={ProfileScreen}/>
         </Tab.Navigator>
     );
 }
