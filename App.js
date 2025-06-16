@@ -1,6 +1,6 @@
 import React from 'react';
-import {NavigationContainer} from "@react-navigation/native";
-import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NavBar from './components/NavBar';
 import SettingsScreen from "./screens/SettingsScreen";
 
@@ -11,7 +11,21 @@ export default function App() {
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Main" component={NavBar} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
+                <Stack.Screen
+                    name="Settings"
+                    component={SettingsScreen}
+                    options={{
+                        presentation: 'modal',
+                        gestureEnabled: true,
+                        gestureDirection: 'vertical',
+                        animation: 'slide_from_bottom',
+                        animationDuration: 200,
+                        // These options enhance the modal feel
+                        contentStyle: {
+                            backgroundColor: 'transparent',
+                        }
+                    }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
