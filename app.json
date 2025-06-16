@@ -18,9 +18,16 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Go_white.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0297b7"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.VisGO"
     },
     "web": {
       "favicon": "./assets/Go_white.png"
