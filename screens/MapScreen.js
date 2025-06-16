@@ -10,6 +10,8 @@ const MapScreen = () => {
     const [markerInfo, setMarkerInfo] = useState({ title: '', description: '', latitude: null, longitude: null });
     const [markers, setMarkers] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
+    // Nieuwe state om aan te geven of de gebruiker een locatie kiest op de kaart
+    const [isPickingLocation, setIsPickingLocation] = useState(false);
 
     const region = {
         latitude: 51.9225,
@@ -22,6 +24,7 @@ const MapScreen = () => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
+                // Gebruik Alert.alert in plaats van een directe console.log of onzichtbare melding
                 Alert.alert('Toegang geweigerd', 'Locatietoegang is nodig om uw positie te bepalen.');
                 return;
             }
@@ -36,7 +39,10 @@ const MapScreen = () => {
     };
 
     const handlePolygonPress = (feature) => {
-        setSelectedFeature(feature);
+        // Voorkom het openen van de watermodal als we een locatie aan het kiezen zijn
+        if (!isPickingLocation) {
+            setSelectedFeature(feature);
+        }
     };
 
     const isRiver = (feature) => feature?.properties?.water === 'river';
@@ -56,7 +62,23 @@ const MapScreen = () => {
                 strokeColor={strokeColor}
                 strokeWidth={1}
                 tappable={true}
-                onPress={() => handlePolygonPress(feature)}
+                // Aangepaste onPress handler voor Polygons
+                onPress={(event) => {
+                    if (isPickingLocation) {
+                        // Als we een locatie aan het kiezen zijn, behandel dit als een kaarttik
+                        const { latitude, longitude } = event.nativeEvent.coordinate;
+                        setMarkerInfo((prevInfo) => ({
+                            ...prevInfo,
+                            latitude: latitude,
+                            longitude: longitude,
+                        }));
+                        setIsPickingLocation(false); // Deactiveer de kies-modus
+                        setAddMarkerModalVisible(true); // Heropen de modal met de gekozen coördinaten
+                    } else {
+                        // Anders, open de waterinformatie modal
+                        handlePolygonPress(feature);
+                    }
+                }}
             />
         );
     };
@@ -95,6 +117,7 @@ const MapScreen = () => {
     };
 
     const openAddMarkerModal = () => {
+        // Initialiseer markerInfo met de huidige locatie bij het openen van de modal
         setMarkerInfo({
             title: '',
             description: '',
@@ -111,13 +134,40 @@ const MapScreen = () => {
             setAddMarkerModalVisible(false);
             setMarkerInfo({ title: '', description: '', latitude: null, longitude: null });
         } else {
+            // Gebruik Alert.alert voor feedback aan de gebruiker
             Alert.alert('Invoer ontbreekt', 'Vul Titel, Breedtegraad en Lengtegraad in voor de marker.');
+        }
+    };
+
+    // Nieuwe functie om de locatiemodus te starten
+    const startPickingLocation = () => {
+        setAddMarkerModalVisible(false); // Sluit de modal
+        setIsPickingLocation(true); // Activeer de kies-modus
+        // Optioneel: toon een tijdelijke melding aan de gebruiker
+        Alert.alert('Locatie Kiezen', 'Tik op de kaart om de marker locatie te kiezen.');
+    };
+
+    // Functie die wordt aangeroepen wanneer op de kaart wordt getikt (voor niet-polygon gebieden)
+    const handleMapPress = (event) => {
+        if (isPickingLocation) {
+            const { latitude, longitude } = event.nativeEvent.coordinate;
+            setMarkerInfo((prevInfo) => ({
+                ...prevInfo,
+                latitude: latitude,
+                longitude: longitude,
+            }));
+            setIsPickingLocation(false); // Deactiveer de kies-modus
+            setAddMarkerModalVisible(true); // Heropen de modal met de gekozen coördinaten
         }
     };
 
     return (
         <View style={styles.container}>
-            <MapView style={styles.map} initialRegion={region}>
+            <MapView
+                style={styles.map}
+                initialRegion={region}
+                onPress={handleMapPress} // Voeg de onPress handler toe aan MapView
+            >
                 {renderPolygons()}
                 {markers.map((m, i) => (
                     <Marker
@@ -133,6 +183,7 @@ const MapScreen = () => {
                 <Text style={styles.roundButtonText}>+</Text>
             </TouchableOpacity>
 
+            {/* Modal voor waterinformatie */}
             <Modal
                 visible={!!selectedFeature}
                 transparent
@@ -177,6 +228,7 @@ const MapScreen = () => {
                 </View>
             </Modal>
 
+            {/* Modal voor marker toevoegen */}
             <Modal visible={addMarkerModalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
@@ -195,18 +247,28 @@ const MapScreen = () => {
                         />
                         <TextInput
                             style={styles.input}
-                            placeholder="Lengtegraad"
-                            keyboardType="numeric"
-                            value={markerInfo.longitude != null ? markerInfo.longitude.toString() : ''}
-                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, longitude: parseFloat(text) || null })}
-                        />
-                        <TextInput
-                            style={styles.input}
                             placeholder="Breedtegraad"
                             keyboardType="numeric"
                             value={markerInfo.latitude != null ? markerInfo.latitude.toString() : ''}
                             onChangeText={(text) => setMarkerInfo({ ...markerInfo, latitude: parseFloat(text) || null })}
+                            editable={!isPickingLocation} // Maak niet bewerkbaar tijdens het kiezen
                         />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Lengtegraad"
+                            keyboardType="numeric"
+                            value={markerInfo.longitude != null ? markerInfo.longitude.toString() : ''}
+                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, longitude: parseFloat(text) || null })}
+                            editable={!isPickingLocation} // Maak niet bewerkbaar tijdens het kiezen
+                        />
+
+                        {/* Nieuwe knop om locatie op kaart te kiezen */}
+                        <TouchableOpacity
+                            style={[styles.button, { backgroundColor: '#4CAF50', marginBottom: 10 }]}
+                            onPress={startPickingLocation}
+                        >
+                            <Text style={styles.buttonText}>Kies Locatie op Kaart</Text>
+                        </TouchableOpacity>
 
                         <TouchableOpacity style={styles.button} onPress={addMarker}>
                             <Text style={styles.buttonText}>Toevoegen</Text>
@@ -220,6 +282,13 @@ const MapScreen = () => {
                     </View>
                 </View>
             </Modal>
+
+            {/* Visuele cue wanneer in picking mode */}
+            {isPickingLocation && (
+                <View style={styles.pickingLocationOverlay} pointerEvents="none">
+                    <Text style={styles.pickingLocationText}>Tik op de kaart...</Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -281,6 +350,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+    pickingLocationOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    pickingLocationText: {
+        color: 'white',
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
 });
 
 export default MapScreen;
