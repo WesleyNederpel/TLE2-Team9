@@ -20,7 +20,6 @@ export default function App() {
                         gestureDirection: 'vertical',
                         animation: 'slide_from_bottom',
                         animationDuration: 200,
-                        // These options enhance the modal feel
                         contentStyle: {
                             backgroundColor: 'transparent',
                         }
