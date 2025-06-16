@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Modal, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Modal, Text, TextInput, TouchableOpacity, Alert, TouchableWithoutFeedback } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
@@ -7,6 +7,7 @@ import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
 const MapScreen = () => {
     const [selectedFeature, setSelectedFeature] = useState(null);
     const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
+    const [addMenuModalVisible, setAddMenuModalVisible] = useState(false); // State voor het nieuwe menu
     const [markerInfo, setMarkerInfo] = useState({ title: '', description: '', latitude: null, longitude: null });
     const [markers, setMarkers] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
@@ -24,7 +25,6 @@ const MapScreen = () => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                // Gebruik Alert.alert in plaats van een directe console.log of onzichtbare melding
                 Alert.alert('Toegang geweigerd', 'Locatietoegang is nodig om uw positie te bepalen.');
                 return;
             }
@@ -116,6 +116,11 @@ const MapScreen = () => {
         });
     };
 
+    // Functie om het add-menu te openen/sluiten (toggle)
+    const toggleAddMenuModal = () => {
+        setAddMenuModalVisible(!addMenuModalVisible);
+    };
+
     const openAddMarkerModal = () => {
         // Initialiseer markerInfo met de huidige locatie bij het openen van de modal
         setMarkerInfo({
@@ -125,6 +130,7 @@ const MapScreen = () => {
             longitude: currentLocation?.coords.longitude ?? null,
         });
         setAddMarkerModalVisible(true);
+        setAddMenuModalVisible(false); // Sluit het add-menu als de marker modal opent
     };
 
     const addMarker = () => {
@@ -134,7 +140,6 @@ const MapScreen = () => {
             setAddMarkerModalVisible(false);
             setMarkerInfo({ title: '', description: '', latitude: null, longitude: null });
         } else {
-            // Gebruik Alert.alert voor feedback aan de gebruiker
             Alert.alert('Invoer ontbreekt', 'Vul Titel, Breedtegraad en Lengtegraad in voor de marker.');
         }
     };
@@ -179,7 +184,7 @@ const MapScreen = () => {
                 ))}
             </MapView>
 
-            <TouchableOpacity style={styles.roundButton} onPress={openAddMarkerModal}>
+            <TouchableOpacity style={styles.roundButton} onPress={toggleAddMenuModal}>
                 <Text style={styles.roundButtonText}>+</Text>
             </TouchableOpacity>
 
@@ -228,7 +233,42 @@ const MapScreen = () => {
                 </View>
             </Modal>
 
-            {/* Modal voor marker toevoegen */}
+            {/* Modal voor Spot/Vis toevoegen menu */}
+            <Modal
+                visible={addMenuModalVisible}
+                transparent
+                animationType="fade" // Gebruik fade voor een vloeiendere overgang van het menu
+                onRequestClose={toggleAddMenuModal} // Sluit menu bij back-knop of buiten tikken
+            >
+                {/* TouchableWithoutFeedback om tikken buiten de knoppen te detecteren en het menu te sluiten */}
+                <TouchableWithoutFeedback onPress={toggleAddMenuModal}>
+                    <View style={styles.menuModalOverlay}>
+                        <View style={styles.addMenuContent}>
+                            <TouchableOpacity
+                                style={styles.menuButton}
+                                onPress={() => {
+                                    setAddMenuModalVisible(false); // Sluit het menu
+                                    openAddMarkerModal(); // Open vervolgens de marker modal
+                                }}
+                            >
+                                <Text style={styles.menuButtonText}>Spot Toevoegen</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.menuButton}
+                                onPress={() => {
+                                    setAddMenuModalVisible(false); // Sluit het menu
+                                    // Geen nieuwe modal voor "Vis Toevoegen" zoals gevraagd
+                                    Alert.alert('Info', 'Functionaliteit voor Vis Toevoegen nog niet geïmplementeerd.');
+                                }}
+                            >
+                                <Text style={styles.menuButtonText}>Vis Toevoegen</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
+
+            {/* Modal voor marker informatie invoeren */}
             <Modal visible={addMarkerModalVisible} transparent animationType="slide">
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
@@ -364,6 +404,36 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    // Nieuwe stijlen voor het add-menu
+    menuModalOverlay: {
+        flex: 1,
+        justifyContent: 'flex-end', // Zorgt ervoor dat de inhoud onderaan staat
+        alignItems: 'flex-end',   // Zorgt ervoor dat de inhoud rechts staat
+        backgroundColor: 'rgba(0,0,0,0)', // Transparante achtergrond om tikken door te laten
+    },
+    addMenuContent: {
+        marginBottom: 110, // Ruimte boven de '+' knop (roundButton bottom 40 + height 60 + extra marge)
+        marginRight: 20,  // Lijn uit met de rechterkant van de '+' knop
+        alignItems: 'flex-end', // Zorgt ervoor dat de knoppen rechts uitlijnen
+    },
+    menuButton: {
+        backgroundColor: '#0096b2', // Achtergrondkleur van de knoppen
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderRadius: 20, // Afgeronde hoeken voor de knoppen
+        marginBottom: 10, // Ruimte tussen de knoppen
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+    },
+    menuButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+        textAlign: 'right',
     },
 });
 
