@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, StyleSheet, Text, View, Platform, TouchableOpacity } from 'react-native';
 import { CameraView } from 'expo-camera';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,11 +34,10 @@ export default function CameraScreen({ navigation }) {
             try {
                 setIsTakingPicture(true);
                 const photo = await cameraRef.current.takePictureAsync({
-                    quality: 1.0,
-                    base64: true,
+                    quality: 1.0, // high quality image
+                    base64: false, // don't include base64 to save space
                 });
 
-                // Save photo to AsyncStorage
                 await savePhotoToStorage(photo);
                 console.log('Photo taken and saved to AsyncStorage');
 
@@ -52,22 +51,17 @@ export default function CameraScreen({ navigation }) {
 
     const savePhotoToStorage = async (photo) => {
         try {
-            // Create a unique key for the photo based on timestamp
             const photoKey = `photo_${new Date().getTime()}`;
 
-            // Save the photo URI and data to AsyncStorage
             const photoData = {
                 uri: photo.uri,
-                base64: photo.base64,
                 width: photo.width,
                 height: photo.height,
                 timestamp: new Date().toISOString()
             };
 
-            // Save the photo data as a JSON string
             await AsyncStorage.setItem(photoKey, JSON.stringify(photoData));
 
-            // Optionally, save a list of all photo keys for easier access later
             const savedPhotoKeys = await AsyncStorage.getItem('savedPhotoKeys');
             const photoKeys = savedPhotoKeys ? JSON.parse(savedPhotoKeys) : [];
             photoKeys.push(photoKey);
@@ -77,6 +71,7 @@ export default function CameraScreen({ navigation }) {
             throw error;
         }
     };
+
 
     if (hasPermission === null) {
         return <View style={styles.container}><Text>Requesting camera permission...</Text></View>;

@@ -15,11 +15,13 @@ export default function GalleryScreen() {
         loadPhotos();
     }, []);
 
+
+
     // Reload photos whenever the screen comes into focus
     useFocusEffect(
         useCallback(() => {
             loadPhotos();
-            return () => {}; // cleanup function
+            return () => { }; // cleanup function
         }, [])
     );
 
@@ -157,7 +159,7 @@ export default function GalleryScreen() {
                 <SafeAreaView style={styles.modalContainer}>
                     <StatusBar backgroundColor="rgba(0,0,0,0.9)" barStyle="light-content" />
                     <View style={styles.modalHeader}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.closeButton}
                             onPress={closePhotoModal}
                         >
