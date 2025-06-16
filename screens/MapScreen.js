@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Button, Modal, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location'; // Importeer expo-location
+import React, { useState } from 'react';
+import { StyleSheet, View, Modal, Text, TouchableOpacity } from 'react-native';
+import MapView, { Polygon } from 'react-native-maps';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
 
 const MapScreen = () => {
+    const [selectedFeature, setSelectedFeature] = useState(null);
+
     // State om de zichtbaarheid van de modal te beheren
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -45,33 +50,72 @@ const MapScreen = () => {
     // Functie om GeoJSON-coördinaten om te zetten van [lng, lat] naar {latitude, longitude}
     const convertCoords = (coordsArray) =>
         coordsArray.map((coord) => ({
+    const convertCoordsList = (coordsArray) => {
+        if (!coordsArray || coordsArray.length === 0) return [];
+        return coordsArray.map((coord) => ({
             latitude: coord[1],
             longitude: coord[0],
         }));
+    };
+
+    const handlePolygonPress = (feature) => {
+        setSelectedFeature(feature);
+    };
 
     // Functie om polygonen te renderen voor waterlichamen uit de GeoJSON-data
+    const isRiver = (feature) => feature?.properties?.water === 'river';
+    const isHarbour = (feature) => feature?.properties?.water === 'harbour';
+
     const renderPolygons = () => {
-        if (!waterGeoJSON || !waterGeoJSON.features) {
-            return null;
-        }
+        if (!waterGeoJSON?.features) return null;
 
         return waterGeoJSON.features.map((feature, index) => {
-            const { type } = feature.geometry;
+            const { type, coordinates } = feature.geometry;
+            const props = feature.properties || {};
+
+            let fillColor = 'rgba(0, 150, 255, 0.3)';
+            let strokeColor = 'rgba(0, 150, 255, 0.8)';
+
+            if (props.water === 'river') {
+                fillColor = 'rgba(128, 0, 128, 0.4)';
+                strokeColor = 'rgba(128, 0, 128, 0.8)';
+            }
+
+            if (props.water === 'harbour') {
+                fillColor = 'rgba(128, 128, 128, 0.5)';
+                strokeColor = 'rgba(105, 105, 105, 0.9)';
+            }
+
+            if (props.name === 'Kralingse Plas') {
+                fillColor = 'rgba(255, 165, 0, 0.6)';
+                strokeColor = 'rgba(255, 165, 0, 0.8)';
+            }
 
             // Als de feature een Polygon is, gebruik dan de eerste ring om de vorm te tekenen
             if (type === 'Polygon') {
                 const coords = convertCoords(feature.geometry.coordinates[0]);
+            const renderSinglePolygon = (polygonCoordsArrays, keySuffix) => {
+                const outerCoordinates = convertCoordsList(polygonCoordsArrays[0]);
+                const innerHoles = polygonCoordsArrays.slice(1).map(convertCoordsList);
+
+                if (outerCoordinates.length === 0) return null;
+
                 return (
                     <Polygon
-                        key={index}
-                        coordinates={coords}
-                        fillColor="rgba(0, 150, 255, 0.3)"
-                        strokeColor="rgba(0, 150, 255, 0.8)"
+                        key={`${index}-${keySuffix}`}
+                        coordinates={outerCoordinates}
+                        holes={innerHoles.length > 0 ? innerHoles : undefined}
+                        fillColor={fillColor}
+                        strokeWidth={1}
+                        strokeColor={strokeColor}
+                        tappable={true}
+                        onPress={() => handlePolygonPress(feature)}
                     />
                 );
-            }
+            };
 
             // Als de feature een MultiPolygon is, itereer dan over elke polygoonsectie
+            if (type === 'Polygon') return renderSinglePolygon(coordinates, 'single');
             if (type === 'MultiPolygon') {
                 return feature.geometry.coordinates.map((polygonCoords, polyIndex) => {
                     const coords = convertCoords(polygonCoords[0]);
@@ -84,6 +128,9 @@ const MapScreen = () => {
                         />
                     );
                 });
+                return coordinates.map((polygonCoords, polyIndex) =>
+                    renderSinglePolygon(polygonCoords, `multi-${polyIndex}`)
+                );
             }
 
             return null;
@@ -121,6 +168,7 @@ const MapScreen = () => {
 
     return (
         <View style={styles.container}>
+            <MapView style={styles.map} initialRegion={region} mapType={'standard'}>
             {/* Kaartcomponent */}
             <MapView
                 style={styles.map}
@@ -140,6 +188,51 @@ const MapScreen = () => {
                 ))}
 
             </MapView>
+
+            {/* Modal */}
+            <Modal
+                visible={!!selectedFeature}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setSelectedFeature(null)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Waterinfo</Text>
+
+                        {isHarbour(selectedFeature) ? (
+                            <Text style={styles.modalText}>🚫 No fish zone – havengebied</Text>
+                        ) : selectedFeature?.properties ? (
+                            <>
+                                {Object.entries(selectedFeature.properties).map(([key, value]) => (
+                                    <Text key={key} style={styles.modalText}>
+                                        <Text style={{ fontWeight: 'bold' }}>{key}: </Text>{value?.toString()}
+                                    </Text>
+                                ))}
+
+                                {isRiver(selectedFeature) ? (
+                                    <Text style={[styles.modalText, { marginTop: 10 }]}>
+                                        🎣 Toegankelijk met <Text style={{ fontWeight: 'bold' }}>VISpas</Text> of <Text style={{ fontWeight: 'bold' }}>Kleine VISpas</Text>.
+                                    </Text>
+                                ) : (
+                                    <View style={{ marginTop: 10 }}>
+                                        <Text style={styles.modalText}>🎣 VISpas van:</Text>
+                                        <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                                        <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                                        <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                                    </View>
+                                )}
+                            </>
+                        ) : (
+                            <Text style={styles.modalText}>Geen eigenschappen beschikbaar</Text>
+                        )}
+
+                        <TouchableOpacity onPress={() => setSelectedFeature(null)} style={styles.closeButton}>
+                            <Text style={styles.closeButtonText}>Sluiten</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Ronde knop om de modal voor markerinvoer te openen */}
             <TouchableOpacity
@@ -265,6 +358,37 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        width: '80%',
+        maxHeight: '70%',
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalText: {
+        marginBottom: 5,
+    },
+    closeButton: {
+        marginTop: 20,
+        backgroundColor: '#007AFF',
+        paddingVertical: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    closeButtonText: {
         color: 'white',
         fontWeight: 'bold',
     },
