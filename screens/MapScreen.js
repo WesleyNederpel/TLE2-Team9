@@ -42,7 +42,6 @@ const MapScreen = () => {
             // Haal de huidige locatie op
             let location = await Location.getCurrentPositionAsync({});
             setCurrentLocation(location); // Sla de opgehaalde locatie op in de state
-            console.log('Huidige locatie:', location.coords); // Log de locatie naar de console
         })();
     }, []); // De lege afhankelijkheidsarray zorgt ervoor dat deze hook slechts één keer wordt uitgevoerd (bij het mounten)
 
@@ -315,7 +314,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semitransparante achtergrond
     },
     modalContent: {
         backgroundColor: 'white',
