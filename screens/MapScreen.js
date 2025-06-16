@@ -13,11 +13,8 @@ const MapScreen = () => {
         longitudeDelta: 0.1,
     };
 
-    // Deze functie converteert een enkele lijst van [longitude, latitude] naar { latitude, longitude } objecten
     const convertCoordsList = (coordsArray) => {
-        if (!coordsArray || coordsArray.length === 0) {
-            return []; // Zorg ervoor dat een lege array wordt teruggegeven bij null/lege input
-        }
+        if (!coordsArray || coordsArray.length === 0) return [];
         return coordsArray.map((coord) => ({
             latitude: coord[1],
             longitude: coord[0],
@@ -28,35 +25,43 @@ const MapScreen = () => {
         setSelectedFeature(feature);
     };
 
+    const isHarbour = (feature) => feature?.properties?.water === 'harbour';
+
     const renderPolygons = () => {
-        if (!waterGeoJSON || !waterGeoJSON.features) {
-            return null;
-        }
+        if (!waterGeoJSON || !waterGeoJSON.features) return null;
 
         return waterGeoJSON.features.map((feature, index) => {
             const { type, coordinates } = feature.geometry;
             const props = feature.properties || {};
 
-            const fillColor = 'rgba(0, 150, 255, 0.3)';
-            const strokeColor = 'rgba(0, 150, 255, 0.8)';
+            let fillColor = 'rgba(0, 150, 255, 0.3)';
+            let strokeColor = 'rgba(0, 150, 255, 0.8)';
 
-            // Functie om een individuele Polygon te renderen, inclusief gaten
+            if (props.water === 'river') {
+                fillColor = 'rgba(128, 0, 128, 0.4)'; // paars
+                strokeColor = 'rgba(128, 0, 128, 0.8)';
+            }
+
+            if (props.water === 'harbour') {
+                fillColor = 'rgba(128, 128, 128, 0.5)'; // grijs
+                strokeColor = 'rgba(105, 105, 105, 0.9)';
+            }
+
+            if (props.name === 'Kralingse Plas') {
+                fillColor = 'rgba(255, 165, 0, 0.6)'; // oranje
+                strokeColor = 'rgba(255, 165, 0, 0.8)';
+            }
+
             const renderSinglePolygon = (polygonCoordsArrays, keySuffix) => {
-                // De eerste array is de buitenrand
                 const outerCoordinates = convertCoordsList(polygonCoordsArrays[0]);
-                // Alle volgende arrays zijn de gaten
                 const innerHoles = polygonCoordsArrays.slice(1).map(convertCoordsList);
-
-                // Als de buitenste coördinaten leeg zijn, render dan niets om fouten te voorkomen
-                if (outerCoordinates.length === 0) {
-                    return null;
-                }
+                if (outerCoordinates.length === 0) return null;
 
                 return (
                     <Polygon
-                        key={`${index}-${keySuffix}`} // Gebruik een unieke key
+                        key={`${index}-${keySuffix}`}
                         coordinates={outerCoordinates}
-                        holes={innerHoles.length > 0 ? innerHoles : undefined} // Geef `holes` alleen mee als er daadwerkelijk gaten zijn
+                        holes={innerHoles.length > 0 ? innerHoles : undefined}
                         fillColor={fillColor}
                         strokeWidth={1}
                         strokeColor={strokeColor}
@@ -66,16 +71,11 @@ const MapScreen = () => {
                 );
             };
 
-
             if (type === 'Polygon') {
-                // Voor een enkel Polygon, geef de volledige `coordinates` array door
-                // die de buitenrand en eventuele gaten bevat
                 return renderSinglePolygon(coordinates, 'single');
             }
 
             if (type === 'MultiPolygon') {
-                // Voor een MultiPolygon, loop over elke individuele polygoon
-                // en render deze met de `renderSinglePolygon` helper
                 return coordinates.map((polygonCoords, polyIndex) =>
                     renderSinglePolygon(polygonCoords, `multi-${polyIndex}`)
                 );
@@ -87,14 +87,14 @@ const MapScreen = () => {
 
     return (
         <View style={styles.container}>
-            <MapView style={styles.map} initialRegion={region}
-                //om satellietbeelden te gebruiken, vervang 'standard' door 'satellite'
+            <MapView
+                style={styles.map}
+                initialRegion={region}
                 mapType={'standard'}
             >
                 {renderPolygons()}
             </MapView>
 
-            {/* Modal met info over waterlichaam */}
             <Modal
                 visible={!!selectedFeature}
                 transparent={true}
@@ -104,7 +104,10 @@ const MapScreen = () => {
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Waterinfo</Text>
-                        {selectedFeature?.properties ? (
+
+                        {isHarbour(selectedFeature) ? (
+                            <Text style={styles.modalText}> No fish zone – havengebied</Text>
+                        ) : selectedFeature?.properties ? (
                             <>
                                 {Object.entries(selectedFeature.properties).map(([key, value]) => (
                                     <Text key={key} style={styles.modalText}>
@@ -115,6 +118,7 @@ const MapScreen = () => {
                         ) : (
                             <Text style={styles.modalText}>Geen eigenschappen beschikbaar</Text>
                         )}
+
                         <TouchableOpacity onPress={() => setSelectedFeature(null)} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>Sluiten</Text>
                         </TouchableOpacity>
@@ -134,7 +138,6 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         justifyContent: 'center',
         alignItems: 'center',
     },
