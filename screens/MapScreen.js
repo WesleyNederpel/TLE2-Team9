@@ -25,10 +25,11 @@ const MapScreen = () => {
         setSelectedFeature(feature);
     };
 
+    const isRiver = (feature) => feature?.properties?.water === 'river';
     const isHarbour = (feature) => feature?.properties?.water === 'harbour';
 
     const renderPolygons = () => {
-        if (!waterGeoJSON || !waterGeoJSON.features) return null;
+        if (!waterGeoJSON?.features) return null;
 
         return waterGeoJSON.features.map((feature, index) => {
             const { type, coordinates } = feature.geometry;
@@ -38,23 +39,24 @@ const MapScreen = () => {
             let strokeColor = 'rgba(0, 150, 255, 0.8)';
 
             if (props.water === 'river') {
-                fillColor = 'rgba(128, 0, 128, 0.4)'; // paars
+                fillColor = 'rgba(128, 0, 128, 0.4)';
                 strokeColor = 'rgba(128, 0, 128, 0.8)';
             }
 
             if (props.water === 'harbour') {
-                fillColor = 'rgba(128, 128, 128, 0.5)'; // grijs
+                fillColor = 'rgba(128, 128, 128, 0.5)';
                 strokeColor = 'rgba(105, 105, 105, 0.9)';
             }
 
             if (props.name === 'Kralingse Plas') {
-                fillColor = 'rgba(255, 165, 0, 0.6)'; // oranje
+                fillColor = 'rgba(255, 165, 0, 0.6)';
                 strokeColor = 'rgba(255, 165, 0, 0.8)';
             }
 
             const renderSinglePolygon = (polygonCoordsArrays, keySuffix) => {
                 const outerCoordinates = convertCoordsList(polygonCoordsArrays[0]);
                 const innerHoles = polygonCoordsArrays.slice(1).map(convertCoordsList);
+
                 if (outerCoordinates.length === 0) return null;
 
                 return (
@@ -71,10 +73,7 @@ const MapScreen = () => {
                 );
             };
 
-            if (type === 'Polygon') {
-                return renderSinglePolygon(coordinates, 'single');
-            }
-
+            if (type === 'Polygon') return renderSinglePolygon(coordinates, 'single');
             if (type === 'MultiPolygon') {
                 return coordinates.map((polygonCoords, polyIndex) =>
                     renderSinglePolygon(polygonCoords, `multi-${polyIndex}`)
@@ -87,14 +86,11 @@ const MapScreen = () => {
 
     return (
         <View style={styles.container}>
-            <MapView
-                style={styles.map}
-                initialRegion={region}
-                mapType={'standard'}
-            >
+            <MapView style={styles.map} initialRegion={region} mapType={'standard'}>
                 {renderPolygons()}
             </MapView>
 
+            {/* Modal */}
             <Modal
                 visible={!!selectedFeature}
                 transparent={true}
@@ -106,7 +102,7 @@ const MapScreen = () => {
                         <Text style={styles.modalTitle}>Waterinfo</Text>
 
                         {isHarbour(selectedFeature) ? (
-                            <Text style={styles.modalText}> No fish zone – havengebied</Text>
+                            <Text style={styles.modalText}>🚫 No fish zone – havengebied</Text>
                         ) : selectedFeature?.properties ? (
                             <>
                                 {Object.entries(selectedFeature.properties).map(([key, value]) => (
@@ -114,6 +110,19 @@ const MapScreen = () => {
                                         <Text style={{ fontWeight: 'bold' }}>{key}: </Text>{value?.toString()}
                                     </Text>
                                 ))}
+
+                                {isRiver(selectedFeature) ? (
+                                    <Text style={[styles.modalText, { marginTop: 10 }]}>
+                                        🎣 Toegankelijk met <Text style={{ fontWeight: 'bold' }}>VISpas</Text> of <Text style={{ fontWeight: 'bold' }}>Kleine VISpas</Text>.
+                                    </Text>
+                                ) : (
+                                    <View style={{ marginTop: 10 }}>
+                                        <Text style={styles.modalText}>🎣 VISpas van:</Text>
+                                        <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                                        <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                                        <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                                    </View>
+                                )}
                             </>
                         ) : (
                             <Text style={styles.modalText}>Geen eigenschappen beschikbaar</Text>
@@ -138,6 +147,7 @@ const styles = StyleSheet.create({
     },
     modalOverlay: {
         flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
         justifyContent: 'center',
         alignItems: 'center',
     },
