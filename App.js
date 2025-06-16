@@ -16,6 +16,7 @@ export default function App() {
                     component={NavBar}
                     options={{ headerShown: false }}
                 />
+                <Stack.Screen name={"Settings"} component={SettingsScreen}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
