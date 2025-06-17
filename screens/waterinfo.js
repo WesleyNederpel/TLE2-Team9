@@ -1,36 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import waters from "../data/waters.json"; // Zorg dat dit JSON-bestand bestaat
+import { useNavigation } from '@react-navigation/native'; // Importeer useNavigation
+import waters from "../data/waters.json";
+import fishesData from "../assets/fish_data_of_the_netherlands.json"; // Importeer het nieuwe fishes.json bestand
 
 const getImage = (name) => {
     const map = {
         "Kralingseplas": require("../images/Kralingseplas.png"),
         "Wijnhaven": require("../images/Wijnhaven.png"),
-        "Bergse Voorplas": require("../images/BergseVoorplas.png"),
+        "BergseVoorplas": require("../images/BergseVoorplas.png"),
         "Oudehaven": require("../images/Oudehaven.png"),
         "Haringvliet": require("../images/Haringvliet.png"),
         "Boerengat": require("../images/Boerengat.png"),
         "Zevenhuizerplas": require("../images/Zevenhuizerplas.png"),
 
+        // Visafbeeldingen (zorg dat deze namen overeenkomen met je JSON en knoppen)
         "snoek": require("../images/snoek.png"),
         "baars": require("../images/baars.png"),
         "karper": require("../images/karper.png"),
         "brasem": require("../images/brasem.png"),
         "snoekbaars": require("../images/snoekbaars.png"),
+        "meerval": require("../images/meerval.png"), // Zorg dat deze afbeeldingen bestaan
+        "zalm": require("../images/zalm.png"),     // Zorg dat deze afbeeldingen bestaan
+        "zeelt": require("../images/zalm.png"),   // Zorg dat deze afbeeldingen bestaan
     };
 
-    return map[name] || require("../images/Kralingseplas.png"); // fallback
+    return map[name.toLowerCase()] || require("../images/Kralingseplas.png"); // fallback
 };
 
-
 export default function WaterInfo({ route }) {
+    const navigation = useNavigation(); // Initialiseer navigation
     const waterName = route?.params?.waterName || "Onbekend";
 
     const location = waters.find(
         (w) => w.name.trim().toLowerCase() === waterName.trim().toLowerCase()
     );
-
 
     const [modalVisible, setModalVisible] = useState(false);
     const [checkedItems, setCheckedItems] = useState({
@@ -78,6 +83,21 @@ export default function WaterInfo({ route }) {
             }));
         } catch (e) {
             console.error("Error saving toggle:", e);
+        }
+    };
+
+    // Functie om naar FishScreen te navigeren
+    const handleFishPress = (fishNameInList) => {
+        // Zoek de volledige visdata in fishesData
+        const fishDetails = fishesData.find(
+            (f) => f.naam.trim().toLowerCase() === fishNameInList.trim().toLowerCase()
+        );
+
+        if (fishDetails) {
+            navigation.navigate('FishScreen', { fish: fishDetails });
+        } else {
+            console.warn(`Visdetails voor "${fishNameInList}" niet gevonden.`);
+            // Optioneel: toon een alert aan de gebruiker
         }
     };
 
@@ -139,6 +159,7 @@ export default function WaterInfo({ route }) {
                     Vissen {location.name}
                 </Text>
 
+                {/* Hier passen we de Pressable toe op elk vis-item */}
                 {location.fishTypes.map((fish, index) => {
                     const isEven = index % 2 === 0;
                     return (
@@ -148,6 +169,7 @@ export default function WaterInfo({ route }) {
                                 styles.fishItem,
                                 isEven ? styles.fishItemDefault : styles.fishItemSelected,
                             ]}
+                            onPress={() => handleFishPress(fish.name)} // Roep handleFishPress aan
                         >
                             {isEven ? (
                                 <>

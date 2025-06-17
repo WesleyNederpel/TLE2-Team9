@@ -5,9 +5,21 @@
     "description": "De Kralingse Plas is een populair recreatiegebied in Rotterdam...",
     "image": "Kralingseplas",
     "fishTypes": [
-      { "id": "1", "name": "Snoek", "image": "snoek.png" },
-      { "id": "2", "name": "Baars", "image": "baars.png" },
-      { "id": "3", "name": "Karpers", "image": "karper.png" }
+      {
+        "id": "1",
+        "name": "Snoek",
+        "image": "snoek"
+      },
+      {
+        "id": "2",
+        "name": "Baars",
+        "image": "baars"
+      },
+      {
+        "id": "3",
+        "name": "Karpers",
+        "image": "karper"
+      }
     ]
   },
   {
@@ -16,8 +28,16 @@
     "description": "Een prachtig watergebied vlakbij Leiden met veel vismogelijkheden...",
     "image": "Wijnhaven",
     "fishTypes": [
-      { "id": "1", "name": "Snoek", "image": "snoek.png" },
-      { "id": "2", "name": "Brasem", "image": "brasem.png" }
+      {
+        "id": "1",
+        "name": "Snoek",
+        "image": "snoek"
+      },
+      {
+        "id": "2",
+        "name": "Brasem",
+        "image": "brasem"
+      }
     ]
   },
   {
@@ -26,8 +46,16 @@
     "description": "Een natuurgebied met veel biodiversiteit en vissoorten...",
     "image": "BergseVoorplas",
     "fishTypes": [
-      { "id": "1", "name": "Karper", "image": "karper.png" },
-      { "id": "2", "name": "Zeelt", "image": "zeelt.png" }
+      {
+        "id": "1",
+        "name": "Karper",
+        "image": "karper"
+      },
+      {
+        "id": "2",
+        "name": "Zeelt",
+        "image": "zeelt"
+      }
     ]
   },
   {
@@ -36,8 +64,16 @@
     "description": "Populair bij sportvissers, met mooie stekken langs de randen...",
     "image": "Oudehaven",
     "fishTypes": [
-      { "id": "1", "name": "Snoekbaars", "image": "snoekbaars.png" },
-      { "id": "2", "name": "Baars", "image": "baars.png" }
+      {
+        "id": "1",
+        "name": "Snoekbaars",
+        "image": "snoekbaars"
+      },
+      {
+        "id": "2",
+        "name": "Baars",
+        "image": "baars"
+      }
     ]
   },
   {
@@ -46,8 +82,16 @@
     "description": "Rustige plas in de buurt van Rotterdam Noord...",
     "image": "HaringVliet",
     "fishTypes": [
-      { "id": "1", "name": "Karper", "image": "karper.png" },
-      { "id": "2", "name": "Snoek", "image": "snoek.png" }
+      {
+        "id": "1",
+        "name": "Karper",
+        "image": "karper"
+      },
+      {
+        "id": "2",
+        "name": "Snoek",
+        "image": "snoek"
+      }
     ]
   },
   {
@@ -56,8 +100,16 @@
     "description": "Rustige plas in de buurt van Rotterdam Noord...",
     "image": "Zevenhuizerplas",
     "fishTypes": [
-      { "id": "1", "name": "Karper", "image": "karper.png" },
-      { "id": "2", "name": "Snoek", "image": "snoek.png" }
+      {
+        "id": "1",
+        "name": "Karper",
+        "image": "karper"
+      },
+      {
+        "id": "2",
+        "name": "Snoek",
+        "image": "snoek"
+      }
     ]
   }
 ]
