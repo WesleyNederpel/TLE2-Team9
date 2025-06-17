@@ -3,8 +3,14 @@
     "naam": "Snoek",
     "aas": "Dode vis, spinnerbait, plug",
     "hengeltype": "Spinhengel, jerkbaithengel",
-    "lengte_cm": { "min": 40, "max": 130 },
-    "gewicht_kg": { "min": 1.5, "max": 18 },
+    "lengte_cm": {
+      "min": 40,
+      "max": 130
+    },
+    "gewicht_kg": {
+      "min": 1.5,
+      "max": 18
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Herfst, Winter",
@@ -14,8 +20,14 @@
     "naam": "Karper",
     "aas": "Boilies, mais, brood",
     "hengeltype": "Karperhengel",
-    "lengte_cm": { "min": 30, "max": 100 },
-    "gewicht_kg": { "min": 2, "max": 25 },
+    "lengte_cm": {
+      "min": 30,
+      "max": 100
+    },
+    "gewicht_kg": {
+      "min": 2,
+      "max": 25
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Hoog",
     "seizoen": "Lente, Zomer",
@@ -25,8 +37,14 @@
     "naam": "Forel",
     "aas": "Worm, powerbait, kunstvlieg",
     "hengeltype": "Vliegvishengel, lichte spinhengel",
-    "lengte_cm": { "min": 20, "max": 60 },
-    "gewicht_kg": { "min": 0.4, "max": 3 },
+    "lengte_cm": {
+      "min": 20,
+      "max": 60
+    },
+    "gewicht_kg": {
+      "min": 0.4,
+      "max": 3
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Voorjaar, Najaar",
@@ -36,19 +54,31 @@
     "naam": "Baars",
     "aas": "Kleine pluggen, worm, shad",
     "hengeltype": "Lichte spinhengel",
-    "lengte_cm": { "min": 10, "max": 50 },
-    "gewicht_kg": { "min": 0.1, "max": 2 },
+    "lengte_cm": {
+      "min": 10,
+      "max": 50
+    },
+    "gewicht_kg": {
+      "min": 0.1,
+      "max": 2
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Laag",
     "seizoen": "Zomer, Herfst",
-    "afbeelding_url": "https://www.bickevissers.be/images/baars.gif"
+    "afbeelding_url": "https://www.peche-en-vendee.fr/img/poissons/14026078608546.png"
   },
   {
     "naam": "Zalm",
     "aas": "Kunstvliegen, zalmpluggen",
     "hengeltype": "Vliegvishengel, trollinghengel",
-    "lengte_cm": { "min": 50, "max": 110 },
-    "gewicht_kg": { "min": 3, "max": 15 },
+    "lengte_cm": {
+      "min": 50,
+      "max": 110
+    },
+    "gewicht_kg": {
+      "min": 3,
+      "max": 15
+    },
     "leefomgeving": "Zout- en zoetwater (trekvis)",
     "moeilijkheidsgraad": "Hoog",
     "seizoen": "Zomer",
@@ -58,8 +88,14 @@
     "naam": "Meerval",
     "aas": "Dode aasvis, pellets",
     "hengeltype": "Zware statische hengel",
-    "lengte_cm": { "min": 70, "max": 250 },
-    "gewicht_kg": { "min": 5, "max": 100 },
+    "lengte_cm": {
+      "min": 70,
+      "max": 250
+    },
+    "gewicht_kg": {
+      "min": 5,
+      "max": 100
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Zeer hoog",
     "seizoen": "Zomer, Najaar",
@@ -69,20 +105,31 @@
     "naam": "Brasem",
     "aas": "Maden, wormen, brood, maïs",
     "hengeltype": "Vaste hengel of feederhengel",
-    "lengte_cm": { "min": 30, "max": 70 },
-    "gewicht_kg": { "min": 1, "max": 4 },
+    "lengte_cm": {
+      "min": 30,
+      "max": 70
+    },
+    "gewicht_kg": {
+      "min": 1,
+      "max": 4
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Voorjaar, Zomer, Herfst",
     "afbeelding_url": "https://www.goodfish.nl/app/uploads/2022/08/abramis_brama_sw--1920x1002.png"
   },
-
   {
     "naam": "Voorn",
     "aas": "Brokken, brood",
     "hengeltype": "Vaste hengel",
-    "lengte_cm": { "min": 10, "max": 30 },
-    "gewicht_kg": { "min": 0.2, "max": 1 },
+    "lengte_cm": {
+      "min": 10,
+      "max": 30
+    },
+    "gewicht_kg": {
+      "min": 0.2,
+      "max": 1
+    },
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Laag",
     "seizoen": "Lente, Zomer",
@@ -92,8 +139,14 @@
     "naam": "Tong",
     "aas": "Zagers, pieren",
     "hengeltype": "Strandhengel",
-    "lengte_cm": { "min": 25, "max": 50 },
-    "gewicht_kg": { "min": 0.4, "max": 1.5 },
+    "lengte_cm": {
+      "min": 25,
+      "max": 50
+    },
+    "gewicht_kg": {
+      "min": 0.4,
+      "max": 1.5
+    },
     "leefomgeving": "Zoutwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Zomer",
@@ -103,8 +156,14 @@
     "naam": "Makreel",
     "aas": "Verenpaternoster, visstrip",
     "hengeltype": "Boot- of pierhengel",
-    "lengte_cm": { "min": 25, "max": 40 },
-    "gewicht_kg": { "min": 0.3, "max": 0.8 },
+    "lengte_cm": {
+      "min": 25,
+      "max": 40
+    },
+    "gewicht_kg": {
+      "min": 0.3,
+      "max": 0.8
+    },
     "leefomgeving": "Zoutwater",
     "moeilijkheidsgraad": "Laag",
     "seizoen": "Zomer",
