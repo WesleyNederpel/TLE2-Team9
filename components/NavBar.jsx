@@ -83,7 +83,7 @@ export default function NavBar({ navigation }) {
                     >
                         <Ionicons
                             name="settings-outline"
-                            size={24}
+                            size={28}
                             color={"#fff"}
                         />
                     </Pressable>
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0,
     },
     headerLogo: {
-        height: 50,
-        width: 50,
+        height: 55,
+        width: 55,
         resizeMode: 'contain',
         marginLeft: 15,
         marginBottom: 10,

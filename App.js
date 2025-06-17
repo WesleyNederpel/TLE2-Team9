@@ -15,8 +15,21 @@ export default function App() {
             <Stack.Navigator screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Main" component={NavBar} />
                 <Stack.Screen name="Map" component={MapScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
                 <Stack.Screen name="FishScreen" component={FishScreen} />
+                <Stack.Screen
+                    name="Settings"
+                    component={SettingsScreen}
+                    options={{
+                        presentation: 'modal',
+                        gestureEnabled: true,
+                        gestureDirection: 'vertical',
+                        animation: 'slide_from_bottom',
+                        animationDuration: 200,
+                        contentStyle: {
+                            backgroundColor: 'transparent',
+                        }
+                    }}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );
