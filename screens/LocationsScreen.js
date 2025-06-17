@@ -65,13 +65,13 @@ export default function LocationsScreen({ navigation }) {
     };
 
     const getImage = (filename) => {
-        if (!filename) return null;
+        // if (!filename) return null;
         switch (filename) {
             case "Kralingseplas.png":
                 return require("../images/Kralingseplas.png");
             // add more files here if you use more images
             default:
-                return null;
+                return require("../images/Kralingseplas.png");
         }
     };
 

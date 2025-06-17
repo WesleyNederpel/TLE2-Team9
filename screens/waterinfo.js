@@ -17,7 +17,7 @@ export default function WaterInfo({ route }) {
     const location = {
         id: Date.now(),
         name: "Kralingseplas",
-        image: "Kralingseplas.png",
+        images: "Kralingseplas.png",
         screen: "WaterInfo",
     };
 
@@ -61,7 +61,7 @@ export default function WaterInfo({ route }) {
             } else {
                 list.push({
                     ...location,
-                    image: ["Kralingseplas.png"], // only filename
+                    images: ["Kralingseplas.png"], // only filename
                 });
             }
 
