@@ -3,6 +3,7 @@ import { Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { CameraView } from 'expo-camera';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import { useIsFocused } from '@react-navigation/native'; // Importeer useIsFocused
 
 export default function CameraScreen({ navigation }) {
     const [type] = useState('back');
@@ -11,12 +12,19 @@ export default function CameraScreen({ navigation }) {
     const [isTakingPicture, setIsTakingPicture] = useState(false);
     const [zoom, setZoom] = useState(0);
 
+    const isFocused = useIsFocused(); // Gebruik de hook hier
+
     useEffect(() => {
         (async () => {
-            const { status } = await requestCameraPermission();
-            setHasPermission(status === 'granted');
+            if (isFocused) { // Voer permissieaanvraag alleen uit als het scherm in focus is
+                const { status } = await requestCameraPermission();
+                setHasPermission(status === 'granted');
+            } else {
+                // Optioneel: reset de permissiestatus of doe iets anders wanneer het scherm niet in focus is
+                setHasPermission(null);
+            }
         })();
-    }, []);
+    }, [isFocused]); // Herlaad de effect wanneer de focus verandert
 
     async function requestCameraPermission() {
         try {
@@ -81,7 +89,7 @@ export default function CameraScreen({ navigation }) {
         setZoom(prevZoom => Math.max(prevZoom - 0.1, 0));
     };
 
-    if (hasPermission === null) {
+    if (hasPermission === null && isFocused) { // Toon dit alleen als het scherm in focus is
         return <View style={styles.container}><Text>Requesting camera permission...</Text></View>;
     }
 
@@ -100,19 +108,25 @@ export default function CameraScreen({ navigation }) {
         );
     }
 
+    // Render de CameraView alleen als het scherm in focus is en permissie is verleend
     return (
         <View style={styles.container}>
-            <CameraView
-                ref={cameraRef}
-                style={styles.camera}
-                type={type}
-                zoom={zoom}
-            />
+            {isFocused && hasPermission ? (
+                <CameraView
+                    ref={cameraRef}
+                    style={styles.camera}
+                    type={type}
+                    zoom={zoom}
+                />
+            ) : (
+                // Optioneel: Toon een placeholder of lege View wanneer de camera niet actief is
+                <View style={styles.cameraPlaceholder} />
+            )}
             <View style={styles.zoomControlsContainer}>
                 <TouchableOpacity
                     style={styles.zoomButton}
                     onPress={zoomOut}
-                    disabled={zoom <= 0}
+                    disabled={zoom <= 0 || !isFocused}
                 >
                     <Ionicons
                         name="remove"
@@ -124,7 +138,7 @@ export default function CameraScreen({ navigation }) {
                 <TouchableOpacity
                     style={styles.zoomButton}
                     onPress={zoomIn}
-                    disabled={zoom >= 1}
+                    disabled={zoom >= 1 || !isFocused}
                 >
                     <Ionicons
                         name="add"
@@ -137,7 +151,7 @@ export default function CameraScreen({ navigation }) {
                 <TouchableOpacity
                     style={styles.shutterButton}
                     onPress={takePicture}
-                    disabled={isTakingPicture}
+                    disabled={isTakingPicture || !isFocused}
                 >
                     <Ionicons
                         name="camera"
@@ -161,6 +175,10 @@ const styles = StyleSheet.create({
     },
     camera: {
         flex: 1,
+    },
+    cameraPlaceholder: { // Voeg een placeholder stijl toe
+        flex: 1,
+        backgroundColor: 'black',
     },
     buttonContainer: {
         position: 'absolute',
