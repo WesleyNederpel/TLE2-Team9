@@ -92,7 +92,7 @@ export default function NavBar({ navigation }) {
         >
             <Tab.Screen name="Camera" component={CameraScreen} />
             <Tab.Screen name="Gallerij" component={GalleryScreen} />
-            <Tab.Screen name="Map" component={MapScreen} />
+            <Tab.Screen name="Map" component={MapStackScreen} />
             <Tab.Screen name="Locaties" component={LocationsStackScreen} />
             <Tab.Screen name="Profiel" component={ProfileScreen} />
         </Tab.Navigator>
