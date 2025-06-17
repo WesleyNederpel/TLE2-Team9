@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, Platform} from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 
@@ -10,7 +10,7 @@ export default function SettingsScreen() {
         <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor="#0096b2" barStyle="light-content"/>
 
-            <View style={styles.header}>
+            <View style={[styles.header, Platform.OS === 'android' && styles.androidHeader]}>
                 <Text style={styles.title}>Settings</Text>
                 <TouchableOpacity
                     style={styles.closeButton}
@@ -20,9 +20,7 @@ export default function SettingsScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Settings content goes here */}
             <View style={styles.content}>
-                {/* Your settings options will go here */}
                 <Text style={styles.emptyMessage}>Settings options will appear here</Text>
             </View>
         </SafeAreaView>
@@ -42,6 +40,9 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         backgroundColor: '#0096b2',
     },
+    androidHeader: {
+        paddingTop: StatusBar.currentHeight || 24, // Add padding for Android status bar
+    },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -49,15 +50,6 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         padding: 8,
-    },
-    dragIndicator: {
-        alignSelf: 'center',
-        width: 40,
-        height: 5,
-        backgroundColor: '#ccc',
-        borderRadius: 3,
-        marginTop: 8,
-        marginBottom: 16,
     },
     content: {
         flex: 1,
