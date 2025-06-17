@@ -1,10 +1,37 @@
-import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
-import {Ionicons} from '@expo/vector-icons';
-import {Pressable, StyleSheet, Image} from 'react-native';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from '@expo/vector-icons';
+import { Pressable, StyleSheet, Image } from 'react-native';
 import MapScreen from "../screens/MapScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import CameraScreen from "../screens/CameraScreen";
-import LocationsScreen from "../screens/LocationsScreen";
+import GalleryScreen from "../screens/GalleryScreen";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LocationsScreen from '../screens/LocationsScreen';
+import WaterInfo from "../screens/waterinfo";
+
+const LocationsStack = createNativeStackNavigator();
+
+function LocationsStackScreen() {
+    return (
+        <LocationsStack.Navigator>
+            <LocationsStack.Screen name="Locations" component={LocationsScreen} options={{ headerShown: false }} />
+            <LocationsStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} />
+        </LocationsStack.Navigator>
+    );
+}
+
+const MapStack = createNativeStackNavigator();
+
+function MapStackScreen() {
+    return (
+        <MapStack.Navigator>
+            <MapStack.Screen name="MapMain" component={MapScreen} options={{ headerShown: false }} />
+            <MapStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} />
+        </MapStack.Navigator>
+    );
+}
+
+
 
 const Tab = createBottomTabNavigator()
 
@@ -13,13 +40,14 @@ const getIconName = (routeName, focused) => {
         Profiel: focused ? 'person' : 'person-outline',
         Camera: focused ? 'camera' : 'camera-outline',
         Map: focused ? 'map' : 'map-outline',
-        Locaties: focused ? 'location' : 'location-outline'
+        Locaties: focused ? 'location' : 'location-outline',
+        Gallerij: focused ? 'images' : 'images-outline'
     }
 
     return icons[routeName];
 }
 
-export default function NavBar({navigation}) {
+export default function NavBar({ navigation }) {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
@@ -45,7 +73,7 @@ export default function NavBar({navigation}) {
                         onPress={() => {
                             navigation.navigate('Settings');
                         }}
-                        style={({pressed}) => [
+                        style={({ pressed }) => [
                             {
                                 marginRight: 15,
                                 marginBottom: 10,
@@ -62,10 +90,11 @@ export default function NavBar({navigation}) {
                 )
             })}
         >
-            <Tab.Screen name="Profiel" component={ProfileScreen} />
             <Tab.Screen name="Camera" component={CameraScreen} />
-            <Tab.Screen name="Map" component={MapScreen} />
-            <Tab.Screen name="Locaties" component={LocationsScreen} />
+            <Tab.Screen name="Gallerij" component={GalleryScreen} />
+            <Tab.Screen name="Map" component={MapStackScreen} />
+            <Tab.Screen name="Locaties" component={LocationsStackScreen} />
+            <Tab.Screen name="Profiel" component={ProfileScreen} />
         </Tab.Navigator>
     );
 }

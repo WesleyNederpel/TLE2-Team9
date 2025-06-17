@@ -1,10 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Modal, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
 
-const MapScreen = () => {
+
+const getAfbeelding = (name) => {
+    switch (name) {
+        case 'Kralingse Plas':
+            return require('../images/Kralingseplas.png');
+        case 'Wijnhaven':
+            return require('../images/Wijnhaven.png');
+        case 'Bergse Voorplas':
+            return require('../images/BergseVoorplas.png');
+        case 'Oudehaven':
+            return require('../images/Oudehaven.png');
+        case 'Haringvliet':
+            return require('../images/Haringvliet.png');
+        case 'Boerengat':
+            return require('../images/Boerengat.png');
+        case 'Zevenhuizerplas':
+            return require('../images/Zevenhuizerplas.png');
+        default:
+            return null; // of een standaardafbeelding, bv. require('../images/placeholder.png');
+    }
+};
+
+
+
+
+const MapScreen = ({ navigation }) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
     const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
     const [markerInfo, setMarkerInfo] = useState({ title: '', description: '', latitude: null, longitude: null });
@@ -140,40 +165,64 @@ const MapScreen = () => {
                 onRequestClose={() => setSelectedFeature(null)}
             >
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Waterinformatie</Text>
-                        {isHarbour(selectedFeature) ? (
-                            <Text style={styles.modalText}>🚫 No fish zone – havengebied</Text>
-                        ) : selectedFeature?.properties ? (
-                            <>
-                                {Object.entries(selectedFeature.properties).map(([key, val]) => (
-                                    <Text key={key} style={styles.modalText}>
-                                        <Text style={{ fontWeight: 'bold' }}>{key}: </Text>
-                                        <Text>{val?.toString() || ''}</Text>
-                                    </Text>
-                                ))}
-
-                                {isRiver(selectedFeature) ? (
-                                    <Text style={[styles.modalText, { marginTop: 10 }]}>
-                                        🎣 Toegankelijk met <Text style={{ fontWeight: 'bold' }}>VISpas</Text> of{' '}
-                                        <Text style={{ fontWeight: 'bold' }}>Kleine VISpas</Text>.
-                                    </Text>
-                                ) : (
-                                    <View style={{ marginTop: 10 }}>
-                                        <Text style={styles.modalText}>🎣 VISpas van:</Text>
-                                        <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
-                                        <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
-                                        <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
-                                    </View>
-                                )}
-                            </>
+                    <TouchableOpacity
+                        activeOpacity={0.9}
+                        style={styles.modalContent}
+                        onPress={() => {
+                            const name = selectedFeature?.properties?.name || 'Onbekend';
+                            setSelectedFeature(null);
+                            navigation.navigate('WaterInfo', { waterName: name });
+                        }}
+                    >
+                        {getAfbeelding(selectedFeature?.properties?.name) ? (
+                            <Image
+                                source={getAfbeelding(selectedFeature.properties.name)}
+                                style={{ width: 250, height: 150, borderRadius: 8, marginBottom: 10 }}
+                                resizeMode="cover"
+                            />
                         ) : (
-                            <Text style={styles.modalText}>Geen eigenschappen beschikbaar</Text>
+                            <View
+                                style={{
+                                    width: 250,
+                                    height: 150,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: '#ccc',
+                                    marginBottom: 10,
+                                    borderRadius: 8,
+                                }}
+                            >
+                                <Text>Geen afbeelding</Text>
+                            </View>
                         )}
-                        <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedFeature(null)}>
-                            <Text style={styles.closeButtonText}>Sluiten</Text>
-                        </TouchableOpacity>
-                    </View>
+
+                        <Text style={styles.modalTitle}>
+                            {selectedFeature?.properties?.name || 'Onbekende locatie'}
+                        </Text>
+
+                        <View style={{ marginTop: 10 }}>
+                            <Text style={styles.modalText}>🎣 Nodige Vispas:</Text>
+                            <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                            <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                            <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                        </View>
+
+                        <Text
+                            style={[
+                                styles.modalText,
+                                { marginTop: 15, fontWeight: 'bold', color: '#005f99' },
+                            ]}
+                        >
+                            Tik om meer informatie te zien
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.closeButton, { marginTop: 15 }]}
+                        onPress={() => setSelectedFeature(null)}
+                    >
+                        <Text style={styles.closeButtonText}>Sluiten</Text>
+                    </TouchableOpacity>
                 </View>
             </Modal>
 
