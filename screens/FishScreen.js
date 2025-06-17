@@ -11,7 +11,7 @@ import {
     Pressable
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // Voor pijltje
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const FishScreen = () => {
     const route = useRoute();
@@ -20,14 +20,16 @@ const FishScreen = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                {/* Terugknop */}
+
+            <View style={styles.header}>
                 <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={24} color="#1e40af" />
+                    <Ionicons name="arrow-back" size={24} color="#ffffff" />
                 </Pressable>
-
                 <Text style={styles.title}>{fish.naam}</Text>
+            </View>
 
+            {/* SCROLLBARE INHOUD */}
+            <ScrollView contentContainerStyle={styles.scrollContent}>
                 {fish.afbeelding_url ? (
                     <Image
                         source={{ uri: fish.afbeelding_url }}
@@ -61,27 +63,39 @@ const Info = ({ label, value }) => (
     </View>
 );
 
+const HEADER_HEIGHT = 80;
+
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#f8fafc',
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        backgroundColor: '#e0f2fe',
+    },
+    header: {
+        left: 0,
+        right: 0,
+        zIndex: 10,
+        height: 100,
+        backgroundColor: '#0096b2',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
     },
     scrollContent: {
-        padding: 20,
-        paddingTop: 10,
-        flexGrow: 1,
+        paddingTop: 80,
+        paddingBottom: 40,
+        paddingHorizontal: 20,
     },
     backButton: {
-        marginBottom: 10,
-        alignSelf: 'flex-start',
+        marginRight: 10,
+        paddingTop:40,
     },
     title: {
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#1e40af',
-        marginBottom: 20,
-        textAlign: 'center',
+        color: '#ffffff',
+        paddingTop: 40,
     },
     image: {
         width: '100%',
@@ -114,15 +128,18 @@ const styles = StyleSheet.create({
     },
     section: {
         marginBottom: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e2e8f0',
+        paddingBottom: 10,
     },
     label: {
         fontSize: 15,
         fontWeight: '600',
-        color: '#475569',
+        color: '#334155',
     },
     value: {
         fontSize: 16,
-        color: '#0f172a',
+        color: '#1e293b',
         marginTop: 4,
     },
 });
