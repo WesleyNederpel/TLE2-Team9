@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, StyleSheet, Text, View, Platform, TouchableOpacity } from 'react-native';
+import { Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { CameraView } from 'expo-camera';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function CameraScreen({ navigation }) {
-    // Set camera type to 'back' and don't provide a way to change it
     const [type] = useState('back');
     const [hasPermission, setHasPermission] = useState(null);
-    const [zoom, setZoom] = useState(Platform.OS === 'ios' ? 1.0 : 0);
-    const cameraRef = useRef(null)
-    const [isTakingPicture, setIsTakingPicture] = useState(false)
+    const cameraRef = useRef(null);
+    const [isTakingPicture, setIsTakingPicture] = useState(false);
+    const [zoom, setZoom] = useState(0);
 
     useEffect(() => {
         (async () => {
@@ -34,8 +33,8 @@ export default function CameraScreen({ navigation }) {
             try {
                 setIsTakingPicture(true);
                 const photo = await cameraRef.current.takePictureAsync({
-                    quality: 1.0, // high quality image
-                    base64: false, // don't include base64 to save space
+                    quality: 1.0,
+                    base64: false,
                 });
 
                 await savePhotoToStorage(photo);
@@ -72,6 +71,15 @@ export default function CameraScreen({ navigation }) {
         }
     };
 
+    // Function to increase zoom (with upper limit of 1)
+    const zoomIn = () => {
+        setZoom(prevZoom => Math.min(prevZoom + 0.1, 1));
+    };
+
+    // Function to decrease zoom (with lower limit of 0)
+    const zoomOut = () => {
+        setZoom(prevZoom => Math.max(prevZoom - 0.1, 0));
+    };
 
     if (hasPermission === null) {
         return <View style={styles.container}><Text>Requesting camera permission...</Text></View>;
@@ -98,7 +106,33 @@ export default function CameraScreen({ navigation }) {
                 ref={cameraRef}
                 style={styles.camera}
                 type={type}
+                zoom={zoom}
             />
+            <View style={styles.zoomControlsContainer}>
+                <TouchableOpacity
+                    style={styles.zoomButton}
+                    onPress={zoomOut}
+                    disabled={zoom <= 0}
+                >
+                    <Ionicons
+                        name="remove"
+                        size={24}
+                        color="white"
+                    />
+                </TouchableOpacity>
+                <Text style={styles.zoomText}>{Math.round(zoom * 10)}x</Text>
+                <TouchableOpacity
+                    style={styles.zoomButton}
+                    onPress={zoomIn}
+                    disabled={zoom >= 1}
+                >
+                    <Ionicons
+                        name="add"
+                        size={24}
+                        color="white"
+                    />
+                </TouchableOpacity>
+            </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={styles.shutterButton}
@@ -115,7 +149,6 @@ export default function CameraScreen({ navigation }) {
         </View>
     );
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -145,5 +178,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 4,
         borderColor: 'white',
+    },
+    zoomControlsContainer: {
+        position: 'absolute',
+        top: 40,
+        right: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: 20,
+        padding: 10,
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    zoomButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 5,
+    },
+    zoomText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginVertical: 5,
     },
 });
