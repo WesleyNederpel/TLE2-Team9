@@ -16,7 +16,7 @@ export default function SettingsScreen() {
                     style={styles.closeButton}
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="close" size={24} color="#fff"/>
+                    <Ionicons name="close" size={28} color="#fff"/>
                 </TouchableOpacity>
             </View>
 
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#0096b2',
     },
     androidHeader: {
-        paddingTop: StatusBar.currentHeight || 24, // Add padding for Android status bar
+        paddingTop: StatusBar.currentHeight || 24,
     },
     title: {
         fontSize: 20,
