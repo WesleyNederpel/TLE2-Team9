@@ -1,28 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import waters from "../data/waters.json"; // Zorg dat dit JSON-bestand bestaat
 
 const getImage = (name) => {
     const map = {
-        "Kralingseplas.png": require("../images/Kralingseplas.png"),
-        "snoek.png": require("../images/snoek.png"),
-        "baars.png": require("../images/baars.png"),
-        "karper.png": require("../images/karper.png"),
-        // add more images if you use them
+        "Kralingseplas": require("../images/Kralingseplas.png"),
+        "Wijnhaven": require("../images/Wijnhaven.png"),
+        "Bergse Voorplas": require("../images/BergseVoorplas.png"),
+        "Oudehaven": require("../images/Oudehaven.png"),
+        "Haringvliet": require("../images/Haringvliet.png"),
+        "Boerengat": require("../images/Boerengat.png"),
+        "Zevenhuizerplas": require("../images/Zevenhuizerplas.png"),
+
+        "snoek": require("../images/snoek.png"),
+        "baars": require("../images/baars.png"),
+        "karper": require("../images/karper.png"),
+        "brasem": require("../images/brasem.png"),
+        "snoekbaars": require("../images/snoekbaars.png"),
     };
-    return map[name] || require("../images/Kralingseplas.png"); // fallback image
+
+    return map[name] || require("../images/Kralingseplas.png"); // fallback
 };
 
+
 export default function WaterInfo({ route }) {
-    const location = {
-        id: Date.now(),
-        name: "Kralingseplas",
-        images: "Kralingseplas.png",
-        screen: "WaterInfo",
-    };
+    const waterName = route?.params?.waterName || "Onbekend";
+
+    const location = waters.find(
+        (w) => w.name.trim().toLowerCase() === waterName.trim().toLowerCase()
+    );
+
 
     const [modalVisible, setModalVisible] = useState(false);
-
     const [checkedItems, setCheckedItems] = useState({
         favorites: false,
         mySpots: false,
@@ -45,28 +55,23 @@ export default function WaterInfo({ route }) {
             }
             setCheckedItems(newChecked);
         };
-        checkStored();
-    }, []);
+        if (location) checkStored();
+    }, [location]);
 
     const toggleItem = async (type) => {
         try {
             const key = `@location_${type}`;
             const existing = await AsyncStorage.getItem(key);
             let list = existing ? JSON.parse(existing) : [];
-
             const exists = list.some(item => item.name === location.name);
 
             if (exists) {
                 list = list.filter(item => item.name !== location.name);
             } else {
-                list.push({
-                    ...location,
-                    images: ["Kralingseplas.png"], // only filename
-                });
+                list.push({ ...location, images: [location.image] });
             }
 
             await AsyncStorage.setItem(key, JSON.stringify(list));
-
             setCheckedItems((prev) => ({
                 ...prev,
                 [type]: !exists,
@@ -76,17 +81,15 @@ export default function WaterInfo({ route }) {
         }
     };
 
-    // Example data
-    const caughtFish = [
-        // { id: "1", uri: require("../images/vis1.png") },
-        // { id: "2", uri: require("../images/vis2.png") },
-    ];
+    if (!location) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.h1}>Water niet gevonden</Text>
+            </View>
+        );
+    }
 
-    const fishTypes = [
-        { id: "1", name: "Snoek", image: require("../images/snoek.png") },
-        { id: "2", name: "Baars", image: require("../images/baars.png") },
-        { id: "3", name: "Karpers", image: require("../images/karper.png") },
-    ];
+    const caughtFish = []; // Later uitbreidbaar
 
     return (
         <ScrollView style={styles.container}>
@@ -103,26 +106,22 @@ export default function WaterInfo({ route }) {
                 <Image source={getImage(location.image)} style={styles.headerImage} />
             </View>
 
-            <Text style={styles.h1}>Kralingseplas</Text>
+            <Text style={styles.h1}>{location.name}</Text>
             <View style={styles.underline} />
-            <Text style={styles.p}>
-                De Kralingse Plas is een populair recreatiegebied in Rotterdam...
-            </Text>
+            <Text style={styles.p}>{location.description}</Text>
 
             <View style={styles.fishPassContainer}>
                 <Image source={require("../images/fishpass.png")} style={styles.fishImage} />
                 <Text style={[styles.h1, { marginTop: 10 }]}>Vispas nodig!</Text>
                 <View style={styles.underline} />
-                <Text style={styles.p}>
-                    Voor deze locatie heb je nog niet een geldige vispas...
-                </Text>
+                <Text style={styles.p}>Voor deze locatie heb je nog niet een geldige vispas...</Text>
                 <Pressable style={styles.button}>
                     <Text style={styles.buttonText}>Vispas aanschaffen</Text>
                 </Pressable>
             </View>
 
             <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20 }]}>
-                Gevangen kralingseplas <Text style={{ fontSize: 16 }}>2 🎣</Text>
+                Gevangen {location.name} <Text style={{ fontSize: 16 }}>{caughtFish.length} 🎣</Text>
             </Text>
             <FlatList
                 horizontal
@@ -137,10 +136,10 @@ export default function WaterInfo({ route }) {
 
             <View style={{ marginBottom: 30 }}>
                 <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20, textAlign: 'center' }]}>
-                    Vissen Kralingseplas
+                    Vissen {location.name}
                 </Text>
 
-                {fishTypes.map((fish, index) => {
+                {location.fishTypes.map((fish, index) => {
                     const isEven = index % 2 === 0;
                     return (
                         <Pressable
@@ -152,7 +151,7 @@ export default function WaterInfo({ route }) {
                         >
                             {isEven ? (
                                 <>
-                                    <Image source={fish.image} style={styles.fishImageStyle} />
+                                    <Image source={getImage(fish.image)} style={styles.fishImageStyle} />
                                     <Text style={[styles.fishText, { color: '#1A3A91' }]}>{fish.name}</Text>
                                     <Text style={styles.blueArrow}>{'>'}</Text>
                                 </>
@@ -160,7 +159,7 @@ export default function WaterInfo({ route }) {
                                 <>
                                     <Text style={styles.greenArrow}>{'<'}</Text>
                                     <Text style={[styles.fishText, { color: '#4C6D4D' }]}>{fish.name}</Text>
-                                    <Image source={fish.image} style={[styles.fishImageStyle, { borderColor: '#4C6D4D' }]} />
+                                    <Image source={getImage(fish.image)} style={[styles.fishImageStyle, { borderColor: '#4C6D4D' }]} />
                                 </>
                             )}
                         </Pressable>
@@ -168,7 +167,6 @@ export default function WaterInfo({ route }) {
                 })}
             </View>
 
-            {/* Modal */}
             <Modal
                 visible={modalVisible}
                 animationType="slide"
@@ -177,7 +175,7 @@ export default function WaterInfo({ route }) {
             >
                 <View style={{ flex: 1, justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)" }}>
                     <View style={{ backgroundColor: "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
-                        <Text style={[styles.h1, {color:'#1A3A91'}]}>Opslaan in...</Text>
+                        <Text style={[styles.h1, { color: '#1A3A91' }]}>Opslaan in...</Text>
 
                         {["favorites", "mySpots", "wantToGo"].map((type) => {
                             const label =
@@ -214,12 +212,9 @@ export default function WaterInfo({ route }) {
                     </View>
                 </View>
             </Modal>
-
         </ScrollView>
     );
 }
-
-// Styles blijven ongewijzigd
 
 const styles = StyleSheet.create({
     container: {

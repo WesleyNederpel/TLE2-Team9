@@ -15,13 +15,7 @@ function LocationsStackScreen() {
     return (
         <LocationsStack.Navigator>
             <LocationsStack.Screen name="Locations" component={LocationsScreen}  options={{ headerShown: false }}  />
-            <LocationsStack.Screen
-                name="WaterInfo"
-                component={WaterInfo}
-                options={{
-                    headerShown: false
-                }}
-            />
+            <LocationsStack.Screen name="WaterInfo" component={WaterInfo} options={{headerShown: false}}/>
         </LocationsStack.Navigator>
     );
 }

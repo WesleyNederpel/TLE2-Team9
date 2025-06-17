@@ -9,11 +9,24 @@ const getAfbeelding = (name) => {
     switch (name) {
         case 'Kralingse Plas':
             return require('../images/Kralingseplas.png');
-        // Voeg meer toe als je meer afbeeldingen hebt
+        case 'Wijnhaven':
+            return require('../images/Wijnhaven.png');
+        case 'Bergse Voorplas':
+            return require('../images/BergseVoorplas.png');
+        case 'Oudehaven':
+            return require('../images/Oudehaven.png');
+        case 'Haringvliet':
+            return require('../images/Haringvliet.png');
+        case 'Boerengat':
+            return require('../images/Boerengat.png');
+        case 'Zevenhuizerplas':
+            return require('../images/Zevenhuizerplas.png');
         default:
-            return null;
+            return null; // of een standaardafbeelding, bv. require('../images/placeholder.png');
     }
 };
+
+
 
 
 const MapScreen = ({navigation}) => {
@@ -156,8 +169,9 @@ const MapScreen = ({navigation}) => {
                         activeOpacity={0.9}
                         style={styles.modalContent}
                         onPress={() => {
+                            const name = selectedFeature?.properties?.name || 'Onbekend';
                             setSelectedFeature(null);
-                            navigation.navigate('WaterInfo');
+                            navigation.navigate('WaterInfo', { waterName: name });
                         }}
                     >
                         {getAfbeelding(selectedFeature?.properties?.name) ? (
