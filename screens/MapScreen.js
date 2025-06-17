@@ -1,18 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Modal, Text, TextInput, TouchableOpacity, Alert, TouchableWithoutFeedback } from 'react-native';
-import MapView, { Polygon, Marker } from 'react-native-maps';
+import React, {useState, useEffect} from 'react';
+import {
+    StyleSheet,
+    View,
+    Modal,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    Alert,
+    TouchableWithoutFeedback
+} from 'react-native';
+import MapView, {Polygon, Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
 
 const MapScreen = () => {
     const [selectedFeature, setSelectedFeature] = useState(null);
-    const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
     const [addMenuModalVisible, setAddMenuModalVisible] = useState(false); // State voor het nieuwe menu
-    const [markerInfo, setMarkerInfo] = useState({ title: '', description: '', latitude: null, longitude: null });
+
+    const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
+    const [markerInfo, setMarkerInfo] = useState({title: '', description: '', latitude: null, longitude: null});
     const [markers, setMarkers] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
-    // Nieuwe state om aan te geven of de gebruiker een locatie kiest op de kaart
     const [isPickingLocation, setIsPickingLocation] = useState(false);
+
+    const [fishInfo, setFishInfo] = useState({title: '', description: '',location: '' ,species: '', length: '', weight: ''});
+    const [fish, setFish] = useState([]);
+    const [addFishModalVisible, setAddFishModalVisible] = useState(false);
 
     const region = {
         latitude: 51.9225,
@@ -23,7 +36,7 @@ const MapScreen = () => {
 
     useEffect(() => {
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+            let {status} = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Toegang geweigerd', 'Locatietoegang is nodig om uw positie te bepalen.');
                 return;
@@ -35,7 +48,7 @@ const MapScreen = () => {
 
     const convertCoords = (coordsArray) => {
         if (!coordsArray || coordsArray.length === 0) return [];
-        return coordsArray.map(([lng, lat]) => ({ latitude: lat, longitude: lng }));
+        return coordsArray.map(([lng, lat]) => ({latitude: lat, longitude: lng}));
     };
 
     const handlePolygonPress = (feature) => {
@@ -66,7 +79,7 @@ const MapScreen = () => {
                 onPress={(event) => {
                     if (isPickingLocation) {
                         // Als we een locatie aan het kiezen zijn, behandel dit als een kaarttik
-                        const { latitude, longitude } = event.nativeEvent.coordinate;
+                        const {latitude, longitude} = event.nativeEvent.coordinate;
                         setMarkerInfo((prevInfo) => ({
                             ...prevInfo,
                             latitude: latitude,
@@ -86,7 +99,7 @@ const MapScreen = () => {
     const renderPolygons = () => {
         if (!waterGeoJSON?.features) return null;
         return waterGeoJSON.features.map((feature, idx) => {
-            const { type, coordinates } = feature.geometry;
+            const {type, coordinates} = feature.geometry;
             const props = feature.properties || {};
 
             let fill = 'rgba(0, 150, 255, 0.3)';
@@ -120,6 +133,12 @@ const MapScreen = () => {
     const toggleAddMenuModal = () => {
         setAddMenuModalVisible(!addMenuModalVisible);
     };
+    const toggleAddMarkerModal = () => {
+        setAddMarkerModalVisible(!addMarkerModalVisible);
+    };
+    const toggleAddFishModal = () => {
+        setAddFishModalVisible(!addFishModalVisible);
+    };
 
     const openAddMarkerModal = () => {
         // Initialiseer markerInfo met de huidige locatie bij het openen van de modal
@@ -133,12 +152,31 @@ const MapScreen = () => {
         setAddMenuModalVisible(false); // Sluit het add-menu als de marker modal opent
     };
 
+    const openAddFishModal = () => {
+        setFishInfo({
+            title: '',
+            description: '',
+            species: '',
+        });
+        setAddFishModalVisible(true);
+        setAddMenuModalVisible(false); // Sluit het add-menu als de marker modal opent
+    };
+    const addFish = () => {
+        if (fishInfo.title && fishInfo.description && fishInfo.species) {
+            setAddFishModalVisible(false);
+            setFish([...fish, fishInfo]);
+            setFishInfo({title: '', description: '', location: '', species: '', length: '', weight: ''})
+            Alert.alert('Vis toegevoegd', 'De vis is toegevoegd aan de lijst in het profiel of te bekijken op de toegevoegde locatie.');
+        } else {
+            Alert.alert('Invoer ontbreekt', 'Vul Titel, Beschrijving en Soort in voor de vis.');
+        }
+    };
     const addMarker = () => {
-        const { title, latitude, longitude } = markerInfo;
+        const {title, latitude, longitude} = markerInfo;
         if (title && latitude != null && longitude != null) {
             setMarkers([...markers, markerInfo]);
             setAddMarkerModalVisible(false);
-            setMarkerInfo({ title: '', description: '', latitude: null, longitude: null });
+            setMarkerInfo({title: '', description: '', latitude: null, longitude: null});
         } else {
             Alert.alert('Invoer ontbreekt', 'Vul Titel, Breedtegraad en Lengtegraad in voor de marker.');
         }
@@ -155,7 +193,7 @@ const MapScreen = () => {
     // Functie die wordt aangeroepen wanneer op de kaart wordt getikt (voor niet-polygon gebieden)
     const handleMapPress = (event) => {
         if (isPickingLocation) {
-            const { latitude, longitude } = event.nativeEvent.coordinate;
+            const {latitude, longitude} = event.nativeEvent.coordinate;
             setMarkerInfo((prevInfo) => ({
                 ...prevInfo,
                 latitude: latitude,
@@ -177,7 +215,7 @@ const MapScreen = () => {
                 {markers.map((m, i) => (
                     <Marker
                         key={`marker-${i}`}
-                        coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+                        coordinate={{latitude: m.latitude, longitude: m.longitude}}
                         title={m.title}
                         description={m.description}
                     />
@@ -204,18 +242,18 @@ const MapScreen = () => {
                             <>
                                 {Object.entries(selectedFeature.properties).map(([key, val]) => (
                                     <Text key={key} style={styles.modalText}>
-                                        <Text style={{ fontWeight: 'bold' }}>{key}: </Text>
+                                        <Text style={{fontWeight: 'bold'}}>{key}: </Text>
                                         <Text>{val?.toString() || ''}</Text>
                                     </Text>
                                 ))}
 
                                 {isRiver(selectedFeature) ? (
-                                    <Text style={[styles.modalText, { marginTop: 10 }]}>
-                                        🎣 Toegankelijk met <Text style={{ fontWeight: 'bold' }}>VISpas</Text> of{' '}
-                                        <Text style={{ fontWeight: 'bold' }}>Kleine VISpas</Text>.
+                                    <Text style={[styles.modalText, {marginTop: 10}]}>
+                                        🎣 Toegankelijk met <Text style={{fontWeight: 'bold'}}>VISpas</Text> of{' '}
+                                        <Text style={{fontWeight: 'bold'}}>Kleine VISpas</Text>.
                                     </Text>
                                 ) : (
-                                    <View style={{ marginTop: 10 }}>
+                                    <View style={{marginTop: 10}}>
                                         <Text style={styles.modalText}>🎣 VISpas van:</Text>
                                         <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
                                         <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
@@ -258,7 +296,7 @@ const MapScreen = () => {
                                 onPress={() => {
                                     setAddMenuModalVisible(false); // Sluit het menu
                                     // Geen nieuwe modal voor "Vis Toevoegen" zoals gevraagd
-                                    Alert.alert('Info', 'Functionaliteit voor Vis Toevoegen nog niet geïmplementeerd.');
+                                    openAddFishModal();
                                 }}
                             >
                                 <Text style={styles.menuButtonText}>Vis Toevoegen</Text>
@@ -269,58 +307,65 @@ const MapScreen = () => {
             </Modal>
 
             {/* Modal voor marker informatie invoeren */}
-            <Modal visible={addMarkerModalVisible} transparent animationType="slide">
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Marker Informatie Invoeren</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Titel"
-                            value={markerInfo.title}
-                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, title: text })}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Beschrijving"
-                            value={markerInfo.description}
-                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, description: text })}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Breedtegraad"
-                            keyboardType="numeric"
-                            value={markerInfo.latitude != null ? markerInfo.latitude.toString() : ''}
-                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, latitude: parseFloat(text) || null })}
-                            editable={!isPickingLocation} // Maak niet bewerkbaar tijdens het kiezen
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Lengtegraad"
-                            keyboardType="numeric"
-                            value={markerInfo.longitude != null ? markerInfo.longitude.toString() : ''}
-                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, longitude: parseFloat(text) || null })}
-                            editable={!isPickingLocation} // Maak niet bewerkbaar tijdens het kiezen
-                        />
+            <Modal visible={addMarkerModalVisible} transparent animationType="slide"
+                   onRequestClose={toggleAddMarkerModal}>
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Marker Informatie Invoeren</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Titel"
+                                value={markerInfo.title}
+                                onChangeText={(text) => setMarkerInfo({...markerInfo, title: text})}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Beschrijving"
+                                value={markerInfo.description}
+                                onChangeText={(text) => setMarkerInfo({...markerInfo, description: text})}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Breedtegraad"
+                                keyboardType="numeric"
+                                value={markerInfo.latitude != null ? markerInfo.latitude.toString() : ''}
+                                onChangeText={(text) => setMarkerInfo({
+                                    ...markerInfo,
+                                    latitude: parseFloat(text) || null
+                                })}
+                                editable={!isPickingLocation} // Maak niet bewerkbaar tijdens het kiezen
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Lengtegraad"
+                                keyboardType="numeric"
+                                value={markerInfo.longitude != null ? markerInfo.longitude.toString() : ''}
+                                onChangeText={(text) => setMarkerInfo({
+                                    ...markerInfo,
+                                    longitude: parseFloat(text) || null
+                                })}
+                                editable={!isPickingLocation} // Maak niet bewerkbaar tijdens het kiezen
+                            />
 
-                        {/* Nieuwe knop om locatie op kaart te kiezen */}
-                        <TouchableOpacity
-                            style={[styles.button, { backgroundColor: '#4CAF50', marginBottom: 10 }]}
-                            onPress={startPickingLocation}
-                        >
-                            <Text style={styles.buttonText}>Kies Locatie op Kaart</Text>
-                        </TouchableOpacity>
+                            {/* Nieuwe knop om locatie op kaart te kiezen */}
+                            <TouchableOpacity
+                                style={[styles.button, {backgroundColor: '#4CAF50', marginBottom: 10}]}
+                                onPress={startPickingLocation}
+                            >
+                                <Text style={styles.buttonText}>Kies Locatie op Kaart</Text>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.button} onPress={addMarker}>
-                            <Text style={styles.buttonText}>Toevoegen</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, { backgroundColor: '#FF6347', marginTop: 10 }]}
-                            onPress={() => setAddMarkerModalVisible(false)}
-                        >
-                            <Text style={styles.buttonText}>Annuleren</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={styles.button} onPress={addMarker}>
+                                <Text style={styles.buttonText}>Toevoegen</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, {backgroundColor: '#FF6347', marginTop: 10}]}
+                                onPress={() => setAddMarkerModalVisible(false)}
+                            >
+                                <Text style={styles.buttonText}>Annuleren</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
             </Modal>
 
             {/* Visuele cue wanneer in picking mode */}
@@ -329,17 +374,68 @@ const MapScreen = () => {
                     <Text style={styles.pickingLocationText}>Tik op de kaart...</Text>
                 </View>
             )}
+            {/*{modal voor vis toevoegen}*/}
+            <Modal visible={addFishModalVisible} transparent animationType="slide" onRequestClose={toggleAddFishModal}>
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>Vis Informatie Invoeren</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Titel"
+                                value={fishInfo.title}
+                                onChangeText={(text) => setFishInfo({...fishInfo, title: text})}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Beschrijving"
+                                value={fishInfo.description}
+                                onChangeText={(text) => setFishInfo({...fishInfo, description: text})}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Soort"
+                                value={fishInfo.species}
+                                onChangeText={(text) => setFishInfo({...fishInfo, species: text})}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Lengte"
+                                keyboardType="numeric"
+                                value={fishInfo.length}
+                                onChangeText={(text) => setFishInfo({...fishInfo, length: text})}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Gewicht"
+                                keyboardType="numeric"
+                                value={fishInfo.weight}
+                                onChangeText={(text) => setFishInfo({...fishInfo, weight: text})}
+                            />
+
+                            <TouchableOpacity style={styles.button} onPress={addFish}>
+                                <Text style={styles.buttonText}>Toevoegen</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, {backgroundColor: '#FF6347', marginTop: 10}]}
+                                onPress={() => setAddFishModalVisible(false)}
+                            >
+                                <Text style={styles.buttonText}>Annuleren</Text>
+                            </TouchableOpacity>
+
+                        </View>
+                    </View>
+            </Modal>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    map: { flex: 1 },
+    container: {flex: 1},
+    map: {flex: 1},
     roundButton: {
         position: 'absolute',
         bottom: 40,
-        right: 20,
+        left: 20,
         backgroundColor: '#0096b2',
         width: 60,
         height: 60,
@@ -348,12 +444,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 5,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    roundButtonText: { color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30 },
-    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    roundButtonText: {color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30},
+    modalOverlay: {flex: 1, justifyContent: 'center', alignItems: 'center'},
     modalContent: {
         backgroundColor: 'white',
         padding: 20,
@@ -362,8 +458,8 @@ const styles = StyleSheet.create({
         maxHeight: '70%',
         alignItems: 'center',
     },
-    modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
-    modalText: { marginBottom: 5, fontSize: 16 },
+    modalTitle: {fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center'},
+    modalText: {marginBottom: 5, fontSize: 16},
     input: {
         width: '100%',
         padding: 10,
@@ -380,7 +476,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         alignItems: 'center',
     },
-    buttonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+    buttonText: {color: 'white', fontWeight: 'bold', fontSize: 16},
     closeButton: {
         marginTop: 20,
         backgroundColor: '#0096b2',
@@ -389,7 +485,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
     },
-    closeButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+    closeButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16},
     pickingLocationOverlay: {
         position: 'absolute',
         top: 0,
@@ -405,17 +501,16 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
     },
-    // Nieuwe stijlen voor het add-menu
     menuModalOverlay: {
         flex: 1,
         justifyContent: 'flex-end', // Zorgt ervoor dat de inhoud onderaan staat
-        alignItems: 'flex-end',   // Zorgt ervoor dat de inhoud rechts staat
+        alignItems: 'flex-start',   // Zorgt ervoor dat de inhoud rechts staat
         backgroundColor: 'rgba(0,0,0,0)', // Transparante achtergrond om tikken door te laten
     },
     addMenuContent: {
-        marginBottom: 110, // Ruimte boven de '+' knop (roundButton bottom 40 + height 60 + extra marge)
-        marginRight: 20,  // Lijn uit met de rechterkant van de '+' knop
-        alignItems: 'flex-end', // Zorgt ervoor dat de knoppen rechts uitlijnen
+        marginBottom: 150, // Ruimte boven de '+' knop (roundButton bottom 40 + height 60 + extra marge)
+        marginLeft: 20,  // Lijn uit met de rechterkant van de '+' knop
+        alignItems: 'flex-start', // Zorgt ervoor dat de knoppen rechts uitlijnen
     },
     menuButton: {
         backgroundColor: '#0096b2', // Achtergrondkleur van de knoppen
@@ -425,7 +520,7 @@ const styles = StyleSheet.create({
         marginBottom: 10, // Ruimte tussen de knoppen
         elevation: 3,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
+        shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.2,
         shadowRadius: 2,
     },
