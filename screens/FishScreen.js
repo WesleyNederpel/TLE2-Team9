@@ -50,20 +50,25 @@ const FishScreen = () => {
                     <Info label="Gewicht (kg)" value={`${fish.gewicht_kg.min} - ${fish.gewicht_kg.max}`} />
                     <Info label="Moeilijkheidsgraad" value={fish.moeilijkheidsgraad} />
                     <Info label="Beste seizoen" value={fish.seizoen} />
+                    {fish.duurzaam_vangen && (
+                        <Info
+                            label="Duurzaam te vangen"
+                            value={fish.duurzaam_vangen}
+                            multiline={true}
+                        />
+                    )}
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 };
 
-const Info = ({ label, value }) => (
+const Info = ({ label, value, multiline }) => (
     <View style={styles.section}>
         <Text style={styles.label}>{label}:</Text>
-        <Text style={styles.value}>{value}</Text>
+        <Text style={[styles.value, multiline && styles.multilineValue]}>{value}</Text>
     </View>
 );
-
-const HEADER_HEIGHT = 80;
 
 const styles = StyleSheet.create({
     safeArea: {
@@ -89,7 +94,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         marginRight: 10,
-        paddingTop:40,
+        paddingTop: 40,
     },
     title: {
         fontSize: 24,
@@ -141,6 +146,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#1e293b',
         marginTop: 4,
+        lineHeight: 24,
+    },
+    multilineValue: {
+        textAlign: 'justify',
     },
 });
 
