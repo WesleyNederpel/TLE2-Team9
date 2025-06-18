@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
-import React, {useState, useEffect} from 'react';
 import {
     StyleSheet,
     View,
@@ -14,7 +12,6 @@ import {
     Image,
     ScrollView // Importeer ScrollView voor scrollbare modals
 } from 'react-native';
-import MapView, {Polygon, Marker} from 'react-native-maps';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
 import {Picker} from '@react-native-picker/picker';
