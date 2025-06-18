@@ -9,7 +9,7 @@ const getImage = (name) => {
     const map = {
         "Kralingseplas": require("../images/Kralingseplas.png"),
         "Wijnhaven": require("../images/Wijnhaven.png"),
-        "Bergse Voorplas": require("../images/BergseVoorplas.png"),
+        "BergseVoorplas": require("../images/BergseVoorplas.png"),
         "Oudehaven": require("../images/Oudehaven.png"),
         "Haringvliet": require("../images/Haringvliet.png"),
         "Boerengat": require("../images/Boerengat.png"),
