@@ -2,12 +2,12 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Image } from 'react-native';
 import MapScreen from "../screens/MapScreen";
-import ProfileScreen from "../screens/ProfileScreen";
 import CameraScreen from "../screens/CameraScreen";
 import GalleryScreen from "../screens/GalleryScreen";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LocationsScreen from '../screens/LocationsScreen';
 import WaterInfo from "../screens/waterinfo";
+import CommunityScreen from '../screens/CommunityScreen';
 
 const LocationsStack = createNativeStackNavigator();
 
@@ -37,7 +37,7 @@ const Tab = createBottomTabNavigator()
 
 const getIconName = (routeName, focused) => {
     const icons = {
-        Profiel: focused ? 'person' : 'person-outline',
+        Community: focused ? 'people' : 'people-outline',
         Camera: focused ? 'camera' : 'camera-outline',
         Map: focused ? 'map' : 'map-outline',
         Locaties: focused ? 'location' : 'location-outline',
@@ -95,7 +95,7 @@ export default function NavBar({ navigation }) {
             <Tab.Screen name="Gallerij" component={GalleryScreen} />
             <Tab.Screen name="Map" component={MapStackScreen} />
             <Tab.Screen name="Locaties" component={LocationsStackScreen} />
-            <Tab.Screen name="Profiel" component={ProfileScreen} />
+            <Tab.Screen name="Community" component={CommunityScreen} />
         </Tab.Navigator>
     );
 }
