@@ -26,6 +26,8 @@ export default function GalleryScreen({ navigation, route }) {
     });
     const [markers, setMarkers] = useState([]); // Om spots te laden voor de dropdown
 
+    AsyncStorage.removeItem('savedPhotoKeys'); // Verwijder deze regel als je de foto's niet meer wilt opslaan in AsyncStorage
+
     // useCallback voor loadPhotos en loadFishCatches om stabiele referenties te garanderen
     const loadPhotos = useCallback(async () => {
         try {
