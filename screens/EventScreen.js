@@ -1,10 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, Linking, Platform } from 'react-native';
 
-// Importeer de events data. Zorg dat het pad klopt.
-// Dit pad moet relatief zijn aan waar EventScreen.js zich bevindt.
-import eventsData from '../data/events.json';
-
 // Helperfunctie om datums te formatteren
 const formatDate = (dateString) => {
     const options = { day: 'numeric', month: 'long', year: 'numeric' };

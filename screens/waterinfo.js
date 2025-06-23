@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from '@react-navigation/native'; // Importeer useNavigation
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons'; // Importeer Ionicons voor het maanicoon
+
 import waters from "../data/waters.json";
-import fishesData from "../assets/fish_data_of_the_netherlands.json"; // Importeer het nieuwe fishes.json bestand
+import fishesData from "../assets/fish_data_of_the_netherlands.json";
 
 const getImage = (name) => {
     const map = {
@@ -14,6 +16,9 @@ const getImage = (name) => {
         "Haringvliet": require("../images/Haringvliet.png"),
         "Boerengat": require("../images/Boerengat.png"),
         "Zevenhuizerplas": require("../images/Zevenhuizerplas.png"),
+        "Rottemeren": require("../images/Rottemeren.png"),
+        "Nieuwe Maas": require("../images/NieuweMaas.png"),
+        "De Rotte": require("../images/deRotte.png"),
 
         // Visafbeeldingen (zorg dat deze namen overeenkomen met je JSON en knoppen)
         "snoek": require("../images/snoek.png"),
@@ -21,16 +26,17 @@ const getImage = (name) => {
         "karper": require("../images/karper.png"),
         "brasem": require("../images/brasem.png"),
         "snoekbaars": require("../images/snoekbaars.png"),
-        "meerval": require("../images/meerval.png"), // Zorg dat deze afbeeldingen bestaan
-        "zalm": require("../images/zalm.png"),     // Zorg dat deze afbeeldingen bestaan
-        "zeelt": require("../images/zalm.png"),   // Zorg dat deze afbeeldingen bestaan
+        "meerval": require("../images/meerval.png"),
+        "zalm": require("../images/zalm.png"),
+        "zeelt": require("../images/zeelt.png"),
     };
 
-    return map[name] || require("../images/Kralingseplas.png"); // fallback
+    // Fallback naar een standaardafbeelding als de naam niet in de map staat
+    return map[name] || require("../images/Kralingseplas.png");
 };
 
 export default function WaterInfo({ route }) {
-    const navigation = useNavigation(); // Initialiseer navigation
+    const navigation = useNavigation();
     const waterName = route?.params?.waterName || "Onbekend";
 
     const location = waters.find(
@@ -88,7 +94,6 @@ export default function WaterInfo({ route }) {
 
     // Functie om naar FishScreen te navigeren
     const handleFishPress = (fishNameInList) => {
-        // Zoek de volledige visdata in fishesData
         const fishDetails = fishesData.find(
             (f) => f.naam.trim().toLowerCase() === fishNameInList.trim().toLowerCase()
         );
@@ -97,7 +102,6 @@ export default function WaterInfo({ route }) {
             navigation.navigate('FishScreen', { fish: fishDetails });
         } else {
             console.warn(`Visdetails voor "${fishNameInList}" niet gevonden.`);
-            // Optioneel: toon een alert aan de gebruiker
         }
     };
 
@@ -130,6 +134,28 @@ export default function WaterInfo({ route }) {
             <View style={styles.underline} />
             <Text style={styles.p}>{location.description}</Text>
 
+            {/* Nieuwe sectie voor AdditionalPermissions */}
+            {location.AdditionalPermissions && location.AdditionalPermissions.length > 0 && (
+                <View style={styles.additionalPermissionsSection}>
+                    <Text style={[styles.h2, { color: '#1A3A91' }]}>Aanvullende Vergunningen</Text>
+                    <View style={styles.underline} />
+                    {location.AdditionalPermissions.map((permission, index) => (
+                        <View key={permission.id || index} style={styles.permissionItem}>
+                            {permission.name === "NachtVISpas" ? (
+                                <Ionicons name="moon" size={24} color="#1A3A91" style={styles.permissionIcon} />
+                            ) : (
+                                // Optioneel: ander icoon voor andere types of leeg laten
+                                <View style={styles.permissionIconPlaceholder} />
+                            )}
+                            <View style={styles.permissionTextContent}>
+                                <Text style={styles.permissionName}>{permission.name}</Text>
+                                <Text style={styles.permissionDescription}>{permission.description}</Text>
+                            </View>
+                        </View>
+                    ))}
+                </View>
+            )}
+
             <View style={styles.fishPassContainer}>
                 <Image source={require("../images/fishpass.png")} style={styles.fishImage} />
                 <Text style={[styles.h1, { marginTop: 10 }]}>Vispas nodig!</Text>
@@ -159,7 +185,6 @@ export default function WaterInfo({ route }) {
                     Vissen {location.name}
                 </Text>
 
-                {/* Hier passen we de Pressable toe op elk vis-item */}
                 {location.fishTypes.map((fish, index) => {
                     const isEven = index % 2 === 0;
                     return (
@@ -169,7 +194,7 @@ export default function WaterInfo({ route }) {
                                 styles.fishItem,
                                 isEven ? styles.fishItemDefault : styles.fishItemSelected,
                             ]}
-                            onPress={() => handleFishPress(fish.name)} // Roep handleFishPress aan
+                            onPress={() => handleFishPress(fish.name)}
                         >
                             {isEven ? (
                                 <>
@@ -247,6 +272,12 @@ const styles = StyleSheet.create({
         color: '#E5A83F',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    h2: { // Nieuwe stijl voor subheaders
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginTop: 15,
+        marginBottom: 5,
     },
     p: {
         fontSize: 14,
@@ -368,5 +399,41 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 18,
+    },
+    // Nieuwe stijlen voor AdditionalPermissions
+    additionalPermissionsSection: {
+        marginTop: 20,
+        paddingHorizontal: 5, // Kleinere padding voor deze sectie
+    },
+    permissionItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F7F7F7', // Lichtgrijze achtergrond
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: '#ADDAEF', // Een zachte blauwe kleur
+    },
+    permissionIcon: {
+        marginRight: 10,
+    },
+    permissionIconPlaceholder: {
+        width: 24, // Zelfde breedte als icoon voor uitlijning
+        height: 24, // Zelfde hoogte als icoon voor uitlijning
+        marginRight: 10,
+    },
+    permissionTextContent: {
+        flex: 1, // Zorgt ervoor dat de tekst de resterende ruimte inneemt
+    },
+    permissionName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#1A3A91',
+        marginBottom: 2,
+    },
+    permissionDescription: {
+        fontSize: 14,
+        color: '#555',
     },
 });

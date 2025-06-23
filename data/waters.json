@@ -20,7 +20,8 @@
         "name": "Karper",
         "image": "karper"
       }
-    ]
+    ],
+    "AdditionalPermissions": []
   },
   {
     "id": 2,
@@ -38,7 +39,8 @@
         "name": "Brasem",
         "image": "brasem"
       }
-    ]
+    ],
+    "AdditionalPermissions": []
   },
   {
     "id": 3,
@@ -56,7 +58,8 @@
         "name": "Zeelt",
         "image": "zeelt"
       }
-    ]
+    ],
+    "AdditionalPermissions": []
   },
   {
     "id": 4,
@@ -74,7 +77,8 @@
         "name": "Baars",
         "image": "baars"
       }
-    ]
+    ],
+    "AdditionalPermissions": []
   },
   {
     "id": 5,
@@ -92,7 +96,8 @@
         "name": "Snoek",
         "image": "snoek"
       }
-    ]
+    ],
+    "AdditionalPermissions": []
   },
   {
     "id": 6,
@@ -110,6 +115,80 @@
         "name": "Snoek",
         "image": "snoek"
       }
+    ],
+    "AdditionalPermissions": []
+  },
+  {
+    "id": 7,
+    "name": "Rottemeren",
+    "description": "Een uitgestrekt natuurgebied met diverse vissoorten...",
+    "image": "Rottemeren",
+    "fishTypes": [
+      {
+        "id": "1",
+        "name": "Snoek",
+        "image": "snoek"
+      },
+      {
+        "id": "2",
+        "name": "Baars",
+        "image": "baars"
+      },
+      {
+        "id": "3",
+        "name": "Karper",
+        "image": "karper"
+      }
+    ],
+    "AdditionalPermissions": []
+  },
+  {
+    "id": 8,
+    "name": "Nieuwe Maas",
+    "description": "Een drukbevaren waterweg met veel vismogelijkheden...",
+    "image": "Nieuwe Maas",
+    "fishTypes": [
+      {
+        "id": "1",
+        "name": "Snoekbaars",
+        "image": "snoekbaars"
+      },
+      {
+        "id": "2",
+        "name": "Baars",
+        "image": "baars"
+      }
+    ],
+    "AdditionalPermissions": [
+      {
+        "id": "1",
+        "name": "NachtVISpas",
+        "description": "Bij dit water is het mogelijk om 's nachts te vissen. Voor het vissen na zonsondergang is een NachtVISpas vereist."
+      }
     ]
+  },
+  {
+    "id": 9,
+    "name": "De Rotte",
+    "description": "De Rotte is een rivier die door Rotterdam stroomt en bekend staat om zijn visrijke oevers.",
+    "image": "De Rotte",
+    "fishTypes": [
+      {
+        "id": "1",
+        "name": "Snoek",
+        "image": "snoek"
+      },
+      {
+        "id": "2",
+        "name": "Baars",
+        "image": "baars"
+      },
+      {
+        "id": "3",
+        "name": "Karper",
+        "image": "karper"
+      }
+    ],
+    "AdditionalPermissions": []
   }
 ]

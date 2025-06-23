@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native'; // ScrollView toegevoegd
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
+import waters from "../data/waters.json"; // Importeer waters.json hier
+import { Ionicons } from '@expo/vector-icons'; // Importeer Ionicons voor het maanicoon
 
 
 const getAfbeelding = (name) => {
@@ -21,12 +23,14 @@ const getAfbeelding = (name) => {
             return require('../images/Boerengat.png');
         case 'Zevenhuizerplas':
             return require('../images/Zevenhuizerplas.png');
+        case 'De Rotte':
+            return require('../images/deRotte.png');
+        case 'Nieuwe Maas':
+            return require('../images/NieuweMaas.png');
         default:
-            return null; // of een standaardafbeelding, bv. require('../images/placeholder.png');
+            return null; // of een standaardafbeelding
     }
 };
-
-
 
 
 const MapScreen = ({ navigation }) => {
@@ -61,7 +65,9 @@ const MapScreen = ({ navigation }) => {
     };
 
     const handlePolygonPress = (feature) => {
-        setSelectedFeature(feature);
+        // Vind de volledige water-data uit waters.json op basis van de naam
+        const waterData = waters.find(w => w.name.trim().toLowerCase() === feature.properties.name.trim().toLowerCase());
+        setSelectedFeature({ ...feature, waterData: waterData }); // Voeg waterData toe aan de geselecteerde feature
     };
 
     const isRiver = (feature) => feature?.properties?.water === 'river';
@@ -101,10 +107,6 @@ const MapScreen = ({ navigation }) => {
             } else if (props.water === 'harbour') {
                 fill = 'rgba(128, 128, 128, 0.5)';
                 stroke = 'rgba(105, 105, 105, 0.9)';
-            }
-            if (props.name === 'Kralingse Plas') {
-                fill = 'rgba(255, 165, 0, 0.6)';
-                stroke = 'rgba(255, 165, 0, 0.8)';
             }
 
             if (type === 'Polygon') {
@@ -200,12 +202,39 @@ const MapScreen = ({ navigation }) => {
                             {selectedFeature?.properties?.name || 'Onbekende locatie'}
                         </Text>
 
-                        <View style={{ marginTop: 10 }}>
-                            <Text style={styles.modalText}>🎣 Nodige Vispas:</Text>
-                            <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
-                            <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
-                            <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
-                        </View>
+                        {/* Hardcode voor Nieuwe Maas, anders dynamische weergave */}
+                        {selectedFeature?.properties?.name === 'Nieuwe Maas' ? (
+                            <View style={styles.permissionsScrollView}>
+                                <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                <Text style={styles.modalText}>• VISpas of Kleine VISpas</Text>
+                            </View>
+                        ) : (
+                            selectedFeature?.waterData?.AdditionalPermissions && selectedFeature.waterData.AdditionalPermissions.length > 0 ? (
+                                <ScrollView style={styles.permissionsScrollView}>
+                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                    {selectedFeature.waterData.AdditionalPermissions.map((permission, index) => (
+                                        <View key={permission.id || index} style={styles.permissionRow}>
+                                            {permission.name === "NachtVISpas" ? (
+                                                <Ionicons name="moon" size={20} color="#1A3A91" style={styles.permissionIcon} />
+                                            ) : (
+                                                <View style={styles.permissionIconPlaceholder} />
+                                            )}
+                                            <View style={styles.permissionTextContainer}>
+                                                <Text style={styles.permissionNameModal}>{permission.name}</Text>
+                                                <Text style={styles.permissionDescriptionModal}>{permission.description}</Text>
+                                            </View>
+                                        </View>
+                                    ))}
+                                </ScrollView>
+                            ) : (
+                                <View style={styles.noPermissionsContainer}>
+                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                    <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                                    <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                                    <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                                </View>
+                            )
+                        )}
 
                         <Text
                             style={[
@@ -293,16 +322,17 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
     },
     roundButtonText: { color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30 },
-    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
     modalContent: {
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
         width: '80%',
-        maxHeight: '70%',
+        maxHeight: '70%', // Beperk de hoogte voor ScrollView
         alignItems: 'center',
     },
     modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
+    modalSubTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, marginTop: 5, color: '#1A3A91' }, // Nieuwe stijl
     modalText: { marginBottom: 5, fontSize: 16 },
     input: {
         width: '100%',
@@ -330,6 +360,48 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     closeButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+    // Stijlen voor de dynamische vergunningen
+    permissionsScrollView: {
+        width: '100%',
+        maxHeight: 200, // Beperk de hoogte van de scrollview voor vergunningen
+        marginBottom: 10,
+        paddingVertical: 5,
+    },
+    permissionRow: {
+        flexDirection: 'row',
+        alignItems: 'left',
+        backgroundColor: '#F7F7F7', // Lichtgrijze achtergrond
+        padding: 8,
+        borderRadius: 5,
+        marginBottom: 5,
+        borderLeftWidth: 3,
+        borderLeftColor: '#ADDAEF', // Een zachte blauwe kleur
+    },
+    permissionIcon: {
+        marginRight: 8,
+    },
+    permissionIconPlaceholder: {
+        width: 20, // Zelfde breedte als icoon voor uitlijning
+        height: 20, // Zelfde hoogte als icoon voor uitlijning
+        marginRight: 8,
+    },
+    permissionTextContainer: {
+        flex: 1,
+    },
+    permissionNameModal: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#1A3A91',
+        marginBottom: 2,
+    },
+    permissionDescriptionModal: {
+        fontSize: 13,
+        color: '#555',
+    },
+    noPermissionsContainer: {
+        paddingVertical: 10,
+        alignItems: 'left',
+    },
 });
 
 export default MapScreen;
