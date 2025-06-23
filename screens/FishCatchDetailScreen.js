@@ -9,7 +9,8 @@ import {
     Modal,
     Dimensions,
     FlatList,
-    Alert, // Importeer Alert voor de bevestigingsdialoog
+    Alert,
+    Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -197,9 +198,9 @@ const FishCatchDetailScreen = ({ route }) => {
                     enableSwipeDown={true}
                     saveToLocalByLongPress={false}
                     renderHeader={() => (
-                        <View style={styles.imageViewerHeader}>
+                        <View style={[styles.imageViewerHeader, { paddingTop: Platform.OS === 'ios' ? 50 : 0 }]}>
                             <TouchableOpacity onPress={() => setIsImageViewerVisible(false)} style={styles.imageViewerCloseButton}>
-                                <Ionicons name="close-circle" size={35} color="white" />
+                                <Ionicons name="close-circle" size={50} color="white" />
                             </TouchableOpacity>
                         </View>
                     )}
@@ -326,7 +327,7 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         right: 0,
-        height: 60,
+        height: Platform.OS === 'ios' ? 100 : 60,
         backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'flex-end',
@@ -335,6 +336,7 @@ const styles = StyleSheet.create({
     },
     imageViewerCloseButton: {
         padding: 5,
+        zIndex: 3,
     },
 });
 

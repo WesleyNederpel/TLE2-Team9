@@ -25,6 +25,7 @@ export default function GalleryScreen({ navigation, route }) {
         imageUris: []
     });
     const [markers, setMarkers] = useState([]); // Om spots te laden voor de dropdown
+    const [spotPickerModalVisible, setSpotPickerModalVisible] = useState(false); // NIEUW: State voor de spot picker modal
 
     // useCallback voor loadPhotos en loadFishCatches om stabiele referenties te garanderen
     const loadPhotos = useCallback(async () => {
@@ -207,6 +208,11 @@ export default function GalleryScreen({ navigation, route }) {
 
     // Combineer photos en fishCatches en sorteer ze hier
     const combinedData = [...photos, ...fishCatches].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    // Functie om de naam van de geselecteerde spot te krijgen
+    const getSelectedSpotName = () => {
+        const selectedSpot = markers.find(m => m.id === fishInfo.location);
+        return selectedSpot ? selectedSpot.title : 'Kies een Spot Locatie';
+    };
 
     if (loading) {
         return (
@@ -279,7 +285,6 @@ export default function GalleryScreen({ navigation, route }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.galleryTitle}>Galerij</Text>
             <FlatList
                 data={combinedData}
                 keyExtractor={(item) => item.id}
@@ -350,19 +355,14 @@ export default function GalleryScreen({ navigation, route }) {
                             placeholderTextColor="#888"
                         />
 
-                        <View style={styles.pickerContainer}>
-                            <Picker
-                                selectedValue={fishInfo.location}
-                                style={styles.picker}
-                                onValueChange={(itemValue) => setFishInfo({ ...fishInfo, location: itemValue })}
-                                itemStyle={styles.pickerItem}
-                            >
-                                <Picker.Item label="Kies een Spot Locatie" value="" color="#888" />
-                                {markers.map((marker) => (
-                                    <Picker.Item key={marker.id} label={marker.title} value={marker.id} />
-                                ))}
-                            </Picker>
-                        </View>
+                        {/* NIEUW: Aangepaste TouchOpactiy voor het openen van de Spot Picker Modal */}
+                        <TouchableOpacity
+                            style={styles.pickerDisplayButton}
+                            onPress={() => setSpotPickerModalVisible(true)}
+                        >
+                            <Text style={styles.pickerDisplayText}>{getSelectedSpotName()}</Text>
+                            <Ionicons name="caret-down-outline" size={20} color="#666" />
+                        </TouchableOpacity>
 
                         <TouchableOpacity style={styles.button} onPress={addFish}>
                             <Text style={styles.buttonText}>Vis Toevoegen</Text>
@@ -376,6 +376,48 @@ export default function GalleryScreen({ navigation, route }) {
                     </ScrollView>
                 </View>
             </Modal>
+            {/* NIEUW: Modal voor het selecteren van een Spot Locatie */}
+            <Modal
+                visible={spotPickerModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setSpotPickerModalVisible(false)}
+            >
+                <TouchableOpacity
+                    style={styles.spotPickerModalOverlay}
+                    activeOpacity={1}
+                    onPress={() => setSpotPickerModalVisible(false)} // Sluit modal bij tikken buiten
+                >
+                    <View style={styles.spotPickerModalContent}>
+                        <Text style={styles.spotPickerModalTitle}>Kies een Spot Locatie</Text>
+                        <FlatList
+                            data={markers}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.spotPickerItem}
+                                    onPress={() => {
+                                        setFishInfo({ ...fishInfo, location: item.id });
+                                        setSpotPickerModalVisible(false);
+                                    }}
+                                >
+                                    <Text style={styles.spotPickerItemText}>{item.title}</Text>
+                                    {fishInfo.location === item.id && (
+                                        <Ionicons name="checkmark" size={20} color="#0096b2" />
+                                    )}
+                                </TouchableOpacity>
+                            )}
+                            ListEmptyComponent={() => (
+                                <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
+                            )}
+                        />
+                        <TouchableOpacity style={styles.spotPickerCloseButton} onPress={() => setSpotPickerModalVisible(false)}>
+                            <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
+                        </TouchableOpacity>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
+
         </View>
     );
 }
@@ -384,14 +426,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f8f8f8',
-    },
-    galleryTitle: {
-        fontSize: 26,
-        fontWeight: 'bold',
-        color: '#004a99',
-        textAlign: 'center',
-        marginTop: 40,
-        marginBottom: 20,
     },
     loadingContainer: {
         flex: 1,
@@ -634,4 +668,75 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
+    pickerDisplayButton: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        padding: 10,
+        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        backgroundColor: '#f9f9f9',
+    },
+    pickerDisplayText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    spotPickerModalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+    },
+    spotPickerModalContent: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        width: '80%',
+        maxHeight: '70%', // Max hoogte voor de lijst
+        padding: 15,
+        alignItems: 'center',
+    },
+    spotPickerModalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        color: '#004a99',
+    },
+    spotPickerItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    spotPickerItemText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    noSpotsText: {
+        fontSize: 14,
+        color: '#888',
+        textAlign: 'center',
+        paddingVertical: 20,
+    },
+    spotPickerCloseButton: {
+        marginTop: 20,
+        backgroundColor: '#FF6347',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        width: '100%',
+        alignItems: 'center',
+    },
+    spotPickerCloseButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+
 });

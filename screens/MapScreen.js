@@ -8,7 +8,6 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
-    TouchableWithoutFeedback,
     Image,
     ScrollView,
     KeyboardAvoidingView, // Importeer KeyboardAvoidingView
@@ -41,7 +40,6 @@ const getAfbeelding = (name) => {
 
 const MapScreen = ({navigation}) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
-    // const [addMenuModalVisible, setAddMenuModalVisible] = useState(false); // Deze is verwijderd
 
     const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
     const [markerInfo, setMarkerInfo] = useState({title: '', description: '', latitude: null, longitude: null});
@@ -169,10 +167,6 @@ const MapScreen = ({navigation}) => {
         });
     };
 
-    // const toggleAddMenuModal = () => { // Deze functie is verwijderd
-    //     setAddMenuModalVisible(!addMenuModalVisible);
-    // };
-
     const openAddMarkerModal = () => {
         setMarkerInfo({
             title: '',
@@ -181,7 +175,6 @@ const MapScreen = ({navigation}) => {
             longitude: currentLocation?.coords.longitude ?? null,
         });
         setAddMarkerModalVisible(true);
-        // setAddMenuModalVisible(false); // Deze regel is niet meer nodig
     };
 
     // addMarker functie aangepast om markers op te slaan

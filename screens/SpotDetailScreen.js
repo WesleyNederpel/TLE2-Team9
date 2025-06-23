@@ -219,7 +219,7 @@ const SpotDetailScreen = ({ route }) => {
                     renderHeader={() => (
                         <View style={styles.imageViewerHeader}>
                             <TouchableOpacity onPress={() => setIsImageViewerVisible(false)} style={styles.imageViewerCloseButton}>
-                                <Ionicons name="close-circle" size={35} color="white" />
+                                <Ionicons name="close-circle" size={50} color="white" />
                             </TouchableOpacity>
                         </View>
                     )}
