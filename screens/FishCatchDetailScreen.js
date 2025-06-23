@@ -9,11 +9,12 @@ import {
     Modal,
     Dimensions,
     FlatList,
+    Alert, // Importeer Alert voor de bevestigingsdialoog
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Nog steeds nodig
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -24,13 +25,12 @@ const FishCatchDetailScreen = ({ route }) => {
     const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [imagesForViewer, setImagesForViewer] = useState([]);
-    const [spotName, setSpotName] = useState('Onbekende locatie'); // State voor spotnaam
+    const [spotName, setSpotName] = useState('Onbekende locatie');
 
     useEffect(() => {
         const fetchSpotDetails = async () => {
             if (fishCatch.location) {
                 try {
-                    // JOUW VOORGESTELDE LOGICA HIER:
                     const savedMarkerKeys = await AsyncStorage.getItem('savedMarkerKeys');
                     let loadedMarkers = [];
                     if (savedMarkerKeys) {
@@ -43,26 +43,70 @@ const FishCatchDetailScreen = ({ route }) => {
                         }
                     }
 
-                    // Zoek de juiste spot op basis van de fishCatch.location ID
                     const foundSpot = loadedMarkers.find(marker => marker.id === fishCatch.location);
 
                     if (foundSpot) {
                         setSpotName(foundSpot.title || 'Onbekende locatie');
-                        console.log("Spot gevonden:", foundSpot.title); // DEBUG LOG
+                        console.log("Spot gevonden:", foundSpot.title);
                     } else {
-                        setSpotName('Locatie niet gevonden in spots'); // Specifieker bericht
-                        console.log("Spot niet gevonden voor ID:", fishCatch.location); // DEBUG LOG
+                        setSpotName('Locatie niet gevonden in spots');
+                        console.log("Spot niet gevonden voor ID:", fishCatch.location);
                     }
                 } catch (error) {
                     console.error("Fout bij het ophalen van spotnaam voor visvangst:", error);
                     setSpotName('Fout bij laden locatie');
                 }
             } else {
-                setSpotName('Geen locatie gekoppeld'); // Als fishCatch.location leeg is
+                setSpotName('Geen locatie gekoppeld');
             }
         };
         fetchSpotDetails();
-    }, [fishCatch.location]); // Draai dit effect opnieuw als de locatie-ID verandert
+    }, [fishCatch.location]);
+
+    // Functie om de visvangst te verwijderen
+    const handleDeleteFishCatch = async () => {
+        Alert.alert(
+            "Visvangst verwijderen",
+            "Weet je zeker dat je deze visvangst wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+            [
+                {
+                    text: "Annuleren",
+                    style: "cancel"
+                },
+                {
+                    text: "Verwijderen",
+                    onPress: async () => {
+                        try {
+                            // 1. Verwijder de individuele visvangst uit AsyncStorage
+                            await AsyncStorage.removeItem(fishCatch.id);
+                            console.log(`Individuele visvangst met ID ${fishCatch.id} verwijderd.`);
+
+                            // 2. Update de lijst met visvangst ID's ('savedFishKeys')
+                            const savedFishKeysString = await AsyncStorage.getItem('savedFishKeys');
+                            let savedFishKeys = savedFishKeysString ? JSON.parse(savedFishKeysString) : [];
+
+                            // Filter de ID van de verwijderde visvangst eruit
+                            const updatedFishKeys = savedFishKeys.filter(
+                                (key) => key !== fishCatch.id
+                            );
+
+                            // Sla de bijgewerkte lijst met sleutels op
+                            await AsyncStorage.setItem('savedFishKeys', JSON.stringify(updatedFishKeys));
+                            console.log(`ID ${fishCatch.id} verwijderd uit savedFishKeys.`);
+
+                            Alert.alert('Succes', 'Visvangst succesvol verwijderd!');
+                            navigation.goBack(); // Navigeer terug na succesvolle verwijdering
+                        } catch (error) {
+                            console.error("Fout bij het verwijderen van de visvangst:", error);
+                            Alert.alert("Fout", "Kon de visvangst niet verwijderen. Probeer het opnieuw.");
+                        }
+                    },
+                    style: "destructive" // Maakt de knop rood op iOS
+                }
+            ],
+            { cancelable: true }
+        );
+    };
 
     if (!fishCatch) {
         return (
@@ -87,9 +131,15 @@ const FishCatchDetailScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={28} color="#004a99" />
-            </TouchableOpacity>
+            <View style={styles.topButtonsContainer}>
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={28} color="#004a99" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteFishCatch}>
+                    <Ionicons name="trash-outline" size={28} color="#dc3545" />
+                </TouchableOpacity>
+            </View>
+
 
             <View style={styles.header}>
                 <Text style={styles.title}>{fishCatch.title}</Text>
@@ -101,7 +151,6 @@ const FishCatchDetailScreen = ({ route }) => {
                     <Text style={styles.detailLabel}>Datum:</Text>{' '}
                     {new Date(fishCatch.timestamp).toLocaleDateString()}
                 </Text>
-                {/* Toon de spotnaam */}
                 <Text style={styles.detailText}>
                     <Text style={styles.detailLabel}>Spot:</Text>{' '}
                     {spotName}
@@ -165,11 +214,22 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f8f8f8',
     },
-    backButton: {
+    topButtonsContainer: {
         position: 'absolute',
         top: 40,
         left: 20,
+        right: 20,
         zIndex: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    backButton: {
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        borderRadius: 20,
+        padding: 5,
+    },
+    deleteButton: {
         backgroundColor: 'rgba(255,255,255,0.8)',
         borderRadius: 20,
         padding: 5,

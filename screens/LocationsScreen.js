@@ -130,10 +130,6 @@ export default function LocationsScreen({ navigation }) {
                     <Ionicons name="location-outline" size={18} color="#005f99" style={styles.spotIcon} />
                     <View style={styles.spotTextContainer}>
                         <Text style={styles.spotTitle}>{spot.title}</Text>
-                        {/* AANGEPAST: Gebruik dynamische tekst */}
-                        <Text style={styles.fishCountText}>
-                            {getFishCountText(spot.fishCatches?.length || 0)}
-                        </Text>
                     </View>
                     <TouchableOpacity
                         style={styles.detailsButton}

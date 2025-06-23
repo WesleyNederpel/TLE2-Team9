@@ -14,10 +14,6 @@ export default function GalleryScreen({ navigation, route }) {
     const [fishCatches, setFishCatches] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // DEZE STATES ZIJN VERWIJDERD:
-    // const [selectedPhoto, setSelectedPhoto] = useState(null);
-    // const [modalVisible, setModalVisible] = useState(false);
-
     const [addFishModalVisible, setAddFishModalVisible] = useState(false);
     const [fishInfo, setFishInfo] = useState({
         title: '',
@@ -30,31 +26,8 @@ export default function GalleryScreen({ navigation, route }) {
     });
     const [markers, setMarkers] = useState([]); // Om spots te laden voor de dropdown
 
-    useFocusEffect(
-        useCallback(() => {
-            const loadData = async () => {
-                setLoading(true);
-                await loadMarkers();
-                await loadPhotos(); // Blijft voor nu staan, maar kan ook weg als 'photos' niet meer relevant is
-                await loadFishCatches();
-                setLoading(false);
-            };
-            loadData();
-
-            if (route.params?.newPhotoUriForFish) {
-                setAddFishModalVisible(true);
-                setFishInfo(prevInfo => ({
-                    ...prevInfo,
-                    imageUris: [route.params.newPhotoUriForFish]
-                }));
-                navigation.setParams({ newPhotoUriForFish: undefined });
-            }
-
-            return () => { };
-        }, [route.params?.newPhotoUriForFish])
-    );
-
-    const loadPhotos = async () => {
+    // useCallback voor loadPhotos en loadFishCatches om stabiele referenties te garanderen
+    const loadPhotos = useCallback(async () => {
         try {
             const savedPhotoKeys = await AsyncStorage.getItem('savedPhotoKeys');
             if (savedPhotoKeys) {
@@ -78,9 +51,9 @@ export default function GalleryScreen({ navigation, route }) {
         } catch (error) {
             console.error('Fout bij het laden van foto\'s:', error);
         }
-    };
+    }, []); // Geen afhankelijkheden, laadt altijd alle foto's
 
-    const loadFishCatches = async () => {
+    const loadFishCatches = useCallback(async () => {
         try {
             const savedFishKeys = await AsyncStorage.getItem('savedFishKeys');
             if (savedFishKeys) {
@@ -105,9 +78,9 @@ export default function GalleryScreen({ navigation, route }) {
             console.error('Fout bij het laden van visvangsten uit AsyncStorage:', error);
             Alert.alert('Fout', 'Kon de visvangsten niet laden.');
         }
-    };
+    }, []); // Geen afhankelijkheden, laadt altijd alle visvangsten
 
-    const loadMarkers = async () => {
+    const loadMarkers = useCallback(async () => {
         try {
             const savedMarkerKeys = await AsyncStorage.getItem('savedMarkerKeys');
             if (savedMarkerKeys) {
@@ -126,23 +99,44 @@ export default function GalleryScreen({ navigation, route }) {
         } catch (error) {
             console.error('Fout bij het laden van markers:', error);
         }
-    };
+    }, []); // Geen afhankelijkheden, laadt altijd alle markers
 
-    // DEZE FUNCTIES ZIJN VERWIJDERD:
-    // const openPhotoModal = (photo) => {
-    //     setSelectedPhoto(photo);
-    //     setModalVisible(true);
-    // };
-    // const closePhotoModal = () => {
-    //     setModalVisible(false);
-    //     setSelectedPhoto(null);
-    // };
+    useFocusEffect(
+        useCallback(() => {
+            const loadAllData = async () => {
+                setLoading(true);
+                await loadMarkers(); // Eerst markers laden voor de picker
+                await loadPhotos();
+                await loadFishCatches();
+                setLoading(false);
+            };
+            loadAllData();
+
+            // Specifieke logica voor wanneer een nieuwe foto voor vis is meegegeven via route.params
+            if (route.params?.newPhotoUriForFish) {
+                setAddFishModalVisible(true);
+                setFishInfo(prevInfo => ({
+                    ...prevInfo,
+                    imageUris: [route.params.newPhotoUriForFish]
+                }));
+                // Belangrijk: reset de param zodat de modal niet opnieuw opent bij elke focus
+                navigation.setParams({ newPhotoUriForFish: undefined });
+            }
+
+            return () => {
+                // Optionele opschoning als het scherm de focus verliest
+                // Bijvoorbeeld, als je event listeners zou hebben die je wilt opruimen
+            };
+        }, [loadMarkers, loadPhotos, loadFishCatches, route.params?.newPhotoUriForFish]) // Afhankelijkheden van useCallback
+    );
 
     const openAddFishModal = () => {
+        // Zorg ervoor dat de locatie standaard de eerste beschikbare spot is, indien aanwezig
+        const defaultLocation = markers.length > 0 ? markers[0].id : '';
         setFishInfo({
             title: '',
             description: '',
-            location: markers.length > 0 ? markers[0].id : '',
+            location: defaultLocation, // Stel de standaardlocatie in
             species: '',
             length: '',
             weight: '',
@@ -153,7 +147,7 @@ export default function GalleryScreen({ navigation, route }) {
 
     const closeAddFishModal = () => {
         setAddFishModalVisible(false);
-        setFishInfo({
+        setFishInfo({ // Reset fishInfo bij sluiten
             title: '',
             description: '',
             location: '',
@@ -196,11 +190,9 @@ export default function GalleryScreen({ navigation, route }) {
                 fishKeys.push(newFishEntry.id);
                 await AsyncStorage.setItem('savedFishKeys', JSON.stringify(fishKeys));
 
-                setFishCatches((prevFishCatches) => {
-                    const updatedCatches = [...prevFishCatches, newFishEntry];
-                    updatedCatches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    return updatedCatches;
-                });
+                // Na het toevoegen, opnieuw laden van alle visvangsten om de lijst te verversen
+                await loadFishCatches(); // Dit zorgt ervoor dat de state 'fishCatches' wordt bijgewerkt
+                // en de FlatList een herrender trigger.
 
                 closeAddFishModal();
                 Alert.alert('Vis toegevoegd', 'De visvangst is succesvol opgeslagen en toegevoegd aan de galerij!');
@@ -213,6 +205,7 @@ export default function GalleryScreen({ navigation, route }) {
         }
     };
 
+    // Combineer photos en fishCatches en sorteer ze hier
     const combinedData = [...photos, ...fishCatches].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     if (loading) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     ScrollView,
     View,
@@ -10,26 +10,67 @@ import {
     FlatList,
     Modal,
     Dimensions,
+    ActivityIndicator,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Nodig om spotnaam op te halen
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Schermafmetingen voor de ImageViewer
 const { width, height } = Dimensions.get('window');
 
 const SpotDetailScreen = ({ route }) => {
     const navigation = useNavigation();
-    const { spot } = route.params;
+    const { spot } = route.params; // De initiële spot gegevens vanuit de navigatie
+    const [spotDetails, setSpotDetails] = useState(spot); // We gebruiken deze state om de spot data bij te werken
 
-    // NIEUW: State voor de lightbox (image viewer)
     const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [imagesForViewer, setImagesForViewer] = useState([]);
+    const [loadingFishCatches, setLoadingFishCatches] = useState(true);
 
-    if (!spot) {
+    const loadFishCatchesForSpot = useCallback(async () => {
+        setLoadingFishCatches(true);
+        try {
+            const savedFishKeysString = await AsyncStorage.getItem('savedFishKeys');
+            const fishKeys = savedFishKeysString ? JSON.parse(savedFishKeysString) : [];
+            const allFishCatches = [];
+
+            for (const key of fishKeys) {
+                const fishString = await AsyncStorage.getItem(key);
+                if (fishString) {
+                    allFishCatches.push(JSON.parse(fishString));
+                }
+            }
+
+            const filteredFishCatches = allFishCatches.filter(
+                (fish) => fish.location === spot.id
+            );
+
+            filteredFishCatches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            // Werk de 'spotDetails' state bij met de geladen visvangsten
+            setSpotDetails(prevDetails => ({
+                ...prevDetails,
+                fishCatches: filteredFishCatches,
+            }));
+
+        } catch (error) {
+            console.error("Fout bij het laden van visvangsten voor spot:", error);
+        } finally {
+            setLoadingFishCatches(false);
+        }
+    }, [spot.id]);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadFishCatchesForSpot();
+            return () => { };
+        }, [loadFishCatchesForSpot])
+    );
+
+    if (!spotDetails) {
         return (
             <View style={styles.container}>
                 <Text style={styles.errorText}>Spot niet gevonden.</Text>
@@ -38,18 +79,18 @@ const SpotDetailScreen = ({ route }) => {
     }
 
     const openGoogleMaps = () => {
-        if (typeof spot.latitude === 'number' && typeof spot.longitude === 'number') {
-            const googleMapsUrl = `http://maps.google.com/maps?q=${spot.latitude},${spot.longitude}`;
+        if (typeof spotDetails.latitude === 'number' && typeof spotDetails.longitude === 'number') {
+            // Correcte Google Maps URL met template literals
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${spotDetails.latitude},${spotDetails.longitude}`;
             Linking.openURL(googleMapsUrl).catch(err =>
-                console.error('An error occurred opening Google Maps', err)
+                console.error('Er is een fout opgetreden bij het openen van Google Maps', err)
             );
         } else {
-            console.warn('Invalid coordinates for Google Maps:', spot.latitude, spot.longitude);
+            console.warn('Ongeldige coördinaten voor Google Maps:', spotDetails.latitude, spotDetails.longitude);
             alert('Locatiecoördinaten zijn ongeldig.');
         }
     };
 
-    // Functie om de lightbox te openen
     const openImageViewer = (uris, index) => {
         const formattedImages = uris.map(uri => ({ url: uri }));
         setImagesForViewer(formattedImages);
@@ -61,7 +102,6 @@ const SpotDetailScreen = ({ route }) => {
         <View style={styles.fishItem}>
             <View style={styles.fishItemHeader}>
                 <Text style={styles.fishTitle}>{fish.title}</Text>
-                {/* NIEUW: Knop naar FishCatchDetailScreen */}
                 <TouchableOpacity
                     style={styles.viewDetailsButton}
                     onPress={() => navigation.navigate('FishCatchDetail', { fishCatch: fish })}
@@ -103,12 +143,13 @@ const SpotDetailScreen = ({ route }) => {
                 <Ionicons name="arrow-back" size={28} color="#004a99" />
             </TouchableOpacity>
 
-            {spot.latitude && spot.longitude ? (
+            {/* Hier controleren we op spotDetails.latitude en .longitude */}
+            {spotDetails.latitude && spotDetails.longitude ? (
                 <MapView
                     style={styles.map}
                     initialRegion={{
-                        latitude: spot.latitude,
-                        longitude: spot.longitude,
+                        latitude: spotDetails.latitude,
+                        longitude: spotDetails.longitude,
                         latitudeDelta: 0.003,
                         longitudeDelta: 0.003,
                     }}
@@ -118,9 +159,9 @@ const SpotDetailScreen = ({ route }) => {
                     rotateEnabled={false}
                 >
                     <Marker
-                        coordinate={{ latitude: spot.latitude, longitude: spot.longitude }}
-                        title={spot.title}
-                        description={spot.description}
+                        coordinate={{ latitude: spotDetails.latitude, longitude: spotDetails.longitude }}
+                        title={spotDetails.title}
+                        description={spotDetails.description}
                     />
                 </MapView>
             ) : (
@@ -131,12 +172,14 @@ const SpotDetailScreen = ({ route }) => {
 
             <View style={styles.contentSection}>
                 <View style={styles.infoSection}>
-                    <Text style={styles.spotDetailTitle}>{spot.title}</Text>
-                    {spot.description && <Text style={styles.spotDetailDescription}>{spot.description}</Text>}
+                    {/* Hier gebruiken we spotDetails voor de titel */}
+                    <Text style={styles.spotDetailTitle}>{spotDetails.title}</Text>
+                    {spotDetails.description && <Text style={styles.spotDetailDescription}>{spotDetails.description}</Text>}
 
-                    {spot.latitude && spot.longitude && (
+                    {/* Hier gebruiken we spotDetails voor de coördinaten */}
+                    {spotDetails.latitude && spotDetails.longitude && (
                         <Text style={styles.spotDetailCoordinates}>
-                            Coördinaten: {spot.latitude.toFixed(6)}, {spot.longitude.toFixed(6)}
+                            Coördinaten: {spotDetails.latitude.toFixed(6)}, {spotDetails.longitude.toFixed(6)}
                         </Text>
                     )}
 
@@ -148,9 +191,14 @@ const SpotDetailScreen = ({ route }) => {
 
                 <View style={styles.fishCatchesSection}>
                     <Text style={styles.sectionHeader}>Gevangen Vissen</Text>
-                    {spot.fishCatches && spot.fishCatches.length > 0 ? (
+                    {loadingFishCatches ? (
+                        <View style={styles.loadingFishCatchesContainer}>
+                            <ActivityIndicator size="small" color="#005f99" />
+                            <Text style={styles.loadingFishCatchesText}>Vissen laden...</Text>
+                        </View>
+                    ) : spotDetails.fishCatches && spotDetails.fishCatches.length > 0 ? (
                         <FlatList
-                            data={spot.fishCatches}
+                            data={spotDetails.fishCatches}
                             keyExtractor={(fish) => fish.id.toString()}
                             renderItem={renderFishItem}
                             scrollEnabled={false}
@@ -279,7 +327,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
-    fishItemHeader: { // NIEUW: Voor titel en knop op één lijn
+    fishItemHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -289,16 +337,16 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#005f99',
-        flexShrink: 1, // Zorg dat de titel kan krimpen als de knop veel ruimte inneemt
+        flexShrink: 1,
         marginRight: 10,
     },
-    viewDetailsButton: { // NIEUW: Stijl voor de knop
+    viewDetailsButton: {
         backgroundColor: '#007bff',
         paddingVertical: 6,
         paddingHorizontal: 10,
         borderRadius: 5,
     },
-    viewDetailsButtonText: { // NIEUW: Stijl voor de tekst op de knop
+    viewDetailsButtonText: {
         color: 'white',
         fontSize: 12,
         fontWeight: 'bold',
@@ -356,6 +404,17 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         color: '#777',
         marginTop: 10,
+        fontSize: 16,
+    },
+    loadingFishCatchesContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 20,
+    },
+    loadingFishCatchesText: {
+        marginLeft: 10,
+        color: '#005f99',
         fontSize: 16,
     },
     errorText: {
