@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Button, StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native'; // Alert toegevoegd
 import { CameraView } from 'expo-camera';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// AsyncStorage is niet meer nodig in CameraScreen voor directe opslag van foto's
+// import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
-import { useIsFocused } from '@react-navigation/native'; // Importeer useIsFocused
+import { useIsFocused } from '@react-navigation/native';
 
 export default function CameraScreen({ navigation }) {
     const [type] = useState('back');
@@ -12,19 +13,18 @@ export default function CameraScreen({ navigation }) {
     const [isTakingPicture, setIsTakingPicture] = useState(false);
     const [zoom, setZoom] = useState(0);
 
-    const isFocused = useIsFocused(); // Gebruik de hook hier
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         (async () => {
-            if (isFocused) { // Voer permissieaanvraag alleen uit als het scherm in focus is
+            if (isFocused) {
                 const { status } = await requestCameraPermission();
                 setHasPermission(status === 'granted');
             } else {
-                // Optioneel: reset de permissiestatus of doe iets anders wanneer het scherm niet in focus is
                 setHasPermission(null);
             }
         })();
-    }, [isFocused]); // Herlaad de effect wanneer de focus verandert
+    }, [isFocused]);
 
     async function requestCameraPermission() {
         try {
@@ -45,70 +45,49 @@ export default function CameraScreen({ navigation }) {
                     base64: false,
                 });
 
-                await savePhotoToStorage(photo);
-                console.log('Photo taken and saved to AsyncStorage');
+                // In plaats van opslaan, navigeer naar GalleryScreen met de foto URI
+                navigation.navigate('Galerij', { newPhotoUriForFish: photo.uri }); // Let op: 'Galerij' moet de naam van je GalleryScreen in de navigator zijn.
+                console.log('Photo taken, navigating to GalleryScreen for fish data entry.');
 
             } catch (error) {
                 console.error('Error taking picture:', error);
+                Alert.alert('Fout', 'Kon geen foto maken. Probeer opnieuw.');
             } finally {
                 setIsTakingPicture(false);
             }
         }
     };
 
-    const savePhotoToStorage = async (photo) => {
-        try {
-            const photoKey = `photo_${new Date().getTime()}`;
+    // savePhotoToStorage is niet meer nodig in CameraScreen
+    // const savePhotoToStorage = async (photo) => { ... };
 
-            const photoData = {
-                uri: photo.uri,
-                width: photo.width,
-                height: photo.height,
-                timestamp: new Date().toISOString()
-            };
-
-            await AsyncStorage.setItem(photoKey, JSON.stringify(photoData));
-
-            const savedPhotoKeys = await AsyncStorage.getItem('savedPhotoKeys');
-            const photoKeys = savedPhotoKeys ? JSON.parse(savedPhotoKeys) : [];
-            photoKeys.push(photoKey);
-            await AsyncStorage.setItem('savedPhotoKeys', JSON.stringify(photoKeys));
-        } catch (error) {
-            console.error('Error saving photo to AsyncStorage:', error);
-            throw error;
-        }
-    };
-
-    // Function to increase zoom (with upper limit of 1)
     const zoomIn = () => {
         setZoom(prevZoom => Math.min(prevZoom + 0.1, 1));
     };
 
-    // Function to decrease zoom (with lower limit of 0)
     const zoomOut = () => {
         setZoom(prevZoom => Math.max(prevZoom - 0.1, 0));
     };
 
-    if (hasPermission === null && isFocused) { // Toon dit alleen als het scherm in focus is
-        return <View style={styles.container}><Text>Requesting camera permission...</Text></View>;
+    if (hasPermission === null && isFocused) {
+        return <View style={styles.container}><Text>Permissie voor camera aanvragen...</Text></View>;
     }
 
     if (hasPermission === false) {
         return (
             <View style={styles.container}>
-                <Text style={styles.message}>We need your permission to show the camera</Text>
+                <Text style={styles.message}>We hebben je permissie nodig om de camera te tonen.</Text>
                 <Button
                     onPress={async () => {
                         const { status } = await requestCameraPermission();
                         setHasPermission(status === 'granted');
                     }}
-                    title="Grant Permission"
+                    title="Geef Permissie"
                 />
             </View>
         );
     }
 
-    // Render de CameraView alleen als het scherm in focus is en permissie is verleend
     return (
         <View style={styles.container}>
             {isFocused && hasPermission ? (
@@ -119,7 +98,6 @@ export default function CameraScreen({ navigation }) {
                     zoom={zoom}
                 />
             ) : (
-                // Optioneel: Toon een placeholder of lege View wanneer de camera niet actief is
                 <View style={styles.cameraPlaceholder} />
             )}
             <View style={styles.zoomControlsContainer}>
@@ -176,7 +154,7 @@ const styles = StyleSheet.create({
     camera: {
         flex: 1,
     },
-    cameraPlaceholder: { // Voeg een placeholder stijl toe
+    cameraPlaceholder: {
         flex: 1,
         backgroundColor: 'black',
     },

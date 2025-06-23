@@ -41,7 +41,7 @@ const getIconName = (routeName, focused) => {
         Camera: focused ? 'camera' : 'camera-outline',
         Map: focused ? 'map' : 'map-outline',
         Locaties: focused ? 'location' : 'location-outline',
-        Gallerij: focused ? 'images' : 'images-outline'
+        Galerij: focused ? 'images' : 'images-outline'
     }
 
     return icons[routeName];
@@ -92,7 +92,7 @@ export default function NavBar({ navigation }) {
             })}
         >
             <Tab.Screen name="Camera" component={CameraScreen} />
-            <Tab.Screen name="Gallerij" component={GalleryScreen} />
+            <Tab.Screen name="Galerij" component={GalleryScreen} />
             <Tab.Screen name="Map" component={MapStackScreen} />
             <Tab.Screen name="Locaties" component={LocationsStackScreen} />
             <Tab.Screen name="Community" component={CommunityScreen} />
