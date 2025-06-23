@@ -1,0 +1,247 @@
+[
+    {
+        "id": 1,
+        "title": "Duurzaam vissen: Tips voor een gezonde toekomst",
+        "author": "Jan de Visser",
+        "date": "2024-06-10",
+        "pinned": true,
+        "type": "Tips",
+        "content": "Duurzaam vissen is belangrijk voor het behoud van onze wateren en vispopulaties. Hier zijn enkele tips:\n\n- Gebruik altijd biologisch afbreekbaar aas.\n- Neem je afval mee terug naar huis.\n- Vang en laat los: laat kleine of beschermde vissen weer zwemmen.\n- Gebruik haken zonder weerhaak om verwondingen te voorkomen.\n- Vis op minder kwetsbare soorten tijdens het broedseizoen.\n\nSamen zorgen we voor een gezonde toekomst voor onze hobby!",
+        "comments": [
+            {
+                "author": "PietjeVist",
+                "date": "2024-06-11",
+                "content": "Goede tips! Vooral het gebruik van weerhaakloze haken helpt echt."
+            },
+            {
+                "author": "Vismattie",
+                "date": "2024-06-12",
+                "content": "Ik neem altijd mijn afval mee, jammer dat niet iedereen dat doet."
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "title": "De beste stekken voor karpervissen in Nederland",
+        "author": "Karin Karper",
+        "date": "2024-06-09",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Karpervissen is populair in Nederland. Goede stekken zijn onder andere de Maasplassen, het IJsselmeer en de Vecht. Vergeet niet je vergunning mee te nemen en respecteer de natuur!",
+        "comments": [
+            {
+                "author": "KarperKing",
+                "date": "2024-06-09",
+                "content": "De Maasplassen zijn echt top! Vorige week nog een 15kg karper gevangen."
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "title": "Welke hengel past bij jou?",
+        "author": "Henk Hengelaar",
+        "date": "2024-06-08",
+        "pinned": false,
+        "type": "Vraag",
+        "content": "Er zijn veel soorten hengels: vaste stok, feeder, spinhengel en meer. Kies een hengel die past bij de vissoort en het water waar je vist. Vraag advies in de hengelsportwinkel als je twijfelt.",
+        "comments": [
+            {
+                "author": "VissendeVader",
+                "date": "2024-06-08",
+                "content": "Goede uitleg! Ik gebruik zelf het liefst een feederhengel."
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "title": "Visvergunningen in Nederland: Wat heb je nodig?",
+        "author": "Lisa Lijn",
+        "date": "2024-06-07",
+        "pinned": false,
+        "type": "Blog",
+        "content": "In Nederland heb je meestal een VISpas nodig om te mogen vissen. Controleer altijd de regels voor het water waar je wilt vissen. Sommige wateren vereisen een extra vergunning.",
+        "comments": [
+            {
+                "author": "RegelRein",
+                "date": "2024-06-07",
+                "content": "Handig overzicht! Vergeet ook niet de NachtVISpas als je 's nachts wilt vissen."
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "title": "Top 5 aas voor roofvissen",
+        "author": "Rik Roofvis",
+        "date": "2024-06-06",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Voor roofvissen zoals snoek en baars zijn kunstaas, dode vis, wormen, pluggen en spinners erg effectief. Probeer verschillende soorten om te ontdekken wat het beste werkt op jouw stek.",
+        "comments": [
+            {
+                "author": "SpinnerFan",
+                "date": "2024-06-06",
+                "content": "Spinners werken bij mij altijd goed voor baars!"
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "title": "Vissen met kinderen: Tips voor een geslaagde dag",
+        "author": "Opa Otto",
+        "date": "2024-06-05",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Vissen met kinderen is leuk en leerzaam. Zorg voor eenvoudige hengels, neem genoeg snacks mee en kies een veilige stek. Maak het niet te lang en vier elke vangst!",
+        "comments": [
+            {
+                "author": "VaderMetVis",
+                "date": "2024-06-05",
+                "content": "Mijn zoon vindt het geweldig! Goede tips."
+            }
+        ]
+    },
+    {
+        "id": 7,
+        "title": "De invloed van het weer op vissen",
+        "author": "WeerWillem",
+        "date": "2024-06-04",
+        "pinned": false,
+        "type": "Blog",
+        "content": "Het weer heeft veel invloed op het gedrag van vissen. Na regen zijn ze vaak actiever. Let op luchtdruk en temperatuur voor de beste vangsten.",
+        "comments": [
+            {
+                "author": "BarometerBart",
+                "date": "2024-06-04",
+                "content": "Ik kijk altijd naar de luchtdruk voor ik ga vissen."
+            }
+        ]
+    },
+    {
+        "id": 8,
+        "title": "Vissen op zee: Wat heb je nodig?",
+        "author": "ZeeZeb",
+        "date": "2024-06-03",
+        "pinned": false,
+        "type": "Blog",
+        "content": "Zeevissen vraagt om stevig materiaal en zoutwaterbestendige molens. Vergeet je loodvrij aas niet en check de getijden voor vertrek.",
+        "comments": [
+            {
+                "author": "GolfGerrit",
+                "date": "2024-06-03",
+                "content": "Goede tip over het loodvrije aas!"
+            }
+        ]
+    },
+    {
+        "id": 9,
+        "title": "Hoe herken je visziektes?",
+        "author": "Dr. Fin",
+        "date": "2024-06-02",
+        "pinned": false,
+        "type": "Vraag",
+        "content": "Let op afwijkend zwemgedrag, wonden of schimmel op de huid. Zie je een zieke vis? Meld het bij de visvereniging en laat de vis met rust.",
+        "comments": [
+            {
+                "author": "GezondeGuppy",
+                "date": "2024-06-02",
+                "content": "Handig om te weten, bedankt!"
+            }
+        ]
+    },
+    {
+        "id": 10,
+        "title": "De beste knopen voor vissers",
+        "author": "KnoopKarel",
+        "date": "2024-06-01",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Sterke knopen zijn essentieel. Leer de Palomar, Clinch en Lus knoop voor verschillende situaties. Oefen thuis voor je aan het water staat.",
+        "comments": [
+            {
+                "author": "TouwtjeTrekker",
+                "date": "2024-06-01",
+                "content": "De Palomar is mijn favoriet!"
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "title": "Nachthengelen: Waar moet je op letten?",
+        "author": "NachtNico",
+        "date": "2024-05-31",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Nachthengelen is spannend, maar zorg voor goede verlichting en warme kleding. Controleer of nachtvissen is toegestaan op jouw stek.",
+        "comments": [
+            {
+                "author": "LampjeLars",
+                "date": "2024-05-31",
+                "content": "Reflecterende kleding is ook handig!"
+            }
+        ]
+    },
+    {
+        "id": 12,
+        "title": "Vissen in de stad: Tips voor urban fishing",
+        "author": "StadSteve",
+        "date": "2024-05-30",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Ook in de stad kun je goed vissen. Let op drukte, houd rekening met voorbijgangers en ruim altijd je spullen op.",
+        "comments": [
+            {
+                "author": "UrbanUkkie",
+                "date": "2024-05-30",
+                "content": "Ik vis vaak in de gracht, altijd gezellig!"
+            }
+        ]
+    },
+    {
+        "id": 13,
+        "title": "Vangstfoto’s maken: Zo doe je dat!",
+        "author": "FotoFemke",
+        "date": "2024-05-29",
+        "pinned": false,
+        "type": "Tips",
+        "content": "Maak je handen nat voor je de vis vasthoudt, houd de vis laag boven het water en gebruik natuurlijk licht voor de mooiste foto’s.",
+        "comments": [
+            {
+                "author": "SnapShotSander",
+                "date": "2024-05-29",
+                "content": "Goede tips, vooral dat van natte handen!"
+            }
+        ]
+    },
+    {
+        "id": 14,
+        "title": "Vissen en natuurbehoud: Hoe help jij mee?",
+        "author": "GroenGerrit",
+        "date": "2024-05-28",
+        "pinned": false,
+        "type": "Vraag",
+        "content": "Help mee door afval te rapen, geen planten te beschadigen en te vissen volgens de regels. Samen houden we het water schoon.",
+        "comments": [
+            {
+                "author": "EcoEline",
+                "date": "2024-05-28",
+                "content": "Ik neem altijd een afvalzakje mee, goed idee!"
+            }
+        ]
+    },
+    {
+        "id": 15,
+        "title": "De opkomst van kunstaas: Voor- en nadelen",
+        "author": "AasAlex",
+        "date": "2024-05-27",
+        "pinned": false,
+        "type": "Blog",
+        "content": "Kunstaas is herbruikbaar en milieuvriendelijker dan levend aas. Maar soms werkt natuurlijk aas beter. Probeer beide en kijk wat werkt!",
+        "comments": [
+            {
+                "author": "PlugPeter",
+                "date": "2024-05-27",
+                "content": "Ik vang meer met kunstaas, maar soms werkt worm toch beter."
+            }
+        ]
+    }
+]

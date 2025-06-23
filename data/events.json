@@ -1,0 +1,87 @@
+[
+    {
+        "naam": "Grote Open Pinksterviswedstrijd 2025",
+        "beschrijving": "HSV Groot Rotterdam organiseert een Open Individuele Pinksterwedstrijd aan de Rottemeren.",
+        "locatie": "Kooilaan 3, 2665 KR Rotterdam",
+        "kosten": "€10,- per persoon",
+        "website": "https://groot-rotterdam.nl/?view=article&id=953:grote-open-pinksterviswedstrijd-2025&catid=14",
+        "afbeelding": "https://groot-rotterdam.nl/images/groot-rotterdam/afdelingen/wedstrijden2025/intro-witvissengrootrotterdam615.jpg",
+        "datum": "2025-06-09",
+        "begintijd": "07:00",
+        "eindtijd": "15:00",
+        "organisatie": "HSV Groot Rotterdam",
+        "contactpersoon": "Onbekend",
+        "contactemail": "witvissen@groot-rotterdam.nl",
+        "contacttelefoon": "Onbekend",
+        "discipline": "Individueel vissen",
+        "water": "Zoet",
+        "score_eenheden": "Gewicht",
+        "gebruikt_app": "Nee",
+        "onderdelen": [
+            {
+                "naam": "Open Individuele Wedstrijd",
+                "niveau": "Lokaal",
+                "geslacht": "Open",
+                "leeftijdsgroep": "Senioren",
+                "inschrijfgeld_per_basisteamlid": "Zie website"
+            }
+        ]
+    },
+    {
+        "naam": "5e Witviswedstrijd HSV De Snoek - Gendt",
+        "beschrijving": "De zesde Koningswedstrijd voor senioren georganiseerd door HSV De Snoek in Gendt.",
+        "locatie": "Nijmeegsestraat 65B, 6691 CM Gendt",
+        "kosten": "Deelname €3,- inleg (aas deeg, worm of maden)",
+        "website": "https://www.sportvisserijnederland.nl/wedstrijden/wedstrijdagenda/verenigingswedstrijden.html",
+        "afbeelding": "https://www.sportvisserijnederland.nl/img/geblondeerd4_88513.jpg",
+        "datum": "2025-06-22",
+        "begintijd": "06:45",
+        "eindtijd": "18:00",
+        "organisatie": "HSV De Snoek - Gendt",
+        "contactpersoon": "Onbekend",
+        "contactemail": "Onbekend",
+        "contacttelefoon": "Onbekend",
+        "discipline": "Dobber (Witvissen)",
+        "water": "Zoet",
+        "score_eenheden": "Punten",
+        "gebruikt_app": "Nee",
+        "onderdelen": [
+            {
+                "naam": "5e wit",
+                "niveau": "Lokaal",
+                "geslacht": "Open",
+                "leeftijdsgroep": "Senioren",
+                "inschrijfgeld_per_basisteamlid": "€3,-"
+            }
+        ]
+    },
+    {
+        "naam": "ZomerVISkaravaan 2025 - Elst (gld)",
+        "beschrijving": "Een eendaags JeugdVISevent voor jongeren tussen 8 en 14 jaar, georganiseerd door Sportvisserij Nederland en lokale hengelsportverenigingen. Inclusief goodiebag en gratis hengel!",
+        "locatie": "Pascalweg 24, 6662 NX Elst",
+        "kosten": "Gratis deelname",
+        "website": "https://stekkie.nl/leer-vissen/zomerviskaravaan/",
+        "afbeelding": "https://stekkie.nl/wp-content/uploads/2023/07/Zomersterfte-wees-alert-1-1024x576.jpg",
+        "datum": "2025-08-13",
+        "begintijd": "09:30",
+        "eindtijd": "13:30",
+        "organisatie": "Sportvisserij Nederland & Lokale HSV's",
+        "contactpersoon": "Zie website",
+        "contactemail": "Zie website",
+        "contacttelefoon": "Zie website",
+        "discipline": "Jeugdvissen (diverse)",
+        "water": "Zoet",
+        "score_eenheden": "Geen (recreatief)",
+        "gebruikt_app": "Niet van toepassing",
+        "onderdelen": [
+            {
+                "naam": "JeugdVISevent",
+                "niveau": "Beginner",
+                "geslacht": "Open",
+                "leeftijdsgroep": "8-14 jaar",
+                "inschrijfgeld_per_basisteamlid": "Gratis"
+            }
+        ]
+    },
+    
+]

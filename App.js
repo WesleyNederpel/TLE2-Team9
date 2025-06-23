@@ -10,8 +10,17 @@ import GalleryScreen from "./screens/GalleryScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SpotDetailScreen from "./screens/SpotDetailScreen";
 import FishCatchDetailScreen from "./screens/FishCatchDetailScreen"; // NIEUW
+import CommunityScreen from './screens/CommunityScreen';
+import BlogPostScreen from './screens/BlogPostScreen';
+import blogpostsData from './data/blogposts.json';
+import EventScreen from './screens/EventScreen';
 
 const Stack = createNativeStackNavigator();
+
+const capitalizeFirstLetter = (string) => {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 export default function App() {
     return (
@@ -38,7 +47,45 @@ export default function App() {
                         animationDuration: 200,
                         contentStyle: {
                             backgroundColor: 'transparent',
-                        }
+                        },
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen name="Community" component={CommunityScreen} />
+
+                <Stack.Screen
+                    name="BlogPostScreen"
+                    component={BlogPostScreen}
+                    options={({ route }) => {
+                        const { blogId } = route.params;
+                        const blog = blogpostsData.find(b => b.id === blogId);
+                        const dynamicTitle = blog && blog.type ? capitalizeFirstLetter(blog.type) : 'Blogpost';
+                        return {
+                            title: dynamicTitle,
+                            headerShown: true,
+                            headerStyle: {
+                                backgroundColor: '#0096b2',
+                            },
+                            headerTintColor: '#fff',
+                            headerTitleStyle: {
+                                fontWeight: 'bold',
+                            },
+                        };
+                    }}
+                />
+                <Stack.Screen
+                    name="EventScreen"
+                    component={EventScreen}
+                    options={{
+                        title: 'Evenement Details',
+                        headerShown: true,
+                        headerStyle: {
+                            backgroundColor: '#0096b2',
+                        },
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
                     }}
                 />
             </Stack.Navigator>

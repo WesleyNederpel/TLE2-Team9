@@ -1,20 +1,10 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import MapView, {Polygon, Marker} from 'react-native-maps';
-import {
-    StyleSheet,
-    View,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    Alert,
-    Image,
-    ScrollView,
-    KeyboardAvoidingView, // Importeer KeyboardAvoidingView
-    Platform // Importeer Platform om OS-specifieke offsets te hanteren
-} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native'; // ScrollView toegevoegd
+import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
+import waters from "../data/waters.json";
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getAfbeelding = (name) => {
@@ -33,16 +23,21 @@ const getAfbeelding = (name) => {
             return require('../images/Boerengat.png');
         case 'Zevenhuizerplas':
             return require('../images/Zevenhuizerplas.png');
+        case 'De Rotte':
+            return require('../images/deRotte.png');
+        case 'Nieuwe Maas':
+            return require('../images/NieuweMaas.png');
         default:
-            return null;
+            return null; // Geen afbeelding beschikbaar
     }
 };
 
-const MapScreen = ({navigation}) => {
+const MapScreen = ({ navigation }) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
+    // const [addMenuModalVisible, setAddMenuModalVisible] = useState(false); // Deze is verwijderd
 
     const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
-    const [markerInfo, setMarkerInfo] = useState({title: '', description: '', latitude: null, longitude: null});
+    const [markerInfo, setMarkerInfo] = useState({ title: '', description: '', latitude: null, longitude: null });
     const [markers, setMarkers] = useState([]); // Array van spots (markers)
     const [currentLocation, setCurrentLocation] = useState(null);
     const [isPickingLocation, setIsPickingLocation] = useState(false);
@@ -79,7 +74,7 @@ const MapScreen = ({navigation}) => {
 
     useEffect(() => {
         (async () => {
-            let {status} = await Location.requestForegroundPermissionsAsync();
+            let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Toegang geweigerd', 'Locatietoegang is nodig om uw positie te bepalen.');
                 return;
@@ -93,10 +88,13 @@ const MapScreen = ({navigation}) => {
 
     const convertCoords = (coordsArray) => {
         if (!coordsArray || coordsArray.length === 0) return [];
-        return coordsArray.map(([lng, lat]) => ({latitude: lat, longitude: lng}));
+        return coordsArray.map(([lng, lat]) => ({ latitude: lat, longitude: lng }));
     };
 
     const handlePolygonPress = (feature) => {
+        // Vind de volledige water-data uit waters.json op basis van de naam
+        const waterData = waters.find(w => w.name.trim().toLowerCase() === feature.properties.name.trim().toLowerCase());
+        setSelectedFeature({ ...feature, waterData: waterData }); // Voeg waterData toe aan de geselecteerde feature
         if (!isPickingLocation) {
             setSelectedFeature(feature);
         }
@@ -118,7 +116,7 @@ const MapScreen = ({navigation}) => {
                 tappable={true}
                 onPress={(event) => {
                     if (isPickingLocation) {
-                        const {latitude, longitude} = event.nativeEvent.coordinate;
+                        const { latitude, longitude } = event.nativeEvent.coordinate;
                         setMarkerInfo((prevInfo) => ({
                             ...prevInfo,
                             latitude: latitude,
@@ -137,7 +135,7 @@ const MapScreen = ({navigation}) => {
     const renderPolygons = () => {
         if (!waterGeoJSON?.features) return null;
         return waterGeoJSON.features.map((feature, idx) => {
-            const {type, coordinates} = feature.geometry;
+            const { type, coordinates } = feature.geometry;
             const props = feature.properties || {};
 
             let fill = 'rgba(0, 150, 255, 0.3)';
@@ -149,10 +147,6 @@ const MapScreen = ({navigation}) => {
             } else if (props.water === 'harbour') {
                 fill = 'rgba(128, 128, 128, 0.5)';
                 stroke = 'rgba(105, 105, 105, 0.9)';
-            }
-            if (props.name === 'Kralingse Plas') {
-                fill = 'rgba(255, 165, 0, 0.6)';
-                stroke = 'rgba(255, 165, 0, 0.8)';
             }
 
             if (type === 'Polygon') {
@@ -167,6 +161,10 @@ const MapScreen = ({navigation}) => {
         });
     };
 
+    // const toggleAddMenuModal = () => { // Deze functie is verwijderd
+    //     setAddMenuModalVisible(!addMenuModalVisible);
+    // };
+
     const openAddMarkerModal = () => {
         setMarkerInfo({
             title: '',
@@ -175,11 +173,12 @@ const MapScreen = ({navigation}) => {
             longitude: currentLocation?.coords.longitude ?? null,
         });
         setAddMarkerModalVisible(true);
+        // setAddMenuModalVisible(false); // Deze regel is niet meer nodig
     };
 
     // addMarker functie aangepast om markers op te slaan
     const addMarker = async () => {
-        const {title, description, latitude, longitude} = markerInfo;
+        const { title, description, latitude, longitude } = markerInfo;
         if (title && latitude != null && longitude != null) {
             const newMarkerEntry = {
                 title,
@@ -198,7 +197,7 @@ const MapScreen = ({navigation}) => {
 
                 setMarkers((prevMarkers) => [...prevMarkers, newMarkerEntry]);
                 setAddMarkerModalVisible(false);
-                setMarkerInfo({title: '', description: '', latitude: null, longitude: null});
+                setMarkerInfo({ title: '', description: '', latitude: null, longitude: null });
                 Alert.alert('Spot Toegevoegd', 'De spot is succesvol aan de kaart toegevoegd!');
             } catch (error) {
                 console.error('Error adding marker:', error);
@@ -218,7 +217,7 @@ const MapScreen = ({navigation}) => {
 
     const handleMapPress = (event) => {
         if (isPickingLocation) {
-            const {latitude, longitude} = event.nativeEvent.coordinate;
+            const { latitude, longitude } = event.nativeEvent.coordinate;
             setMarkerInfo((prevInfo) => ({
                 ...prevInfo,
                 latitude: latitude,
@@ -240,7 +239,7 @@ const MapScreen = ({navigation}) => {
                 {markers.map((m) => ( // Gebruik de id van de marker als key
                     <Marker
                         key={m.id}
-                        coordinate={{latitude: m.latitude, longitude: m.longitude}}
+                        coordinate={{ latitude: m.latitude, longitude: m.longitude }}
                         title={m.title}
                         description={m.description}
                     />
@@ -265,13 +264,13 @@ const MapScreen = ({navigation}) => {
                         onPress={() => {
                             const name = selectedFeature?.properties?.name || 'Onbekend';
                             setSelectedFeature(null);
-                            navigation.navigate('WaterInfo', {waterName: name});
+                            navigation.navigate('WaterInfo', { waterName: name });
                         }}
                     >
                         {getAfbeelding(selectedFeature?.properties?.name) ? (
                             <Image
                                 source={getAfbeelding(selectedFeature.properties.name)}
-                                style={{width: 250, height: 150, borderRadius: 8, marginBottom: 10}}
+                                style={{ width: 250, height: 150, borderRadius: 8, marginBottom: 10 }}
                                 resizeMode="cover"
                             />
                         ) : (
@@ -294,34 +293,63 @@ const MapScreen = ({navigation}) => {
                             {selectedFeature?.properties?.name || 'Onbekende locatie'}
                         </Text>
 
-                        <View style={{marginTop: 10}}>
-                            <Text style={styles.modalText}>🎣 Nodige Vispas:</Text>
-                            <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
-                            <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
-                            <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
-                        </View>
+                        {/* Hardcode voor Nieuwe Maas, anders dynamische weergave */}
+                        {
+                            selectedFeature?.properties?.name === 'Nieuwe Maas' ? (
+                                <View style={styles.permissionsScrollView}>
+                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                    <Text style={styles.modalText}>• VISpas of Kleine VISpas</Text>
+                                </View>
+                            ) : (
+                                selectedFeature?.waterData?.AdditionalPermissions && selectedFeature.waterData.AdditionalPermissions.length > 0 ? (
+                                    <ScrollView style={styles.permissionsScrollView}>
+                                        <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                        {selectedFeature.waterData.AdditionalPermissions.map((permission, index) => (
+                                            <View key={permission.id || index} style={styles.permissionRow}>
+                                                {permission.name === "NachtVISpas" ? (
+                                                    <Ionicons name="moon" size={20} color="#1A3A91" style={styles.permissionIcon} />
+                                                ) : (
+                                                    <View style={styles.permissionIconPlaceholder} />
+                                                )}
+                                                <View style={styles.permissionTextContainer}>
+                                                    <Text style={styles.permissionNameModal}>{permission.name}</Text>
+                                                    <Text style={styles.permissionDescriptionModal}>{permission.description}</Text>
+                                                </View>
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                ) : (
+                                    <View style={styles.noPermissionsContainer}>
+                                        <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                        <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                                        <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                                        <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                                    </View>
+                                )
+                            )
+                        }
 
                         <Text
                             style={[
                                 styles.modalText,
-                                {marginTop: 15, fontWeight: 'bold', color: '#005f99'},
+                                { marginTop: 15, fontWeight: 'bold', color: '#005f99' },
                             ]}
                         >
                             Tik om meer informatie te zien
                         </Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity >
 
                     <TouchableOpacity
-                        style={[styles.closeButton, {marginTop: 15}]}
+                        style={[styles.closeButton, { marginTop: 15 }]}
                         onPress={() => setSelectedFeature(null)}
                     >
                         <Text style={styles.closeButtonText}>Sluiten</Text>
                     </TouchableOpacity>
-                </View>
-            </Modal>
+                </View >
+            </Modal >
 
             {/* Modal voor marker informatie invoeren */}
-            <Modal
+            < Modal
                 visible={addMarkerModalVisible}
                 transparent
                 animationType="slide"
@@ -334,13 +362,13 @@ const MapScreen = ({navigation}) => {
                             style={styles.input}
                             placeholder="Titel"
                             value={markerInfo.title}
-                            onChangeText={(text) => setMarkerInfo({...markerInfo, title: text})}
+                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, title: text })}
                         />
                         <TextInput
                             style={styles.input}
                             placeholder="Beschrijving"
                             value={markerInfo.description}
-                            onChangeText={(text) => setMarkerInfo({...markerInfo, description: text})}
+                            onChangeText={(text) => setMarkerInfo({ ...markerInfo, description: text })}
                         />
                         <TextInput
                             style={styles.input}
@@ -366,7 +394,7 @@ const MapScreen = ({navigation}) => {
                         />
 
                         <TouchableOpacity
-                            style={[styles.button, {backgroundColor: '#4CAF50', marginBottom: 10}]}
+                            style={[styles.button, { backgroundColor: '#4CAF50', marginBottom: 10 }]}
                             onPress={startPickingLocation}
                         >
                             <Text style={styles.buttonText}>Kies Locatie op Kaart</Text>
@@ -376,28 +404,30 @@ const MapScreen = ({navigation}) => {
                             <Text style={styles.buttonText}>Spot Toevoegen</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.button, {backgroundColor: '#FF6347', marginTop: 10}]}
+                            style={[styles.button, { backgroundColor: '#FF6347', marginTop: 10 }]}
                             onPress={() => setAddMarkerModalVisible(false)}
                         >
                             <Text style={styles.buttonText}>Annuleren</Text>
                         </TouchableOpacity>
                     </ScrollView>
                 </View>
-            </Modal>
+            </Modal >
 
             {/* Visuele cue wanneer in picking mode */}
-            {isPickingLocation && (
-                <View style={styles.pickingLocationOverlay} pointerEvents="none">
-                    <Text style={styles.pickingLocationText}>Tik op de kaart...</Text>
-                </View>
-            )}
-        </View>
+            {
+                isPickingLocation && (
+                    <View style={styles.pickingLocationOverlay} pointerEvents="none">
+                        <Text style={styles.pickingLocationText}>Tik op de kaart...</Text>
+                    </View>
+                )
+            }
+        </View >
     );
 };
 
 const styles = StyleSheet.create({
-    container: {flex: 1},
-    map: {flex: 1},
+    container: { flex: 1 },
+    map: { flex: 1 },
     roundButton: {
         position: 'absolute',
         bottom: 40,
@@ -410,13 +440,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 5,
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    roundButtonText: {color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30},
-    modalOverlay: {flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)'},
-    scrollModalContent: { // Deze stijl is misschien niet meer nodig als de modal is verwijderd
+    roundButtonText: { color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30 },
+    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+    scrollModalContent: {
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
@@ -430,10 +460,11 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: '80%',
         maxHeight: '70%',
-        alignItems: 'flex-start',
+        alignItems: 'center',
     },
-    modalTitle: {fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center'},
-    modalText: {marginBottom: 5, fontSize: 16},
+    modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
+    modalSubTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, marginTop: 5, color: '#1A3A91' }, // Nieuwe stijl
+    modalText: { marginBottom: 5, fontSize: 16 },
     input: {
         width: '100%',
         padding: 10,
@@ -451,7 +482,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '100%',
     },
-    buttonText: {color: 'white', fontWeight: 'bold', fontSize: 16},
+    buttonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
     closeButton: {
         marginTop: 20,
         backgroundColor: '#0096b2',
@@ -460,7 +491,48 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
     },
-    closeButtonText: {color: 'white', fontWeight: 'bold', fontSize: 16},
+    closeButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+    permissionsScrollView: {
+        width: '100%',
+        maxHeight: 200, // Beperk de hoogte van de scrollview voor vergunningen
+        marginBottom: 10,
+        paddingVertical: 5,
+    },
+    permissionRow: {
+        flexDirection: 'row',
+        alignItems: 'left',
+        backgroundColor: '#F7F7F7', // Lichtgrijze achtergrond
+        padding: 8,
+        borderRadius: 5,
+        marginBottom: 5,
+        borderLeftWidth: 3,
+        borderLeftColor: '#ADDAEF', // Een zachte blauwe kleur
+    },
+    permissionIcon: {
+        marginRight: 8,
+    },
+    permissionIconPlaceholder: {
+        width: 20, // Zelfde breedte als icoon voor uitlijning
+        height: 20, // Zelfde hoogte als icoon voor uitlijning
+        marginRight: 8,
+    },
+    permissionTextContainer: {
+        flex: 1,
+    },
+    permissionNameModal: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#1A3A91',
+        marginBottom: 2,
+    },
+    permissionDescriptionModal: {
+        fontSize: 13,
+        color: '#555',
+    },
+    noPermissionsContainer: {
+        paddingVertical: 10,
+        alignItems: 'left',
+    },
     pickingLocationOverlay: {
         position: 'absolute',
         top: 0,
