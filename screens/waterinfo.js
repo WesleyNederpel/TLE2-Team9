@@ -9,7 +9,7 @@ const getImage = (name) => {
     const map = {
         "Kralingseplas": require("../images/Kralingseplas.png"),
         "Wijnhaven": require("../images/Wijnhaven.png"),
-        "BergseVoorplas": require("../images/BergseVoorplas.png"),
+        "Bergse Voorplas": require("../images/BergseVoorplas.png"),
         "Oudehaven": require("../images/Oudehaven.png"),
         "Haringvliet": require("../images/Haringvliet.png"),
         "Boerengat": require("../images/Boerengat.png"),
@@ -26,7 +26,7 @@ const getImage = (name) => {
         "zeelt": require("../images/zalm.png"),   // Zorg dat deze afbeeldingen bestaan
     };
 
-    return map[name.toLowerCase()] || require("../images/Kralingseplas.png"); // fallback
+    return map[name] || require("../images/Kralingseplas.png"); // fallback
 };
 
 export default function WaterInfo({ route }) {

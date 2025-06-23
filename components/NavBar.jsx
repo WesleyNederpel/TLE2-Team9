@@ -50,6 +50,7 @@ const getIconName = (routeName, focused) => {
 export default function NavBar({ navigation }) {
     return (
         <Tab.Navigator
+            initialRouteName="Map"
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color }) => {
                     const iconName = getIconName(route.name, focused);

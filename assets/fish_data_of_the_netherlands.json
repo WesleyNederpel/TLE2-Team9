@@ -14,7 +14,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Herfst, Winter",
-    "afbeelding_url": "https://www.nootica.com/media/wysiwyg/blog/peche/456/northern-pike-g03dde02f0-1280.png"
+    "afbeelding_url": "https://www.nootica.com/media/wysiwyg/blog/peche/456/northern-pike-g03dde02f0-1280.png",
+    "duurzaam_vangen": "Gebruik weerhaakloze haken om verwonding te beperken. Vang met een rubberen schepnet en houd de vis nat tijdens het onthaken. Gebruik een onthaakmat en houd de vis niet te lang boven water. Vang bij voorkeur in koelere maanden (zoals herfst) om stress te verminderen."
   },
   {
     "naam": "Karper",
@@ -31,7 +32,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Hoog",
     "seizoen": "Lente, Zomer",
-    "afbeelding_url": "https://guidesly.com/static/f566f30428986c37e349ea00d8a7c918/4576d/Carp_ID%401600x_3a885a8bb2.png"
+    "afbeelding_url": "https://guidesly.com/static/f566f30428986c37e349ea00d8a7c918/4576d/Carp_ID%401600x_3a885a8bb2.png",
+    "duurzaam_vangen": "Barbless (weerhaakloze) hair rigs verminderen schade aan de bek. Gebruik altijd een grote onthaakmat en een rubber schepnet. Houd de vis vochtig en beperk de tijd buiten water tot een minimum. Gebruik visveilige loodsystemen zodat de vis zichzelf kan bevrijden bij lijnbreuk."
   },
   {
     "naam": "Forel",
@@ -48,7 +50,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Voorjaar, Najaar",
-    "afbeelding_url": "https://nl.fishguide.be/wp-content/uploads/2017/08/287877.png"
+    "afbeelding_url": "https://nl.fishguide.be/wp-content/uploads/2017/08/287877.png",
+    "duurzaam_vangen": "Vliegvissen met kunstvliegen is een zachte methode. Gebruik een lichte hengel om snel binnen te halen, wat minder uitputting geeft. Houd de vis in het water bij onthaken en zet de vis rustig terug met de stroom mee."
   },
   {
     "naam": "Baars",
@@ -65,7 +68,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Laag",
     "seizoen": "Zomer, Herfst",
-    "afbeelding_url": "https://www.peche-en-vendee.fr/img/poissons/14026078608546.png"
+    "afbeelding_url": "https://www.peche-en-vendee.fr/img/poissons/14026078608546.png",
+    "duurzaam_vangen": "Gebruik kleine haakjes zonder weerhaak en zachte aasimitaties. Vermijd diep inslikken door snel te reageren op aanbeten. Houd een nat schepnet en natte handen klaar bij terugzetten."
   },
   {
     "naam": "Zalm",
@@ -82,7 +86,8 @@
     "leefomgeving": "Zout- en zoetwater (trekvis)",
     "moeilijkheidsgraad": "Hoog",
     "seizoen": "Zomer",
-    "afbeelding_url": "https://vislokaal.com/wp-content/uploads/2018/09/zalm.png"
+    "afbeelding_url": "https://vislokaal.com/wp-content/uploads/2018/09/zalm.png",
+    "duurzaam_vangen": "Vliegvissen is de meest humane techniek. Catch & release verplicht in veel wateren – volg deze richtlijnen. Vermijd vangst in extreem warm water vanwege zuurstoftekort."
   },
   {
     "naam": "Meerval",
@@ -99,7 +104,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Zeer hoog",
     "seizoen": "Zomer, Najaar",
-    "afbeelding_url": "https://visrecepten.nl/sites/default/files/2017-08/meerval.png"
+    "afbeelding_url": "https://visrecepten.nl/sites/default/files/2017-08/meerval.png",
+    "duurzaam_vangen": "Gebruik grote enkele haken zonder weerhaak. Alleen ervaren vissers: correct onthaken vereist kennis. Gebruik een grote, natte onthaakmat. Vang enkel als je weet hoe je de vis goed kunt terugzetten zonder schade."
   },
   {
     "naam": "Brasem",
@@ -116,7 +122,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Voorjaar, Zomer, Herfst",
-    "afbeelding_url": "https://www.goodfish.nl/app/uploads/2022/08/abramis_brama_sw--1920x1002.png"
+    "afbeelding_url": "https://www.goodfish.nl/app/uploads/2022/08/abramis_brama_sw--1920x1002.png",
+    "duurzaam_vangen": "Gebruik lichte feeders met kleine, scherpe haakjes zonder weerhaak. Houd vissen nat en gebruik een natte handdoek of onthaakmat. Beperk de tijd buiten het water tot max. 30 seconden."
   },
   {
     "naam": "Voorn",
@@ -133,7 +140,8 @@
     "leefomgeving": "Zoetwater",
     "moeilijkheidsgraad": "Laag",
     "seizoen": "Lente, Zomer",
-    "afbeelding_url": "http://fortkoningshooikt.be/new/wp-content/uploads/2015/09/voorn.png"
+    "afbeelding_url": "http://fortkoningshooikt.be/new/wp-content/uploads/2015/09/voorn.png",
+    "duurzaam_vangen": "Kleine haakjes zonder weerhaak en lichte montage. Vis met de vaste stok zodat je controle houdt. Houd de vis onder water bij het onthaken of doe dit in een vochtig net."
   },
   {
     "naam": "Tong",
@@ -150,7 +158,8 @@
     "leefomgeving": "Zoutwater",
     "moeilijkheidsgraad": "Gemiddeld",
     "seizoen": "Zomer",
-    "afbeelding_url": "https://visrecepten.nl/sites/default/files/2017-07/tong.png"
+    "afbeelding_url": "https://visrecepten.nl/sites/default/files/2017-07/tong.png",
+    "duurzaam_vangen": "Gebruik ronde haken zonder weerhaak. Vissen vanaf het strand: beperk de tijd dat de vis in het zand ligt. Houd nat en behandel snel bij terugzetting. Vis op diepere stukken zodat kleine tongen kunnen ontsnappen."
   },
   {
     "naam": "Makreel",
@@ -167,6 +176,7 @@
     "leefomgeving": "Zoutwater",
     "moeilijkheidsgraad": "Laag",
     "seizoen": "Zomer",
-    "afbeelding_url": "https://visrecepten.nl/sites/default/files/2017-07/makreel.png"
+    "afbeelding_url": "https://visrecepten.nl/sites/default/files/2017-07/makreel.png",
+    "duurzaam_vangen": "Gebruik kleine verenpaternosters zonder weerhaak. Houd de vis nat of in een waterbak met zeewater bij vangst. Bij terugzetting: gooi niet, maar laat de vis weer rustig zwemmen. Vang alleen wat je gaat consumeren – vermijd verspilling."
   }
 ]
