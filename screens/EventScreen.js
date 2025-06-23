@@ -31,17 +31,31 @@ export default function EventScreen({ route }) {
     };
 
     // Functie om een routebeschrijving te openen
-    const openDirections = () => {
+    const openDirections = async () => {
         const scheme = Platform.select({ ios: 'maps:0,0?q=', android: 'geo:0,0?q=' });
         const label = encodeURIComponent(event.naam); // Naam van het evenement, gecodeerd voor URL
         const address = encodeURIComponent(event.locatie); // Volledige adres, gecodeerd voor URL
 
         let url;
         if (Platform.OS === 'ios') {
-            // Apple Maps URL
-            url = `${scheme}${label}@${address}`;
+            // Probeer Google Maps te openen op iOS
+            const googleMapsUrl = `comgooglemaps://?q=${address}&zoom=15&directionsmode=driving`;
+            const appleMapsUrl = `maps:0,0?q=${label}@${address}`;
+
+            try {
+                const canOpenGoogleMaps = await Linking.canOpenURL(googleMapsUrl);
+                if (canOpenGoogleMaps) {
+                    url = googleMapsUrl;
+                } else {
+                    // Val terug op Apple Maps als Google Maps niet geïnstalleerd is
+                    url = appleMapsUrl;
+                }
+            } catch (error) {
+                console.error("Fout bij controleren Google Maps beschikbaarheid op iOS:", error);
+                url = appleMapsUrl; // Fallback bij fout
+            }
         } else {
-            // Google Maps URL (werkt ook op iOS als app geïnstalleerd is)
+            // Android gebruikt direct de Google Maps web-intent URL
             url = `https://www.google.com/maps/dir/?api=1&destination=${address}&travelmode=driving`;
         }
 
