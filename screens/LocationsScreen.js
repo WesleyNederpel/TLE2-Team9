@@ -17,10 +17,10 @@ export default function LocationsScreen({ navigation }) {
     });
 
     const [visibleSections, setVisibleSections] = useState({
-        favorites: true,
-        mySpots: true,
+        favorites: false,
+        mySpots: false,
         wantToGo: false,
-        rotterdam: true,
+        rotterdam: false,
     });
 
     const [expandedFishLists, setExpandedFishLists] = useState({});

@@ -10,7 +10,9 @@ import {
     Alert,
     TouchableWithoutFeedback,
     Image,
-    ScrollView
+    ScrollView,
+    KeyboardAvoidingView, // Importeer KeyboardAvoidingView
+    Platform // Importeer Platform om OS-specifieke offsets te hanteren
 } from 'react-native';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
@@ -39,7 +41,7 @@ const getAfbeelding = (name) => {
 
 const MapScreen = ({navigation}) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
-    const [addMenuModalVisible, setAddMenuModalVisible] = useState(false);
+    // const [addMenuModalVisible, setAddMenuModalVisible] = useState(false); // Deze is verwijderd
 
     const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
     const [markerInfo, setMarkerInfo] = useState({title: '', description: '', latitude: null, longitude: null});
@@ -167,9 +169,9 @@ const MapScreen = ({navigation}) => {
         });
     };
 
-    const toggleAddMenuModal = () => {
-        setAddMenuModalVisible(!addMenuModalVisible);
-    };
+    // const toggleAddMenuModal = () => { // Deze functie is verwijderd
+    //     setAddMenuModalVisible(!addMenuModalVisible);
+    // };
 
     const openAddMarkerModal = () => {
         setMarkerInfo({
@@ -179,7 +181,7 @@ const MapScreen = ({navigation}) => {
             longitude: currentLocation?.coords.longitude ?? null,
         });
         setAddMarkerModalVisible(true);
-        setAddMenuModalVisible(false);
+        // setAddMenuModalVisible(false); // Deze regel is niet meer nodig
     };
 
     // addMarker functie aangepast om markers op te slaan
@@ -252,7 +254,7 @@ const MapScreen = ({navigation}) => {
                 ))}
             </MapView>
 
-            <TouchableOpacity style={styles.roundButton} onPress={toggleAddMenuModal}>
+            <TouchableOpacity style={styles.roundButton} onPress={openAddMarkerModal}>
                 <Text style={styles.roundButtonText}>+</Text>
             </TouchableOpacity>
 
@@ -325,32 +327,15 @@ const MapScreen = ({navigation}) => {
                 </View>
             </Modal>
 
-            {/* Modal voor Spot toevoegen menu */}
-            <Modal
-                visible={addMenuModalVisible}
-                transparent
-                animationType="fade"
-                onRequestClose={toggleAddMenuModal}
-            >
-                <TouchableWithoutFeedback onPress={toggleAddMenuModal}>
-                    <View style={styles.menuModalOverlay}>
-                        <View style={styles.addMenuContent}>
-                            <TouchableOpacity
-                                style={styles.menuButton}
-                                onPress={openAddMarkerModal}
-                            >
-                                <Text style={styles.menuButtonText}>Spot Toevoegen</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </TouchableWithoutFeedback>
-            </Modal>
-
             {/* Modal voor marker informatie invoeren */}
-            <Modal visible={addMarkerModalVisible} transparent animationType="slide"
-                   onRequestClose={() => setAddMarkerModalVisible(false)}>
+            <Modal
+                visible={addMarkerModalVisible}
+                transparent
+                animationType="slide"
+                onRequestClose={() => setAddMarkerModalVisible(false)}
+            >
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
+                    <ScrollView contentContainerStyle={styles.scrollModalContent}>
                         <Text style={styles.modalTitle}>Spot Informatie Invoeren</Text>
                         <TextInput
                             style={styles.input}
@@ -403,7 +388,7 @@ const MapScreen = ({navigation}) => {
                         >
                             <Text style={styles.buttonText}>Annuleren</Text>
                         </TouchableOpacity>
-                    </View>
+                    </ScrollView>
                 </View>
             </Modal>
 
@@ -444,7 +429,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: 300,
         alignItems: 'center',
-        marginTop: '20%',
+        marginTop: '30%',
     },
     modalContent: {
         backgroundColor: 'white',
@@ -498,36 +483,6 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
     },
-    menuModalOverlay: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        alignItems: 'flex-start',
-        backgroundColor: 'rgba(0,0,0,0)',
-    },
-    addMenuContent: {
-        marginBottom: 150,
-        marginLeft: 20,
-        alignItems: 'flex-start',
-    },
-    menuButton: {
-        backgroundColor: '#0096b2',
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        borderRadius: 20,
-        marginBottom: 10,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-    },
-    menuButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 16,
-        textAlign: 'left',
-    },
-    // Verwijder ImagePickerButton, fishImagePreview, imagePreviewScrollView, pickerContainer, picker stijlen als ze niet meer nodig zijn.
 });
 
 export default MapScreen;

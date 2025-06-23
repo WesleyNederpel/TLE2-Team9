@@ -161,7 +161,7 @@ const SpotDetailScreen = ({ route }) => {
                 </View>
             </View>
 
-            <Modal visible={isImageViewerVisible} transparent={true}>
+            <Modal visible={isImageViewerVisible} transparent={true} onRequestClose={() => setIsImageViewerVisible(false)}>
                 <ImageViewer
                     imageUrls={imagesForViewer}
                     index={currentImageIndex}
