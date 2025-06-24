@@ -5,7 +5,7 @@ import NavBar from './components/NavBar'; // Zorg dat dit pad correct is
 import SettingsScreen from "./screens/SettingsScreen";
 import FishScreen from './screens/FishScreen';
 import MapScreen from './screens/MapScreen';
-import WaterInfo from "./screens/Waterinfo";
+import WaterInfo from "./screens/waterinfo";
 import GalleryScreen from "./screens/GalleryScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SpotDetailScreen from "./screens/SpotDetailScreen";
