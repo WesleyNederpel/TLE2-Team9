@@ -95,35 +95,44 @@ export default function WaterInfo({ route }) {
 
     //route openen in Google Maps of Apple Maps
     const openDirections = async () => {
-        if (!latitude || !longitude) {
-            console.warn("Geen locatie beschikbaar om route te openen.");
-            return;
-        }
-
         const label = encodeURIComponent(waterName || 'Bestemming');
-        const latLng = `${latitude},${longitude}`;
 
         let url;
-        if (Platform.OS === 'ios') {
-            const googleMapsUrl = `comgooglemaps://?q=${latLng}&zoom=15&directionsmode=driving`;
-            const appleMapsUrl = `maps:0,0?q=${label}@${latLng}`;
 
-            try {
-                const canOpenGoogleMaps = await Linking.canOpenURL(googleMapsUrl);
-                url = canOpenGoogleMaps ? googleMapsUrl : appleMapsUrl;
-            } catch (error) {
-                console.error("Fout bij controleren Google Maps beschikbaarheid op iOS:", error);
-                url = appleMapsUrl;
+        if (latitude && longitude) {
+            const latLng = `${latitude},${longitude}`;
+
+            if (Platform.OS === 'ios') {
+                const googleMapsUrl = `comgooglemaps://?q=${latLng}&zoom=15&directionsmode=driving`;
+                const appleMapsUrl = `maps:0,0?q=${label}@${latLng}`;
+
+                try {
+                    const canOpenGoogleMaps = await Linking.canOpenURL(googleMapsUrl);
+                    url = canOpenGoogleMaps ? googleMapsUrl : appleMapsUrl;
+                } catch (error) {
+                    console.error("Fout bij controleren Google Maps beschikbaarheid op iOS:", error);
+                    url = appleMapsUrl;
+                }
+            } else {
+                url = `https://www.google.com/maps/dir/?api=1&destination=${latLng}&travelmode=driving`;
+            }
+
+        } else if (waterName) {
+            // Fallback: gebruik naam als zoekopdracht
+            if (Platform.OS === 'ios') {
+                url = `maps:0,0?q=${label}`;
+            } else {
+                url = `https://www.google.com/maps/search/?api=1&query=${label}`;
             }
         } else {
-            url = `https://www.google.com/maps/dir/?api=1&destination=${latLng}&travelmode=driving`;
+            console.warn("Geen locatie of naam beschikbaar om route te openen.");
+            return;
         }
 
         Linking.openURL(url).catch(err =>
             console.error("Kon de route niet openen", err)
         );
     };
-
 
     // Functie om naar FishScreen te navigeren
     const handleFishPress = (fishNameInList) => {
@@ -150,20 +159,18 @@ export default function WaterInfo({ route }) {
 
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.topButtonsContainer}>
-                <Pressable style={styles.topButton} onPress={openDirections}>
-                    <Text style={styles.topButtonText}>Route</Text>
-                </Pressable>
-                <Pressable style={styles.topButton} onPress={() => setModalVisible(true)}>
-                    <Text style={styles.topButtonText}>Opslaan</Text>
-                </Pressable>
-            </View>
-
             <View style={styles.headerImageContainer}>
                 <Image source={getImage(location.image)} style={styles.headerImage} />
             </View>
 
-            <Text style={styles.h1}>{location.name}</Text>
+            <View style={styles.bottomButtonsContainer}>
+                <Pressable style={styles.bottomButton} onPress={openDirections}>
+                    <Text style={styles.bottomButtonText}>Route</Text>
+                </Pressable>
+                <Pressable style={styles.bottomButton} onPress={() => setModalVisible(true)}>
+                    <Text style={styles.bottomButtonText}>Opslaan</Text>
+                </Pressable>
+            </View>
             <View style={styles.underline} />
             <Text style={styles.p}>{location.description}</Text>
 
@@ -189,17 +196,7 @@ export default function WaterInfo({ route }) {
                 </View>
             )}
 
-            <View style={styles.fishPassContainer}>
-                <Image source={require("../images/fishpass.png")} style={styles.fishImage} />
-                <Text style={[styles.h1, { marginTop: 10 }]}>Vispas nodig!</Text>
-                <View style={styles.underline} />
-                <Text style={styles.p}>Voor deze locatie heb je nog niet een geldige vispas...</Text>
-                <Pressable style={styles.button}>
-                    <Text style={styles.buttonText}>Vispas aanschaffen</Text>
-                </Pressable>
-            </View>
-
-            <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20 }]}>
+            {/* <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20 }]}>
                 Gevangen {location.name} <Text style={{ fontSize: 16 }}>{caughtFish.length} 🎣</Text>
             </Text>
             <FlatList
@@ -211,7 +208,7 @@ export default function WaterInfo({ route }) {
                 )}
                 style={{ marginVertical: 10 }}
                 showsHorizontalScrollIndicator={false}
-            />
+            /> */}
 
             <View style={{ marginBottom: 30 }}>
                 <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20, textAlign: 'center' }]}>
@@ -237,9 +234,9 @@ export default function WaterInfo({ route }) {
                                 </>
                             ) : (
                                 <>
-                                    <Text style={styles.greenArrow}>{'<'}</Text>
-                                    <Text style={[styles.fishText, { color: '#4C6D4D' }]}>{fish.name}</Text>
                                     <Image source={getImage(fish.image)} style={[styles.fishImageStyle, { borderColor: '#4C6D4D' }]} />
+                                    <Text style={[styles.fishText, { color: '#4C6D4D' }]}>{fish.name}</Text>
+                                    <Text style={styles.greenArrow}>{'>'}</Text>
                                 </>
                             )}
                         </Pressable>
@@ -257,11 +254,10 @@ export default function WaterInfo({ route }) {
                     <View style={{ backgroundColor: "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
                         <Text style={[styles.h1, { color: '#1A3A91' }]}>Opslaan in...</Text>
 
-                        {["favorites", "mySpots", "wantToGo"].map((type) => {
+                        {["favorites", "wantToGo"].map((type) => {
                             const label =
                                 type === "favorites" ? "❤️ Favorieten" :
-                                    type === "mySpots" ? "⭐ Mijn Spots" :
-                                        "🚩 Wil ik heen";
+                                    "🚩 Wil ik heen";
 
                             const checked = checkedItems[type];
 
@@ -286,8 +282,8 @@ export default function WaterInfo({ route }) {
                             );
                         })}
 
-                        <Pressable onPress={() => setModalVisible(false)} style={styles.topButton}>
-                            <Text style={styles.topButtonText}>Sluiten</Text>
+                        <Pressable onPress={() => setModalVisible(false)} style={styles.bottomButton}>
+                            <Text style={styles.bottomButtonText}>Sluiten</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -321,7 +317,7 @@ const styles = StyleSheet.create({
         height: 2,
         backgroundColor: '#E5A83F',
         width: '100%',
-        marginVertical: 4,
+        marginBottom: 4,
     },
     headerImageContainer: {
         width: '100%',
@@ -396,18 +392,24 @@ const styles = StyleSheet.create({
         color: '#4C6D4D',
         fontWeight: 'bold',
     },
-    topButtonsContainer: {
+    bottomButtonsContainer: {
         flexDirection: 'row',
-        gap: 10,
-        marginBottom: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 8,
     },
-    topButton: {
+    bottomButton: {
         backgroundColor: '#ADDAEF',
-        paddingVertical: 6,
-        paddingHorizontal: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         borderRadius: 6,
+        marginHorizontal: 5,
+        marginVertical: 5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
-    topButtonText: {
+    bottomButtonText: {
         color: '#1A3A91',
         fontWeight: '600',
     },

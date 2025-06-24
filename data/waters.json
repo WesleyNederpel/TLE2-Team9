@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Kralingse plas",
-    "description": "De Kralingse Plas is een populair recreatiegebied in Rotterdam...",
+    "description": "De Kralingse Plas is een populair recreatiegebied in Rotterdam, bekend om zijn uitgestrekte wateroppervlak en groene omgeving. Het gebied biedt uitstekende mogelijkheden voor sportvissers, wandelaars en watersportliefhebbers. Langs de oevers zijn diverse visstekken te vinden waar je in alle rust kunt vissen op verschillende soorten vis. Ook zijn er faciliteiten zoals horeca en parkeergelegenheid aanwezig.",
     "image": "Kralingseplas",
     "fishTypes": [
       {
@@ -26,7 +26,7 @@
   {
     "id": 2,
     "name": "Wijnhaven",
-    "description": "Een prachtig watergebied vlakbij Leiden met veel vismogelijkheden...",
+    "description": "De Wijnhaven is een prachtig watergebied vlakbij Leiden, omgeven door historische gebouwen en gezellige terrassen. Het water is helder en biedt veel vismogelijkheden voor zowel beginnende als ervaren vissers. Door de centrale ligging is het een geliefde plek voor stadsbewoners die willen genieten van de rust aan het water.",
     "image": "Wijnhaven",
     "fishTypes": [
       {
@@ -45,7 +45,7 @@
   {
     "id": 3,
     "name": "Bergse Voorplas",
-    "description": "Een natuurgebied met veel biodiversiteit en vissoorten...",
+    "description": "De Bergse Voorplas is een natuurgebied met veel biodiversiteit en een grote variatie aan vissoorten. Het gebied is omgeven door rietkragen en bossen, wat zorgt voor een rustige en natuurlijke sfeer. Vissers kunnen hier genieten van de stilte en de kans om bijzondere vissoorten te vangen.",
     "image": "Bergse Voorplas",
     "fishTypes": [
       {
@@ -64,7 +64,7 @@
   {
     "id": 4,
     "name": "Oudehaven",
-    "description": "Populair bij sportvissers, met mooie stekken langs de randen...",
+    "description": "De Oudehaven is populair bij sportvissers en biedt mooie stekken langs de randen van het water. Het gebied ligt in het hart van Rotterdam en combineert een levendige sfeer met goede vismogelijkheden. Je vindt hier zowel rustige plekken als gezellige drukte, ideaal voor een dagje vissen in de stad.",
     "image": "Oudehaven",
     "fishTypes": [
       {
@@ -83,7 +83,7 @@
   {
     "id": 5,
     "name": "HaringVliet",
-    "description": "Rustige plas in de buurt van Rotterdam Noord...",
+    "description": "Het HaringVliet is een rustige plas in de buurt van Rotterdam Noord, omgeven door natuur en wandelpaden. Het water staat bekend om zijn heldere kwaliteit en de aanwezigheid van verschillende vissoorten. Het is een ideale plek voor vissers die de drukte willen ontvluchten en in alle rust willen genieten van hun hobby.",
     "image": "HaringVliet",
     "fishTypes": [
       {
@@ -102,7 +102,7 @@
   {
     "id": 6,
     "name": "Zevenhuizerplas",
-    "description": "Rustige plas in de buurt van Rotterdam Noord...",
+    "description": "De Zevenhuizerplas is een uitgestrekt watergebied in de buurt van Rotterdam Noord. Het gebied is populair bij vissers, zwemmers en watersporters. De oevers zijn goed bereikbaar en bieden veel ruimte voor het uitwerpen van je hengel. Door de variatie in dieptes en begroeiing is het een interessante plek voor het vangen van verschillende vissoorten.",
     "image": "Zevenhuizerplas",
     "fishTypes": [
       {
@@ -121,7 +121,7 @@
   {
     "id": 7,
     "name": "Rottemeren",
-    "description": "Een uitgestrekt natuurgebied met diverse vissoorten...",
+    "description": "De Rottemeren vormen een uitgestrekt natuurgebied met diverse vissoorten en prachtige uitzichten. Het gebied is ideaal voor een dagje vissen, wandelen of fietsen. Door de aanwezigheid van verschillende wateren en oevers is er altijd wel een geschikte visplek te vinden, zowel voor de recreatieve als de fanatieke visser.",
     "image": "Rottemeren",
     "fishTypes": [
       {
@@ -145,7 +145,7 @@
   {
     "id": 8,
     "name": "Nieuwe Maas",
-    "description": "Een drukbevaren waterweg met veel vismogelijkheden...",
+    "description": "De Nieuwe Maas is een drukbevaren waterweg die dwars door Rotterdam stroomt. Ondanks het scheepvaartverkeer biedt het water veel vismogelijkheden, vooral langs de rustige oevers en in de luwte van bruggen. Vissers kunnen hier terecht voor een unieke viservaring midden in de stad, met uitzicht op de skyline van Rotterdam.",
     "image": "Nieuwe Maas",
     "fishTypes": [
       {
@@ -170,7 +170,7 @@
   {
     "id": 9,
     "name": "De Rotte",
-    "description": "De Rotte is een rivier die door Rotterdam stroomt en bekend staat om zijn visrijke oevers.",
+    "description": "De Rotte is een rivier die door Rotterdam stroomt en bekend staat om zijn visrijke oevers. Het water is omgeven door groene natuur en biedt volop mogelijkheden voor sportvissers. Langs de rivier zijn diverse visstekken te vinden, variërend van rustige plekken tot locaties met meer activiteit. Ideaal voor wie wil genieten van de natuur en het vissen dicht bij de stad.",
     "image": "De Rotte",
     "fishTypes": [
       {
