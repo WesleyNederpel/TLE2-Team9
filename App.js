@@ -14,6 +14,7 @@ import CommunityScreen from './screens/CommunityScreen';
 import BlogPostScreen from './screens/BlogPostScreen';
 import blogpostsData from './data/blogposts.json';
 import EventScreen from './screens/EventScreen';
+import EditFishCatchScreen from "./screens/EditFishCatchScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ export default function App() {
                 <Stack.Screen name="Camera" component={CameraScreen} />
                 <Stack.Screen name="SpotDetail" component={SpotDetailScreen} />
                 <Stack.Screen name="FishCatchDetail" component={FishCatchDetailScreen} />
+                <Stack.Screen name="EditFishCatch" component={EditFishCatchScreen} />
 
                 <Stack.Screen
                     name="Settings"
