@@ -48,6 +48,13 @@ const EditFishCatchScreen = ({ route }) => {
                 }
 
                 setMarkers(loadedMarkers);
+
+                if (fishCatch.location) {
+                    const matchingMarker = loadedMarkers.find(marker => marker.id === fishCatch.location);
+                    if (matchingMarker) {
+                        setSpotName(matchingMarker.title);
+                    }
+                }
             } catch (error) {
                 console.error("Fout bij het laden van spots:", error);
             }
@@ -55,7 +62,6 @@ const EditFishCatchScreen = ({ route }) => {
 
         loadSpots();
     }, []);
-
 
     const handleSaveFishCatch = async () => {
         if (!title || !species || !description) {
@@ -70,7 +76,6 @@ const EditFishCatchScreen = ({ route }) => {
             description,
             length: length ? parseFloat(length) : null,
             weight: weight ? parseFloat(weight) : null,
-            // De timestamp blijft de originele, tenzij je hier een manier toevoegt om deze te bewerken
             timestamp: timestamp.toISOString(),
             location: selectedLocation,
         };
@@ -87,12 +92,12 @@ const EditFishCatchScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={28} color="#FFF" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Visvangst bewerken</Text>
-            </View>
+            {/*<View style={styles.header}>*/}
+            {/*    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>*/}
+            {/*        <Ionicons name="arrow-back" size={28} color="#FFF" />*/}
+            {/*    </TouchableOpacity>*/}
+            {/*    <Text style={styles.headerTitle}>Visvangst bewerken</Text>*/}
+            {/*</View>*/}
 
             <View style={styles.formSection}>
                 <Text style={styles.label}>Titel:</Text>
@@ -111,7 +116,7 @@ const EditFishCatchScreen = ({ route }) => {
                     placeholder="Soort vis (bijv. Snoek, Baars)"
                 />
 
-                <Text style={styles.label}>Notities:</Text>
+                <Text style={styles.label}>Beschrijving:</Text>
                 <TextInput
                     style={[styles.input, styles.textArea]}
                     value={description}
@@ -249,7 +254,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 5,
-        color: '#004a99',
+        color: '#005f99',
     },
     input: {
         borderWidth: 1,
@@ -296,7 +301,7 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     saveButton: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#4CAF50',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',

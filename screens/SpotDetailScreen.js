@@ -157,7 +157,7 @@ const SpotDetailScreen = ({ route }) => {
                     style={styles.viewDetailsButton}
                     onPress={() => navigation.navigate('FishCatchDetail', { fishCatch: fish })}
                 >
-                    <Text style={styles.viewDetailsButtonText}>Bekijk Details</Text>
+                    <Text style={styles.viewDetailsButtonText}>Details</Text>
                 </TouchableOpacity>
             </View>
             <Text style={styles.fishSpecies}>{fish.species}</Text>
@@ -190,9 +190,9 @@ const SpotDetailScreen = ({ route }) => {
 
     return (
         <ScrollView style={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                <Ionicons name="arrow-back" size={28} color="#004a99" />
-            </TouchableOpacity>
+            {/*<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>*/}
+            {/*    <Ionicons name="arrow-back" size={28} color="#004a99" />*/}
+            {/*</TouchableOpacity>*/}
 
             {spotDetails.latitude && spotDetails.longitude ? (
                 <MapView
@@ -200,8 +200,8 @@ const SpotDetailScreen = ({ route }) => {
                     initialRegion={{
                         latitude: spotDetails.latitude,
                         longitude: spotDetails.longitude,
-                        latitudeDelta: 0.003,
-                        longitudeDelta: 0.003,
+                        latitudeDelta: 0.006,
+                        longitudeDelta: 0.006,
                     }}
                     scrollEnabled={false}
                     zoomEnabled={false}
@@ -210,8 +210,8 @@ const SpotDetailScreen = ({ route }) => {
                 >
                     <Marker
                         coordinate={{ latitude: spotDetails.latitude, longitude: spotDetails.longitude }}
-                        title={spotDetails.title}
-                        description={spotDetails.description}
+                        // title={spotDetails.title}
+                        // description={spotDetails.description}
                     />
                 </MapView>
             ) : (

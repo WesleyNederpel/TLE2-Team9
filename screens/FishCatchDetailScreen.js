@@ -142,9 +142,9 @@ const FishCatchDetailScreen = ({ route }) => {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.topButtonsContainer}>
-                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                    <Ionicons name="arrow-back" size={28} color="#004a99" />
-                </TouchableOpacity>
+                {/*<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>*/}
+                {/*    <Ionicons name="arrow-back" size={28} color="#004a99" />*/}
+                {/*</TouchableOpacity>*/}
                 <View style={styles.rightButtons}>
                     <TouchableOpacity style={styles.editButton} onPress={handleEditFishCatch}>
                         <Ionicons name="pencil-outline" size={28} color="#004a99" />
@@ -155,12 +155,16 @@ const FishCatchDetailScreen = ({ route }) => {
                 </View>
             </View>
 
-            <View style={styles.header}>
-                <Text style={styles.title}>{updatedCatch.title}</Text>
-                {updatedCatch.species && <Text style={styles.species}>{updatedCatch.species}</Text>}
-            </View>
+            {/*<View style={styles.header}>*/}
+            {/*    <Text style={styles.title}>{updatedCatch.title}</Text>*/}
+            {/*    {updatedCatch.species && <Text style={styles.species}>{updatedCatch.species}</Text>}*/}
+            {/*</View>*/}
 
             <View style={styles.detailsSection}>
+                <Text style={styles.detailText}>
+                    <Text style={styles.detailLabel}>Soort:</Text>{' '}
+                    {updatedCatch.species && <Text>{updatedCatch.species}</Text>}
+                </Text>
                 <Text style={styles.detailText}>
                     <Text style={styles.detailLabel}>Datum:</Text>{' '}
                     {new Date(updatedCatch.timestamp).toLocaleDateString()}
@@ -230,11 +234,11 @@ const styles = StyleSheet.create({
     },
     topButtonsContainer: {
         position: 'absolute',
-        top: 40,
+        top: 20,
         left: 20,
         right: 20,
         zIndex: 10,
-        flexDirection: 'row',
+        flexDirection: 'row-reverse',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
@@ -250,7 +254,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.8)',
         borderRadius: 20,
         padding: 5,
-        marginRight: 10, // Ruimte tussen bewerken en verwijderen
+        marginRight: 10,
     },
     deleteButton: {
         backgroundColor: 'rgba(255,255,255,0.8)',
@@ -258,7 +262,7 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     header: {
-        backgroundColor: '#e6f2ff',
+        backgroundColor: '#fdfdfd',
         padding: 20,
         paddingTop: 80,
         borderBottomWidth: 1,
@@ -283,10 +287,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         margin: 15,
         borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.1,
+        // shadowRadius: 3,
         elevation: 3,
     },
     detailText: {
@@ -315,12 +319,12 @@ const styles = StyleSheet.create({
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 15,
-        color: '#004a99',
+        color: '#005f99',
         textAlign: 'center',
     },
     fullImage: {
         width: '100%',
-        height: width * 0.6,
+        height: width * 0.9,
         borderRadius: 10,
         marginBottom: 15,
         resizeMode: 'cover',
