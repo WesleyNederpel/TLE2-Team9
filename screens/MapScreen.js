@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native'; // ScrollView toegevoegd
+import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
@@ -252,7 +252,7 @@ const MapScreen = ({ navigation }) => {
             </MapView>
 
             <TouchableOpacity style={styles.roundButton} onPress={openAddMarkerModal}>
-                <Text style={styles.roundButtonText}>+</Text>
+                <Ionicons name="add" size={30} color="white" />
             </TouchableOpacity>
 
             {/* Modal voor waterinformatie */}
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    roundButtonText: { color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30 },
+    // roundButtonText: { color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30 },
     modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
     scrollModalContent: {
         backgroundColor: 'white',

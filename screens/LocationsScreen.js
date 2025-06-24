@@ -111,7 +111,6 @@ export default function LocationsScreen({ navigation }) {
         }
     };
 
-    // NIEUW: Helper functie voor dynamische vistekst
     const getFishCountText = (count) => {
         if (count === 0) {
             return "0 vissen gevangen";
@@ -139,14 +138,12 @@ export default function LocationsScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
 
-                {/* FIX: Zorg dat spot.description altijd in een Text component zit en alleen rendert als het bestaat */}
                 {spot.description ? <Text style={styles.spotDescription}>{spot.description}</Text> : null}
 
                 <Pressable
                     style={styles.toggleFishListButton}
                     onPress={() => toggleFishList(spot.id)}
                 >
-                    {/* AANGEPAST: Gebruik dynamische tekst voor het aantal vissen in de toggle knop */}
                     <Text style={styles.toggleFishListText}>
                         Vissen ({getFishCountText(spot.fishCatches?.length || 0)}) {expandedFishLists[spot.id] ? '▲' : '▼'}
                     </Text>
@@ -188,7 +185,7 @@ export default function LocationsScreen({ navigation }) {
             <Pressable
                 key={spot.id}
                 style={styles.spotRow}
-                onPress={() => spot.screen && navigation.navigate('WaterInfo', { waterName: spot.name })}
+                onPress={() => navigation.navigate('WaterInfo', { waterName: spot.name })}
             >
                 <Text style={styles.spotTitle}>{spot.name}</Text>
                 {spot.images?.length > 0 && (
