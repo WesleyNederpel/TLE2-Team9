@@ -150,8 +150,8 @@
     "fishTypes": [
       {
         "id": "1",
-        "name": "Snoekbaars",
-        "image": "snoekbaars"
+        "name": "Snoek",
+        "image": "snoek"
       },
       {
         "id": "2",
