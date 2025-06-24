@@ -185,7 +185,7 @@ const FishCatchDetailScreen = ({ route }) => {
                 )}
                 {updatedCatch.description && (
                     <Text style={styles.descriptionText}>
-                        <Text style={styles.detailLabel}>Notities:</Text> {updatedCatch.description}
+                        <Text style={styles.detailLabel}>Beschrijving:</Text> {updatedCatch.description}
                     </Text>
                 )}
             </View>
