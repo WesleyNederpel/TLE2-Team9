@@ -18,14 +18,14 @@ export default function GalleryScreen({ navigation, route }) {
     const [fishInfo, setFishInfo] = useState({
         title: '',
         description: '',
-        location: '', // Slaat de ID van de spot op
+        location: '',
         species: '',
         length: '',
         weight: '',
         imageUris: []
     });
-    const [markers, setMarkers] = useState([]); // Om spots te laden voor de dropdown
-    const [spotPickerModalVisible, setSpotPickerModalVisible] = useState(false); // NIEUW: State voor de spot picker modal
+    const [markers, setMarkers] = useState([]);
+    const [spotPickerModalVisible, setSpotPickerModalVisible] = useState(false);
     // Add a new state to track which "mode" the modal is in
     const [modalMode, setModalMode] = useState('fish'); // 'fish' or 'spotPicker'
 
@@ -225,19 +225,19 @@ export default function GalleryScreen({ navigation, route }) {
         );
     }
 
-    if (photos.length === 0 && fishCatches.length === 0) {
-        return (
-            <View style={styles.emptyContainer}>
-                <Ionicons name="images-outline" size={64} color="#0096b2" />
-                <Text style={styles.emptyMessage}>Geen foto's of visvangsten gevonden</Text>
-                <Text style={styles.emptySubMessage}>Voeg een foto of visvangst toe om te beginnen!</Text>
-                <TouchableOpacity style={styles.addFishButtonLarge} onPress={openAddFishModal}>
-                    <Ionicons name="add" size={30} color="white" />
-                    <Text style={styles.addFishButtonLargeText}>Voeg Vis Toe</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
+    // if (photos.length === 0 && fishCatches.length === 0) {
+    //     return (
+    //         <View style={styles.emptyContainer}>
+    //             <Ionicons name="images-outline" size={64} color="#0096b2" />
+    //             <Text style={styles.emptyMessage}>Geen foto's of visvangsten gevonden</Text>
+    //             <Text style={styles.emptySubMessage}>Voeg een foto of visvangst toe om te beginnen!</Text>
+    //             <TouchableOpacity style={styles.addFishButtonLarge} onPress={openAddFishModal}>
+    //                 <Ionicons name="add" size={30} color="white" />
+    //                 <Text style={styles.addFishButtonLargeText}>Voeg Vis Toe</Text>
+    //             </TouchableOpacity>
+    //         </View>
+    //     );
+    // }
 
     const renderGalleryItem = ({ item }) => {
         if (item.type === 'photo') {
@@ -293,6 +293,17 @@ export default function GalleryScreen({ navigation, route }) {
                 numColumns={2}
                 renderItem={renderGalleryItem}
                 contentContainerStyle={styles.photoGrid}
+                ListEmptyComponent={() => (
+                    <View style={styles.emptyContainer}>
+                        <Ionicons name="images-outline" size={64} color="#0096b2" />
+                        <Text style={styles.emptyMessage}>Geen foto's of visvangsten gevonden</Text>
+                        <Text style={styles.emptySubMessage}>Voeg een foto of visvangst toe om te beginnen!</Text>
+                        <TouchableOpacity style={styles.addFishButtonLarge} onPress={openAddFishModal}>
+                            <Ionicons name="add" size={30} color="white" />
+                            <Text style={styles.addFishButtonLargeText}>Voeg Vis Toe</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             />
 
             <TouchableOpacity style={styles.addFishButton} onPress={openAddFishModal}>
@@ -689,7 +700,7 @@ const styles = StyleSheet.create({
     },
     addFishButton: {
         position: 'absolute',
-        bottom: 20,
+        bottom: 60,
         right: 20,
         backgroundColor: '#0096b2',
         width: 60,
