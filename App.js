@@ -5,7 +5,7 @@ import NavBar from './components/NavBar'; // Zorg dat dit pad correct is
 import SettingsScreen from "./screens/SettingsScreen";
 import FishScreen from './screens/FishScreen';
 import MapScreen from './screens/MapScreen';
-import WaterInfo from "./screens/waterinfo";
+import WaterInfo from "./screens/Waterinfo";
 import GalleryScreen from "./screens/GalleryScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SpotDetailScreen from "./screens/SpotDetailScreen";
@@ -29,7 +29,21 @@ export default function App() {
                 <Stack.Screen name="Main" component={NavBar} />
                 <Stack.Screen name="Map" component={MapScreen} />
                 <Stack.Screen name="FishScreen" component={FishScreen} />
-                <Stack.Screen name="WaterInfo" component={WaterInfo} />
+                <Stack.Screen
+                    name="WaterInfo"
+                    component={WaterInfo}
+                    options={({ route }) => ({
+                        title: route.params && route.params.waterName ? route.params.waterName : 'Water Info',
+                        headerShown: true,
+                        headerStyle: {
+                            backgroundColor: '#0096b2',
+                        },
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
+                    })}
+                />
 
                 <Stack.Screen name="Galerij" component={GalleryScreen} />
                 <Stack.Screen name="Camera" component={CameraScreen} />

@@ -6,7 +6,7 @@ import CameraScreen from "../screens/CameraScreen";
 import GalleryScreen from "../screens/GalleryScreen";
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LocationsScreen from '../screens/LocationsScreen';
-import WaterInfo from "../screens/waterinfo";
+// import WaterInfo from "../screens/waterinfo";
 import CommunityScreen from '../screens/CommunityScreen';
 
 const LocationsStack = createNativeStackNavigator();
@@ -15,7 +15,7 @@ function LocationsStackScreen() {
     return (
         <LocationsStack.Navigator>
             <LocationsStack.Screen name="Locations" component={LocationsScreen} options={{ headerShown: false }} />
-            <LocationsStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} />
+            {/* <LocationsStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} /> */}
         </LocationsStack.Navigator>
     );
 }
@@ -26,7 +26,7 @@ function MapStackScreen() {
     return (
         <MapStack.Navigator>
             <MapStack.Screen name="MapMain" component={MapScreen} options={{ headerShown: false }} />
-            <MapStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} />
+            {/* <MapStack.Screen name="WaterInfo" component={WaterInfo} options={{ headerShown: false }} /> */}
         </MapStack.Navigator>
     );
 }
