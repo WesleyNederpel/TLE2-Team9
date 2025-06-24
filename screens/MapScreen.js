@@ -92,7 +92,9 @@ const MapScreen = ({ navigation }) => {
 
     const handlePolygonPress = (feature) => {
         // Vind de volledige water-data uit waters.json op basis van de naam
-        const waterData = waters.find(w => w.name.trim().toLowerCase() === feature.properties.name.trim().toLowerCase());
+        const featureName = feature.properties?.name ?? '';
+        const waterData = waters.find(w => (w.name ?? '').trim().toLowerCase() === featureName.trim().toLowerCase());
+        setSelectedFeature({ ...feature, waterData });
         setSelectedFeature({ ...feature, waterData: waterData }); // Voeg waterData toe aan de geselecteerde feature
         if (!isPickingLocation) {
             setSelectedFeature(feature);
@@ -140,7 +142,7 @@ const MapScreen = ({ navigation }) => {
             let fill = 'rgba(0, 150, 255, 0.3)';
             let stroke = 'rgba(0, 150, 255, 0.8)';
 
-            if (props.water === 'river') {
+            if (props.name === 'Nieuwe Maas') {
                 fill = 'rgba(128, 0, 128, 0.4)';
                 stroke = 'rgba(128, 0, 128, 0.8)';
             } else if (props.water === 'harbour') {
@@ -275,9 +277,29 @@ const MapScreen = ({ navigation }) => {
                         style={styles.modalContent}
                         onPress={() => {
                             const name = selectedFeature?.properties?.name || 'Onbekend';
+                            const coords = selectedFeature?.geometry?.coordinates;
+
+                            let center = { latitude: null, longitude: null };
+
+                            if (selectedFeature.geometry.type === 'Polygon' && coords?.length > 0) {
+                                const outerRing = coords[0]; // gebruik de eerste ring van de polygon
+                                const lngLatPairs = outerRing.map(([lng, lat]) => ({ latitude: lat, longitude: lng }));
+                                if (lngLatPairs.length > 0) {
+                                    const avgLat = lngLatPairs.reduce((sum, p) => sum + p.latitude, 0) / lngLatPairs.length;
+                                    const avgLng = lngLatPairs.reduce((sum, p) => sum + p.longitude, 0) / lngLatPairs.length;
+                                    center = { latitude: avgLat, longitude: avgLng };
+                                }
+                            }
+
                             setSelectedFeature(null);
-                            navigation.navigate('WaterInfo', { waterName: name });
+
+                            navigation.navigate('WaterInfo', {
+                                waterName: name,
+                                latitude: center.latitude,
+                                longitude: center.longitude,
+                            });
                         }}
+
                     >
                         {getAfbeelding(selectedFeature?.properties?.name) ? (
                             <Image
@@ -305,41 +327,44 @@ const MapScreen = ({ navigation }) => {
                             {selectedFeature?.properties?.name || 'Onbekende locatie'}
                         </Text>
 
-                        {/* Hardcode voor Nieuwe Maas, anders dynamische weergave */}
                         {
                             selectedFeature?.properties?.name === 'Nieuwe Maas' ? (
                                 <View style={styles.permissionsScrollView}>
                                     <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
                                     <Text style={styles.modalText}>• VISpas of Kleine VISpas</Text>
                                 </View>
-                            ) : (
-                                selectedFeature?.waterData?.AdditionalPermissions && selectedFeature.waterData.AdditionalPermissions.length > 0 ? (
-                                    <ScrollView style={styles.permissionsScrollView}>
-                                        <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
-                                        {selectedFeature.waterData.AdditionalPermissions.map((permission, index) => (
-                                            <View key={permission.id || index} style={styles.permissionRow}>
-                                                {permission.name === "NachtVISpas" ? (
-                                                    <Ionicons name="moon" size={20} color="#1A3A91" style={styles.permissionIcon} />
-                                                ) : (
-                                                    <View style={styles.permissionIconPlaceholder} />
-                                                )}
-                                                <View style={styles.permissionTextContainer}>
-                                                    <Text style={styles.permissionNameModal}>{permission.name}</Text>
-                                                    <Text style={styles.permissionDescriptionModal}>{permission.description}</Text>
-                                                </View>
+                            ) : selectedFeature?.properties?.water === 'harbour' ? (
+                                <View style={styles.permissionsScrollView}>
+                                    <Text style={styles.modalSubTitle}>🚫 Verboden te Vissen:</Text>
+                                    <Text style={styles.modalText}>Het is hier niet toegestaan om te vissen.</Text>
+                                </View>
+                            ) : selectedFeature?.waterData?.AdditionalPermissions?.length > 0 ? (
+                                <ScrollView style={styles.permissionsScrollView}>
+                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                    {selectedFeature.waterData.AdditionalPermissions.map((permission, index) => (
+                                        <View key={permission.id || index} style={styles.permissionRow}>
+                                            {permission.name === "NachtVISpas" ? (
+                                                <Ionicons name="moon" size={20} color="#1A3A91" style={styles.permissionIcon} />
+                                            ) : (
+                                                <View style={styles.permissionIconPlaceholder} />
+                                            )}
+                                            <View style={styles.permissionTextContainer}>
+                                                <Text style={styles.permissionNameModal}>{permission.name}</Text>
+                                                <Text style={styles.permissionDescriptionModal}>{permission.description}</Text>
                                             </View>
-                                        ))}
-                                    </ScrollView>
-                                ) : (
-                                    <View style={styles.noPermissionsContainer}>
-                                        <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
-                                        <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
-                                        <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
-                                        <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
-                                    </View>
-                                )
+                                        </View>
+                                    ))}
+                                </ScrollView>
+                            ) : (
+                                <View style={styles.noPermissionsContainer}>
+                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                    <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                                    <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                                    <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                                </View>
                             )
                         }
+
 
                         <Text
                             style={[
