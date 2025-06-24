@@ -34,7 +34,6 @@ const getAfbeelding = (name) => {
 
 const MapScreen = ({ navigation }) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
-    // const [addMenuModalVisible, setAddMenuModalVisible] = useState(false); // Deze is verwijderd
 
     const [addMarkerModalVisible, setAddMarkerModalVisible] = useState(false);
     const [markerInfo, setMarkerInfo] = useState({ title: '', description: '', latitude: null, longitude: null });
@@ -161,10 +160,6 @@ const MapScreen = ({ navigation }) => {
         });
     };
 
-    // const toggleAddMenuModal = () => { // Deze functie is verwijderd
-    //     setAddMenuModalVisible(!addMenuModalVisible);
-    // };
-
     const openAddMarkerModal = () => {
         setMarkerInfo({
             title: '',
@@ -173,7 +168,6 @@ const MapScreen = ({ navigation }) => {
             longitude: currentLocation?.coords.longitude ?? null,
         });
         setAddMarkerModalVisible(true);
-        // setAddMenuModalVisible(false); // Deze regel is niet meer nodig
     };
 
     // addMarker functie aangepast om markers op te slaan
@@ -234,6 +228,17 @@ const MapScreen = ({ navigation }) => {
                 style={styles.map}
                 initialRegion={region}
                 onPress={handleMapPress}
+                onLongPress={(event) => {
+                    // Langdruk opent direct het 'Spot toevoegen' scherm met de gekozen locatie
+                    const { latitude, longitude } = event.nativeEvent.coordinate;
+                    setMarkerInfo({
+                        title: '',
+                        description: '',
+                        latitude: latitude,
+                        longitude: longitude,
+                    });
+                    setAddMarkerModalVisible(true);
+                }}
             >
                 {renderPolygons()}
                 {markers.map((m) => ( // Gebruik de id van de marker als key
