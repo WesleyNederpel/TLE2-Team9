@@ -11,6 +11,7 @@ import {
     Modal,
     Dimensions,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,8 +23,8 @@ const { width, height } = Dimensions.get('window');
 
 const SpotDetailScreen = ({ route }) => {
     const navigation = useNavigation();
-    const { spot } = route.params; // De initiële spot gegevens vanuit de navigatie
-    const [spotDetails, setSpotDetails] = useState(spot); // We gebruiken deze state om de spot data bij te werken
+    const { spot } = route.params;
+    const [spotDetails, setSpotDetails] = useState(spot);
 
     const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -50,7 +51,6 @@ const SpotDetailScreen = ({ route }) => {
 
             filteredFishCatches.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-            // Werk de 'spotDetails' state bij met de geladen visvangsten
             setSpotDetails(prevDetails => ({
                 ...prevDetails,
                 fishCatches: filteredFishCatches,
@@ -70,6 +70,58 @@ const SpotDetailScreen = ({ route }) => {
         }, [loadFishCatchesForSpot])
     );
 
+    const handleDeleteSpot = async () => {
+        Alert.alert(
+            "Spot verwijderen",
+            "Weet je zeker dat je deze spot wilt verwijderen? Vissen die aan deze spot gekoppeld zijn, blijven behouden maar hun locatie wordt ontkoppeld. Deze actie kan niet ongedaan worden gemaakt.",
+            [
+                {
+                    text: "Annuleren",
+                    style: "cancel"
+                },
+                {
+                    text: "Verwijderen",
+                    onPress: async () => {
+                        try {
+                            // Check eerst of de spot bestaat met de marker_ prefix
+                            const markerKey = `marker_${spot.id}`;
+                            const spotExists = await AsyncStorage.getItem(markerKey);
+
+                            if (!spotExists) {
+                                Alert.alert("Fout", "Spot bestaat niet in opslag");
+                                return;
+                            }
+
+                            // Verwijder de spot met de juiste prefix
+                            await AsyncStorage.removeItem(markerKey);
+                            console.log(`Spot met ID ${markerKey} verwijderd.`);
+
+                            // Update de lijst met marker keys (niet spots keys)
+                            const savedMarkerKeysString = await AsyncStorage.getItem('savedMarkerKeys');
+                            let savedMarkerKeys = savedMarkerKeysString ? JSON.parse(savedMarkerKeysString) : [];
+
+                            // Filter de marker key eruit
+                            const updatedMarkerKeys = savedMarkerKeys.filter(
+                                (key) => key !== markerKey
+                            );
+
+                            // Sla de bijgewerkte lijst op
+                            await AsyncStorage.setItem('savedMarkerKeys', JSON.stringify(updatedMarkerKeys));
+                            console.log(`ID ${markerKey} verwijderd uit savedMarkerKeys.`);
+
+                            Alert.alert('Succes', 'Spot succesvol verwijderd!');
+                            navigation.goBack();
+                        } catch (error) {
+                            console.error("Fout bij het verwijderen van de spot:", error);
+                            Alert.alert("Fout", "Kon de spot niet verwijderen. Probeer het opnieuw.");
+                        }
+                    },
+                    style: "destructive"
+                }
+            ],
+            { cancelable: true }
+        );
+    };
     if (!spotDetails) {
         return (
             <View style={styles.container}>
@@ -80,8 +132,7 @@ const SpotDetailScreen = ({ route }) => {
 
     const openGoogleMaps = () => {
         if (typeof spotDetails.latitude === 'number' && typeof spotDetails.longitude === 'number') {
-            // Correcte Google Maps URL met template literals
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${spotDetails.latitude},${spotDetails.longitude}`;
+            const googleMapsUrl = `http://maps.google.com/?q=${spotDetails.latitude},${spotDetails.longitude}`; // Corrected Google Maps URL
             Linking.openURL(googleMapsUrl).catch(err =>
                 console.error('Er is een fout opgetreden bij het openen van Google Maps', err)
             );
@@ -143,7 +194,6 @@ const SpotDetailScreen = ({ route }) => {
                 <Ionicons name="arrow-back" size={28} color="#004a99" />
             </TouchableOpacity>
 
-            {/* Hier controleren we op spotDetails.latitude en .longitude */}
             {spotDetails.latitude && spotDetails.longitude ? (
                 <MapView
                     style={styles.map}
@@ -172,11 +222,9 @@ const SpotDetailScreen = ({ route }) => {
 
             <View style={styles.contentSection}>
                 <View style={styles.infoSection}>
-                    {/* Hier gebruiken we spotDetails voor de titel */}
                     <Text style={styles.spotDetailTitle}>{spotDetails.title}</Text>
                     {spotDetails.description && <Text style={styles.spotDetailDescription}>{spotDetails.description}</Text>}
 
-                    {/* Hier gebruiken we spotDetails voor de coördinaten */}
                     {spotDetails.latitude && spotDetails.longitude && (
                         <Text style={styles.spotDetailCoordinates}>
                             Coördinaten: {spotDetails.latitude.toFixed(6)}, {spotDetails.longitude.toFixed(6)}
@@ -187,6 +235,12 @@ const SpotDetailScreen = ({ route }) => {
                         <Ionicons name="navigate-outline" size={20} color="white" style={{ marginRight: 5 }} />
                         <Text style={styles.googleMapsButtonText}>Open in Google Maps</Text>
                     </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.deleteSpotButton} onPress={handleDeleteSpot}>
+                        <Ionicons name="trash-outline" size={20} color="white" style={{ marginRight: 5 }} />
+                        <Text style={styles.deleteSpotButtonText}>Verwijder Spot</Text>
+                    </TouchableOpacity>
+
                 </View>
 
                 <View style={styles.fishCatchesSection}>
@@ -302,6 +356,20 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     googleMapsButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    deleteSpotButton: {
+        backgroundColor: '#dc3545',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        borderRadius: 5,
+        marginTop: 10,
+    },
+    deleteSpotButtonText: {
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
