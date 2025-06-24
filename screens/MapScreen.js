@@ -92,7 +92,9 @@ const MapScreen = ({ navigation }) => {
 
     const handlePolygonPress = (feature) => {
         // Vind de volledige water-data uit waters.json op basis van de naam
-        const waterData = waters.find(w => w.name.trim().toLowerCase() === feature.properties.name.trim().toLowerCase());
+        const featureName = feature.properties?.name ?? '';
+        const waterData = waters.find(w => (w.name ?? '').trim().toLowerCase() === featureName.trim().toLowerCase());
+        setSelectedFeature({ ...feature, waterData });
         setSelectedFeature({ ...feature, waterData: waterData }); // Voeg waterData toe aan de geselecteerde feature
         if (!isPickingLocation) {
             setSelectedFeature(feature);
@@ -268,9 +270,29 @@ const MapScreen = ({ navigation }) => {
                         style={styles.modalContent}
                         onPress={() => {
                             const name = selectedFeature?.properties?.name || 'Onbekend';
+                            const coords = selectedFeature?.geometry?.coordinates;
+
+                            let center = { latitude: null, longitude: null };
+
+                            if (selectedFeature.geometry.type === 'Polygon' && coords?.length > 0) {
+                                const outerRing = coords[0]; // gebruik de eerste ring van de polygon
+                                const lngLatPairs = outerRing.map(([lng, lat]) => ({ latitude: lat, longitude: lng }));
+                                if (lngLatPairs.length > 0) {
+                                    const avgLat = lngLatPairs.reduce((sum, p) => sum + p.latitude, 0) / lngLatPairs.length;
+                                    const avgLng = lngLatPairs.reduce((sum, p) => sum + p.longitude, 0) / lngLatPairs.length;
+                                    center = { latitude: avgLat, longitude: avgLng };
+                                }
+                            }
+
                             setSelectedFeature(null);
-                            navigation.navigate('WaterInfo', { waterName: name });
+
+                            navigation.navigate('WaterInfo', {
+                                waterName: name,
+                                latitude: center.latitude,
+                                longitude: center.longitude,
+                            });
                         }}
+
                     >
                         {getAfbeelding(selectedFeature?.properties?.name) ? (
                             <Image

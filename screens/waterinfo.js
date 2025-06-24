@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal } from "react-native";
+import { Pressable, StyleSheet, Text, View, Image, ScrollView, FlatList, Modal, Platform, Linking, Button } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Importeer Ionicons voor het maanicoon
-
+import { Ionicons } from '@expo/vector-icons';
 import waters from "../data/waters.json";
 import fishesData from "../assets/fish_data_of_the_netherlands.json";
+import { useRoute } from '@react-navigation/native';
+
 
 const getImage = (name) => {
     const map = {
@@ -37,7 +38,7 @@ const getImage = (name) => {
 
 export default function WaterInfo({ route }) {
     const navigation = useNavigation();
-    const waterName = route?.params?.waterName || "Onbekend";
+    const { waterName, latitude, longitude } = route.params;
 
     const location = waters.find(
         (w) => w.name.trim().toLowerCase() === waterName.trim().toLowerCase()
@@ -92,6 +93,38 @@ export default function WaterInfo({ route }) {
         }
     };
 
+    //route openen in Google Maps of Apple Maps
+    const openDirections = async () => {
+        if (!latitude || !longitude) {
+            console.warn("Geen locatie beschikbaar om route te openen.");
+            return;
+        }
+
+        const label = encodeURIComponent(waterName || 'Bestemming');
+        const latLng = `${latitude},${longitude}`;
+
+        let url;
+        if (Platform.OS === 'ios') {
+            const googleMapsUrl = `comgooglemaps://?q=${latLng}&zoom=15&directionsmode=driving`;
+            const appleMapsUrl = `maps:0,0?q=${label}@${latLng}`;
+
+            try {
+                const canOpenGoogleMaps = await Linking.canOpenURL(googleMapsUrl);
+                url = canOpenGoogleMaps ? googleMapsUrl : appleMapsUrl;
+            } catch (error) {
+                console.error("Fout bij controleren Google Maps beschikbaarheid op iOS:", error);
+                url = appleMapsUrl;
+            }
+        } else {
+            url = `https://www.google.com/maps/dir/?api=1&destination=${latLng}&travelmode=driving`;
+        }
+
+        Linking.openURL(url).catch(err =>
+            console.error("Kon de route niet openen", err)
+        );
+    };
+
+
     // Functie om naar FishScreen te navigeren
     const handleFishPress = (fishNameInList) => {
         const fishDetails = fishesData.find(
@@ -118,7 +151,7 @@ export default function WaterInfo({ route }) {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.topButtonsContainer}>
-                <Pressable style={styles.topButton}>
+                <Pressable style={styles.topButton} onPress={openDirections}>
                     <Text style={styles.topButtonText}>Route</Text>
                 </Pressable>
                 <Pressable style={styles.topButton} onPress={() => setModalVisible(true)}>

@@ -221,47 +221,50 @@ export default function LocationsScreen({ navigation }) {
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Locaties</Text>
+            <View style={styles.paddingBottom} >
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mySpots')}>
-                <Text style={styles.sectionIcon}>⭐</Text>
-                <Text style={styles.sectionTitle}>Mijn spots</Text>
-                <Text style={styles.arrow}>{visibleSections.mySpots ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.mySpots && (
-                locationData.mySpots.length === 0 ? (
-                    <Text style={styles.emptyText}>(Nog geen spots toegevoegd)</Text>
-                ) : (
-                    renderMySpots(locationData.mySpots)
-                )
-            )}
+                <Text style={styles.title}>Locaties</Text>
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorites')}>
-                <Text style={styles.sectionIcon}>❤️</Text>
-                <Text style={styles.sectionTitle}>Favorieten</Text>
-                <Text style={styles.arrow}>{visibleSections.favorites ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.favorites && (
-                locationData.favorites.length === 0 ? (
-                    <Text style={styles.emptyText}>(Nog geen favorieten toegevoegd)</Text>
-                ) : (
-                    renderStandardSpots(locationData.favorites)
-                )
-            )}
+                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mySpots')}>
+                    <Text style={styles.sectionIcon}>⭐</Text>
+                    <Text style={styles.sectionTitle}>Mijn spots</Text>
+                    <Text style={styles.arrow}>{visibleSections.mySpots ? '▲' : '▼'}</Text>
+                </Pressable>
+                {visibleSections.mySpots && (
+                    locationData.mySpots.length === 0 ? (
+                        <Text style={styles.emptyText}>(Nog geen spots toegevoegd)</Text>
+                    ) : (
+                        renderMySpots(locationData.mySpots)
+                    )
+                )}
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wantToGo')}>
-                <Text style={styles.sectionIcon}>🚩</Text>
-                <Text style={styles.sectionTitle}>Wil ik heen</Text>
-                <Text style={styles.arrow}>{visibleSections.wantToGo ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.wantToGo && (
-                locationData.wantToGo.length === 0 ? (
-                    <Text style={styles.emptyText}>(Nog geen plekken toegevoegd)</Text>
-                ) : (
-                    renderStandardSpots(locationData.wantToGo)
-                )
-            )}
-        </ScrollView>
+                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorites')}>
+                    <Text style={styles.sectionIcon}>❤️</Text>
+                    <Text style={styles.sectionTitle}>Favorieten</Text>
+                    <Text style={styles.arrow}>{visibleSections.favorites ? '▲' : '▼'}</Text>
+                </Pressable>
+                {visibleSections.favorites && (
+                    locationData.favorites.length === 0 ? (
+                        <Text style={styles.emptyText}>(Nog geen favorieten toegevoegd)</Text>
+                    ) : (
+                        renderStandardSpots(locationData.favorites)
+                    )
+                )}
+
+                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wantToGo')}>
+                    <Text style={styles.sectionIcon}>🚩</Text>
+                    <Text style={styles.sectionTitle}>Wil ik heen</Text>
+                    <Text style={styles.arrow}>{visibleSections.wantToGo ? '▲' : '▼'}</Text>
+                </Pressable>
+                {visibleSections.wantToGo && (
+                    locationData.wantToGo.length === 0 ? (
+                        <Text style={styles.emptyText}>(Nog geen plekken toegevoegd)</Text>
+                    ) : (
+                        renderStandardSpots(locationData.wantToGo)
+                    )
+                )}
+            </View>
+        </ScrollView >
     );
 }
 
@@ -270,7 +273,6 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#fff',
-        paddingBottom: 50
     },
     title: {
         fontSize: 24,
@@ -470,5 +472,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#333',
         fontStyle: 'italic',
+    },
+    paddingBottom: {
+        paddingBottom: 30
     },
 });
