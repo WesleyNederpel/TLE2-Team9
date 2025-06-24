@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Image, Pressable, StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import waters from "../data/waters.json"; // Importeer de waters data
 
 export default function LocationsScreen({ navigation }) {
 
@@ -13,6 +14,8 @@ export default function LocationsScreen({ navigation }) {
             id: 100 + i,
             name: 'Gemeentewater Rotterdam',
             association: 'HSV Groot Rotterdam',
+            // Voeg hier eventueel een standaardafbeelding toe voor 'Gemeentewater Rotterdam' als deze bestaat
+            image: 'Kralingseplas', // Voorbeeld, pas dit aan naar de juiste afbeeldingsnaam
         })),
     });
 
@@ -100,15 +103,23 @@ export default function LocationsScreen({ navigation }) {
         setVisibleSections((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
-    const getImage = (filename) => {
-        switch (filename) {
-            case "Kralingseplas.png":
-                return require("../images/Kralingseplas.png");
-            case "Wijnhaven.png":
-                return require("../images/Wijnhaven.png");
-            default:
-                return require("../images/Kralingseplas.png");
-        }
+    // Verbeterde getImage functie die overeenkomt met WaterInfo.js
+    const getImage = (imageName) => {
+        const map = {
+            "Kralingseplas": require("../images/Kralingseplas.png"),
+            "Wijnhaven": require("../images/Wijnhaven.png"),
+            "Bergse Voorplas": require("../images/BergseVoorplas.png"),
+            "Oudehaven": require("../images/Oudehaven.png"),
+            "Haringvliet": require("../images/Haringvliet.png"),
+            "Boerengat": require("../images/Boerengat.png"),
+            "Zevenhuizerplas": require("../images/Zevenhuizerplas.png"),
+            "Rottemeren": require("../images/Rottemeren.png"),
+            "Nieuwe Maas": require("../images/NieuweMaas.png"),
+            "de Rotte": require("../images/deRotte.png"), // Aangepast naar "de Rotte" om overeen te komen met je JSON
+
+            // Visafbeeldingen zijn hier niet direct nodig, maar kunnen worden toegevoegd indien nodig
+        };
+        return map[imageName] || require("../images/Kralingseplas.png"); // Fallback
     };
 
     const getFishCountText = (count) => {
@@ -188,12 +199,18 @@ export default function LocationsScreen({ navigation }) {
                 onPress={() => navigation.navigate('WaterInfo', { waterName: spot.name })}
             >
                 <Text style={styles.spotTitle}>{spot.name}</Text>
-                {spot.images?.length > 0 && (
-                    <Image source={getImage(spot.images?.[0])} style={styles.image} />
+                {/* Zorg ervoor dat spot.images[0] of spot.image de juiste afbeeldingsnaam bevat */}
+                {spot.images && spot.images.length > 0 && (
+                    <Image source={getImage(spot.images[0])} style={styles.image} />
+                )}
+                {/* Als de afbeelding direct onder de 'image' property staat (zoals in waters.json) */}
+                {spot.image && !spot.images && (
+                    <Image source={getImage(spot.image)} style={styles.image} />
                 )}
             </Pressable>
         ));
 
+    // Deze functie wordt niet gebruikt in de huidige render, maar is hier voor de volledigheid
     const renderWaterItems = (items) =>
         items.map((item) => (
             <View key={item.id} style={styles.waterItem}>
@@ -204,54 +221,50 @@ export default function LocationsScreen({ navigation }) {
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Locaties</Text>
+            <View style={styles.paddingBottom} >
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorites')}>
-                <Text style={styles.sectionIcon}>❤️</Text>
-                <Text style={styles.sectionTitle}>Favorieten</Text>
-                <Text style={styles.arrow}>{visibleSections.favorites ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.favorites && (
-                locationData.favorites.length === 0 ? (
-                    <Text style={styles.emptyText}>(Nog geen favorieten toegevoegd)</Text>
-                ) : (
-                    renderStandardSpots(locationData.favorites)
-                )
-            )}
+                <Text style={styles.title}>Locaties</Text>
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mySpots')}>
-                <Text style={styles.sectionIcon}>⭐</Text>
-                <Text style={styles.sectionTitle}>Mijn spots</Text>
-                <Text style={styles.arrow}>{visibleSections.mySpots ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.mySpots && (
-                locationData.mySpots.length === 0 ? (
-                    <Text style={styles.emptyText}>(Nog geen spots toegevoegd)</Text>
-                ) : (
-                    renderMySpots(locationData.mySpots)
-                )
-            )}
+                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mySpots')}>
+                    <Text style={styles.sectionIcon}>⭐</Text>
+                    <Text style={styles.sectionTitle}>Mijn spots</Text>
+                    <Text style={styles.arrow}>{visibleSections.mySpots ? '▲' : '▼'}</Text>
+                </Pressable>
+                {visibleSections.mySpots && (
+                    locationData.mySpots.length === 0 ? (
+                        <Text style={styles.emptyText}>(Nog geen spots toegevoegd)</Text>
+                    ) : (
+                        renderMySpots(locationData.mySpots)
+                    )
+                )}
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wantToGo')}>
-                <Text style={styles.sectionIcon}>🚩</Text>
-                <Text style={styles.sectionTitle}>Wil ik heen</Text>
-                <Text style={styles.arrow}>{visibleSections.wantToGo ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.wantToGo && (
-                locationData.wantToGo.length === 0 ? (
-                    <Text style={styles.emptyText}>(Nog geen plekken toegevoegd)</Text>
-                ) : (
-                    renderStandardSpots(locationData.wantToGo)
-                )
-            )}
+                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorites')}>
+                    <Text style={styles.sectionIcon}>❤️</Text>
+                    <Text style={styles.sectionTitle}>Favorieten</Text>
+                    <Text style={styles.arrow}>{visibleSections.favorites ? '▲' : '▼'}</Text>
+                </Pressable>
+                {visibleSections.favorites && (
+                    locationData.favorites.length === 0 ? (
+                        <Text style={styles.emptyText}>(Nog geen favorieten toegevoegd)</Text>
+                    ) : (
+                        renderStandardSpots(locationData.favorites)
+                    )
+                )}
 
-            <Pressable style={styles.sectionHeader} onPress={() => toggleSection('rotterdam')}>
-                <Text style={styles.sectionIcon}>📍</Text>
-                <Text style={styles.sectionTitle}>Gemeentewater Rotterdam</Text>
-                <Text style={styles.arrow}>{visibleSections.rotterdam ? '▲' : '▼'}</Text>
-            </Pressable>
-            {visibleSections.rotterdam && renderWaterItems(locationData.rotterdam)}
-        </ScrollView>
+                <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wantToGo')}>
+                    <Text style={styles.sectionIcon}>🚩</Text>
+                    <Text style={styles.sectionTitle}>Wil ik heen</Text>
+                    <Text style={styles.arrow}>{visibleSections.wantToGo ? '▲' : '▼'}</Text>
+                </Pressable>
+                {visibleSections.wantToGo && (
+                    locationData.wantToGo.length === 0 ? (
+                        <Text style={styles.emptyText}>(Nog geen plekken toegevoegd)</Text>
+                    ) : (
+                        renderStandardSpots(locationData.wantToGo)
+                    )
+                )}
+            </View>
+        </ScrollView >
     );
 }
 
@@ -459,5 +472,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#333',
         fontStyle: 'italic',
+    },
+    paddingBottom: {
+        paddingBottom: 30
     },
 });

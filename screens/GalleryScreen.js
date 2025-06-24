@@ -26,6 +26,8 @@ export default function GalleryScreen({ navigation, route }) {
     });
     const [markers, setMarkers] = useState([]);
     const [spotPickerModalVisible, setSpotPickerModalVisible] = useState(false);
+    // Add a new state to track which "mode" the modal is in
+    const [modalMode, setModalMode] = useState('fish'); // 'fish' or 'spotPicker'
 
     // useCallback voor loadPhotos en loadFishCatches om stabiele referenties te garanderen
     const loadPhotos = useCallback(async () => {
@@ -295,82 +297,115 @@ export default function GalleryScreen({ navigation, route }) {
             </TouchableOpacity>
 
             {/* Modal voor Vis Toevoegen - (deze blijft zoals die was) */}
+            {/* In your render: */}
             <Modal visible={addFishModalVisible} transparent animationType="slide" onRequestClose={closeAddFishModal}>
                 <View style={styles.modalOverlay}>
-                    <ScrollView contentContainerStyle={styles.scrollModalContent}>
-                        <Text style={styles.modalTitle}>Vis Informatie Invoeren</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Titel"
-                            value={fishInfo.title}
-                            onChangeText={(text) => setFishInfo({ ...fishInfo, title: text })}
-                            placeholderTextColor="#888"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Beschrijving"
-                            value={fishInfo.description}
-                            onChangeText={(text) => setFishInfo({ ...fishInfo, description: text })}
-                            placeholderTextColor="#888"
-                            multiline
-                        />
+                    {modalMode === 'fish' ? (
+                        <ScrollView contentContainerStyle={styles.scrollModalContent}>
+                            <Text style={styles.modalTitle}>Vis Informatie Invoeren</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Titel"
+                                value={fishInfo.title}
+                                onChangeText={(text) => setFishInfo({ ...fishInfo, title: text })}
+                                placeholderTextColor="#888"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Beschrijving"
+                                value={fishInfo.description}
+                                onChangeText={(text) => setFishInfo({ ...fishInfo, description: text })}
+                                placeholderTextColor="#888"
+                                multiline
+                            />
 
-                        <TouchableOpacity style={[styles.button, styles.imagePickerButton]} onPress={pickImage}>
-                            <Ionicons name="images-outline" size={24} color="white" style={{ marginRight: 10 }} />
-                            <Text style={styles.buttonText}>Kies Foto's (Telefoon Galerij)</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, styles.imagePickerButton]} onPress={pickImage}>
+                                <Ionicons name="images-outline" size={24} color="white" style={{ marginRight: 10 }} />
+                                <Text style={styles.buttonText}>Kies Foto's (Telefoon Galerij)</Text>
+                            </TouchableOpacity>
 
-                        {fishInfo.imageUris.length > 0 && (
-                            <ScrollView horizontal style={styles.imagePreviewScrollView} showsHorizontalScrollIndicator={false}>
-                                {fishInfo.imageUris.map((uri, index) => (
-                                    <Image key={index} source={{ uri }} style={styles.fishImagePreview} />
-                                ))}
-                            </ScrollView>
-                        )}
+                            {fishInfo.imageUris.length > 0 && (
+                                <ScrollView horizontal style={styles.imagePreviewScrollView} showsHorizontalScrollIndicator={false}>
+                                    {fishInfo.imageUris.map((uri, index) => (
+                                        <Image key={index} source={{ uri }} style={styles.fishImagePreview} />
+                                    ))}
+                                </ScrollView>
+                            )}
 
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Soort"
-                            value={fishInfo.species}
-                            onChangeText={(text) => setFishInfo({ ...fishInfo, species: text })}
-                            placeholderTextColor="#888"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Lengte (cm)"
-                            keyboardType="numeric"
-                            value={fishInfo.length}
-                            onChangeText={(text) => setFishInfo({ ...fishInfo, length: text })}
-                            placeholderTextColor="#888"
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Gewicht (kg)"
-                            keyboardType="numeric"
-                            value={fishInfo.weight}
-                            onChangeText={(text) => setFishInfo({ ...fishInfo, weight: text })}
-                            placeholderTextColor="#888"
-                        />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Soort"
+                                value={fishInfo.species}
+                                onChangeText={(text) => setFishInfo({ ...fishInfo, species: text })}
+                                placeholderTextColor="#888"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Lengte (cm)"
+                                keyboardType="numeric"
+                                value={fishInfo.length}
+                                onChangeText={(text) => setFishInfo({ ...fishInfo, length: text })}
+                                placeholderTextColor="#888"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Gewicht (kg)"
+                                keyboardType="numeric"
+                                value={fishInfo.weight}
+                                onChangeText={(text) => setFishInfo({ ...fishInfo, weight: text })}
+                                placeholderTextColor="#888"
+                            />
 
-                        {/* NIEUW: Aangepaste TouchOpactiy voor het openen van de Spot Picker Modal */}
-                        <TouchableOpacity
-                            style={styles.pickerDisplayButton}
-                            onPress={() => setSpotPickerModalVisible(true)}
-                        >
-                            <Text style={styles.pickerDisplayText}>{getSelectedSpotName()}</Text>
-                            <Ionicons name="caret-down-outline" size={20} color="#666" />
-                        </TouchableOpacity>
+                            {/* Replace the TouchableOpacity with this: */}
+                            <TouchableOpacity
+                                style={styles.pickerDisplayButton}
+                                onPress={() => setModalMode('spotPicker')}
+                            >
+                                <Text style={styles.pickerDisplayText}>{getSelectedSpotName()}</Text>
+                                <Ionicons name="caret-down-outline" size={20} color="#666" />
+                            </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.button} onPress={addFish}>
-                            <Text style={styles.buttonText}>Vis Toevoegen</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.button, { backgroundColor: '#FF6347', marginTop: 10 }]}
-                            onPress={closeAddFishModal}
-                        >
-                            <Text style={styles.buttonText}>Annuleren</Text>
-                        </TouchableOpacity>
-                    </ScrollView>
+                            {/* Rest of fish modal content */}
+                            <TouchableOpacity style={styles.button} onPress={addFish}>
+                                <Text style={styles.buttonText}>Vis Toevoegen</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.button, { backgroundColor: '#FF6347', marginTop: 10 }]}
+                                onPress={closeAddFishModal}
+                            >
+                                <Text style={styles.buttonText}>Annuleren</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    ) : (
+                        <View style={styles.spotPickerModalContent}>
+                            {/* Spot picker content */}
+                            <Text style={styles.spotPickerModalTitle}>Kies een Spot Locatie</Text>
+                            <FlatList
+                                data={markers}
+                                keyExtractor={(item) => item.id}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        style={styles.spotPickerItem}
+                                        onPress={() => {
+                                            setFishInfo({ ...fishInfo, location: item.id });
+                                            setModalMode('fish'); // Switch back to fish mode
+                                        }}
+                                    >
+                                        <Text style={styles.spotPickerItemText}>{item.title}</Text>
+                                        {fishInfo.location === item.id && (
+                                            <Ionicons name="checkmark" size={20} color="#0096b2" />
+                                        )}
+                                    </TouchableOpacity>
+                                )}
+                                ListEmptyComponent={() => (
+                                    <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
+                                )}
+                            />
+                            <TouchableOpacity style={styles.spotPickerCloseButton} onPress={() => setModalMode('fish')}>
+                                <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </Modal>
             {/* NIEUW: Modal voor het selecteren van een Spot Locatie */}

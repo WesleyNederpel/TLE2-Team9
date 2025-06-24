@@ -26,11 +26,25 @@ const capitalizeFirstLetter = (string) => {
 export default function App() {
     return (
         <NavigationContainer>
-            <Stack.Navigator screenOptions={{headerShown: false}}>
-                <Stack.Screen name="Main" component={NavBar}/>
-                <Stack.Screen name="Map" component={MapScreen}/>
-                <Stack.Screen name="FishScreen" component={FishScreen}/>
-                <Stack.Screen name="WaterInfo" component={WaterInfo}/>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Main" component={NavBar} />
+                <Stack.Screen name="Map" component={MapScreen} />
+                <Stack.Screen name="FishScreen" component={FishScreen} />
+                <Stack.Screen
+                    name="WaterInfo"
+                    component={WaterInfo}
+                    options={({ route }) => ({
+                        title: route.params && route.params.waterName ? route.params.waterName : 'Water Info',
+                        headerShown: true,
+                        headerStyle: {
+                            backgroundColor: '#0096b2',
+                        },
+                        headerTintColor: '#fff',
+                        headerTitleStyle: {
+                            fontWeight: 'bold',
+                        },
+                    })}
+                />
 
                 <Stack.Screen name="Galerij" component={GalleryScreen}/>
                 <Stack.Screen name="Camera" component={CameraScreen}/>
@@ -107,8 +121,8 @@ export default function App() {
                 <Stack.Screen
                     name="BlogPostScreen"
                     component={BlogPostScreen}
-                    options={({route}) => {
-                        const {blogId} = route.params;
+                    options={({ route }) => {
+                        const { blogId } = route.params;
                         const blog = blogpostsData.find(b => b.id === blogId);
                         const dynamicTitle = blog && blog.type ? capitalizeFirstLetter(blog.type) : 'Blogpost';
                         return {
