@@ -40,6 +40,18 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a52a1c92-4262-48c3-9d5a-5c0f8f350b66"
+      }
+    },
+    "owner": "wesleynederpel",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a52a1c92-4262-48c3-9d5a-5c0f8f350b66"
+    }
   }
 }
