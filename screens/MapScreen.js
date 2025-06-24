@@ -249,6 +249,13 @@ const MapScreen = ({ navigation }) => {
                         coordinate={{ latitude: m.latitude, longitude: m.longitude }}
                         title={m.title}
                         description={m.description}
+                        // onPress={() => {
+                        //     // Kleine vertraging om de standaard marker druk te laten zien
+                        //     setTimeout(() => {
+                        //         navigation.navigate('SpotDetail', { spot: m });
+                        //     }, 100);
+                        // }}
+                        //
                     />
                 ))}
             </MapView>
@@ -460,8 +467,8 @@ const styles = StyleSheet.create({
     map: { flex: 1 },
     roundButton: {
         position: 'absolute',
-        bottom: 40,
-        left: 20,
+        bottom: 60,
+        right: 20,
         backgroundColor: '#0096b2',
         width: 60,
         height: 60,
@@ -548,6 +555,41 @@ const styles = StyleSheet.create({
     },
     permissionTextContainer: {
         flex: 1,
+    },
+    calloutContainer: {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 12,
+        width: 160,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    calloutTitle: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        color: '#005f99',
+        marginBottom: 4,
+    },
+    calloutDescription: {
+        fontSize: 12,
+        color: '#666',
+        marginBottom: 8,
+    },
+    calloutButton: {
+        backgroundColor: '#007bff',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    calloutButtonText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     permissionNameModal: {
         fontSize: 15,
