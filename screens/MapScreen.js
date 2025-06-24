@@ -40,6 +40,7 @@ const MapScreen = ({ navigation }) => {
     const [markers, setMarkers] = useState([]); // Array van spots (markers)
     const [currentLocation, setCurrentLocation] = useState(null);
     const [isPickingLocation, setIsPickingLocation] = useState(false);
+    const [locationSource, SetLocationSource] = useState('current'); // 'current', 'picked', 'manual'
 
     const region = {
         latitude: 51.9225,
@@ -121,6 +122,7 @@ const MapScreen = ({ navigation }) => {
                             latitude: latitude,
                             longitude: longitude,
                         }));
+                        SetLocationSource('picked');
                         setIsPickingLocation(false);
                         setAddMarkerModalVisible(true);
                     } else {
@@ -167,6 +169,7 @@ const MapScreen = ({ navigation }) => {
             latitude: currentLocation?.coords.latitude ?? null,
             longitude: currentLocation?.coords.longitude ?? null,
         });
+        SetLocationSource('current');
         setAddMarkerModalVisible(true);
     };
 
@@ -198,7 +201,7 @@ const MapScreen = ({ navigation }) => {
                 Alert.alert('Fout', 'Er is een fout opgetreden bij het opslaan van de spot.');
             }
         } else {
-            Alert.alert('Invoer ontbreekt', 'Vul Titel, Breedtegraad en Lengtegraad in voor de marker.');
+            Alert.alert('Invoer ontbreekt', 'Vul Titel in en kies een locatie voor de marker.');
         }
     };
 
@@ -217,6 +220,7 @@ const MapScreen = ({ navigation }) => {
                 latitude: latitude,
                 longitude: longitude,
             }));
+            SetLocationSource('picked');
             setIsPickingLocation(false);
             setAddMarkerModalVisible(true);
         }
@@ -237,6 +241,7 @@ const MapScreen = ({ navigation }) => {
                         latitude: latitude,
                         longitude: longitude,
                     });
+                    SetLocationSource('picked'); // Set source to 'picked' for long press
                     setAddMarkerModalVisible(true);
                 }}
             >
@@ -247,13 +252,6 @@ const MapScreen = ({ navigation }) => {
                         coordinate={{ latitude: m.latitude, longitude: m.longitude }}
                         title={m.title}
                         description={m.description}
-                        // onPress={() => {
-                        //     // Kleine vertraging om de standaard marker druk te laten zien
-                        //     setTimeout(() => {
-                        //         navigation.navigate('SpotDetail', { spot: m });
-                        //     }, 100);
-                        // }}
-                        //
                     />
                 ))}
             </MapView>
@@ -384,25 +382,12 @@ const MapScreen = ({ navigation }) => {
                         />
                         <TextInput
                             style={styles.input}
-                            placeholder="Breedtegraad"
-                            keyboardType="numeric"
-                            value={markerInfo.latitude != null ? markerInfo.latitude.toString() : ''}
-                            onChangeText={(text) => setMarkerInfo({
-                                ...markerInfo,
-                                latitude: parseFloat(text) || null
-                            })}
-                            editable={!isPickingLocation}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Lengtegraad"
-                            keyboardType="numeric"
-                            value={markerInfo.longitude != null ? markerInfo.longitude.toString() : ''}
-                            onChangeText={(text) => setMarkerInfo({
-                                ...markerInfo,
-                                longitude: parseFloat(text) || null
-                            })}
-                            editable={!isPickingLocation}
+                            placeholder={
+                                locationSource === 'current'
+                                    ? 'Locatie: Huidige locatie'
+                                    : 'Locatie: Gekozen locatie'
+                            }
+                            editable={false}
                         />
 
                         <TouchableOpacity
@@ -456,7 +441,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    // roundButtonText: { color: 'white', fontSize: 30, fontWeight: 'bold', lineHeight: 30 },
     modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
     scrollModalContent: {
         backgroundColor: 'white',
@@ -594,6 +578,14 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    locationDisplay: {
+        fontSize: 16,
+        marginBottom: 10,
+        color: '#333',
+        alignSelf: 'flex-start', // Align text to the left
+        marginLeft: '5%', // Match input field alignment
+        marginTop: 5,
     },
 });
 

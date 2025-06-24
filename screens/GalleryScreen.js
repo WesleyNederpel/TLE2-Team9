@@ -223,20 +223,6 @@ export default function GalleryScreen({ navigation, route }) {
         );
     }
 
-    // if (photos.length === 0 && fishCatches.length === 0) {
-    //     return (
-    //         <View style={styles.emptyContainer}>
-    //             <Ionicons name="images-outline" size={64} color="#0096b2" />
-    //             <Text style={styles.emptyMessage}>Geen foto's of visvangsten gevonden</Text>
-    //             <Text style={styles.emptySubMessage}>Voeg een foto of visvangst toe om te beginnen!</Text>
-    //             <TouchableOpacity style={styles.addFishButtonLarge} onPress={openAddFishModal}>
-    //                 <Ionicons name="add" size={30} color="white" />
-    //                 <Text style={styles.addFishButtonLargeText}>Voeg Vis Toe</Text>
-    //             </TouchableOpacity>
-    //         </View>
-    //     );
-    // }
-
     const renderGalleryItem = ({ item }) => {
         if (item.type === 'photo') {
             // Dit is een standalone foto
