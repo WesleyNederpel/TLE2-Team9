@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import blogpostsData from '../data/blogposts.json';
 import eventsData from '../data/events.json';
+import { useLocationSetting } from '../LocationSettingContext';
 
 // Helperfunctie om datums te formatteren
 const formatDate = (dateString) => {
@@ -36,6 +37,7 @@ const getCityFromLocation = (locationString) => {
 
 export default function CommunityScreen() {
     const navigation = useNavigation();
+    const { darkMode } = useLocationSetting();
     // State om bij te houden hoeveel blogs zichtbaar zijn
     // Begint met 5 blogs zichtbaar, aangezien de knop '5 nieuwe blogs' toont
     const [visibleBlogCount, setVisibleBlogCount] = useState(5);
@@ -60,26 +62,28 @@ export default function CommunityScreen() {
     };
 
     return (
-        // Gebruik ScrollView zodat de content scrollbaar is als er veel items zijn
-        <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.contentContainer}>
+        <ScrollView
+            style={[styles.scrollViewContainer, darkMode && styles.scrollViewContainerDark]}
+            contentContainerStyle={styles.contentContainer}
+        >
             {/* Evenementen Sectie */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Evenementen</Text>
+                <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Evenementen</Text>
                 {eventsData.map((event, index) => (
                     <TouchableOpacity
-                        key={index} // Gebruik een unieke sleutel, bij voorkeur een 'id' van het evenement als die er was
-                        style={styles.eventListItemButton} // Nieuwe stijl voor evenementen
+                        key={index}
+                        style={[styles.eventListItemButton, darkMode && styles.eventListItemButtonDark]}
                         onPress={() => handleEventPress(event)}
                     >
                         <View style={styles.eventTextContainer}>
-                            <Text style={styles.eventTitle}>{event.naam}</Text>
-                            <Text style={styles.eventSubtitle}>{formatDate(event.datum)} om {event.begintijd}</Text>
-                            <Text style={styles.eventLocation}>{getCityFromLocation(event.locatie)}</Text>
+                            <Text style={[styles.eventTitle, darkMode && styles.eventTitleDark]}>{event.naam}</Text>
+                            <Text style={[styles.eventSubtitle, darkMode && styles.eventSubtitleDark]}>{formatDate(event.datum)} om {event.begintijd}</Text>
+                            <Text style={[styles.eventLocation, darkMode && styles.eventLocationDark]}>{getCityFromLocation(event.locatie)}</Text>
                         </View>
                         {event.afbeelding && (
                             <Image
                                 source={{ uri: event.afbeelding }}
-                                style={styles.eventSmallImage} // Nieuwe stijl voor kleine afbeelding
+                                style={styles.eventSmallImage}
                                 accessibilityLabel={`Afbeelding van ${event.naam}`}
                             />
                         )}
@@ -89,16 +93,15 @@ export default function CommunityScreen() {
 
             {/* Blogs & Posts Sectie */}
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Blogs & Posts</Text>
-                {blogsToDisplay.map((blog) => ( // Gebruik blogsToDisplay
+                <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Blogs & Posts</Text>
+                {blogsToDisplay.map((blog) => (
                     <TouchableOpacity
-                        key={blog.id} // Gebruik de unieke blog ID als sleutel
-                        style={styles.listItemButton} // Gebruikt de originele stijl voor blogs
+                        key={blog.id}
+                        style={[styles.listItemButton, darkMode && styles.listItemButtonDark]}
                         onPress={() => handleBlogPress(blog.id)}
                     >
-                        <Text style={styles.listItemTitle}>{blog.title}</Text>
-                        {/* Datum formatteren voor blogs */}
-                        <Text style={styles.listItemSubtitle}>{blog.author} - {formatDate(blog.date)}</Text>
+                        <Text style={[styles.listItemTitle, darkMode && styles.listItemTitleDark]}>{blog.title}</Text>
+                        <Text style={[styles.listItemSubtitle, darkMode && styles.listItemSubtitleDark]}>{blog.author} - {formatDate(blog.date)}</Text>
                         {blog.pinned && (
                             <View style={styles.pinIconContainer}>
                                 <Ionicons name="bookmark" size={24} color="#f5a623" />
@@ -106,11 +109,10 @@ export default function CommunityScreen() {
                         )}
                     </TouchableOpacity>
                 ))}
-                {/* Toon de "Meer tonen" knop alleen als er nog meer blogs zijn om te laden */}
                 {visibleBlogCount < blogpostsData.length && (
                     <TouchableOpacity
                         style={styles.showMoreButton}
-                        onPress={loadMoreBlogs} // Roep de nieuwe loadMoreBlogs functie aan
+                        onPress={loadMoreBlogs}
                     >
                         <Text style={styles.showMoreButtonText}>Meer tonen</Text>
                     </TouchableOpacity>
@@ -124,6 +126,9 @@ const styles = StyleSheet.create({
     scrollViewContainer: {
         flex: 1,
         backgroundColor: '#f8f8f8',
+    },
+    scrollViewContainerDark: {
+        backgroundColor: '#181818',
     },
     contentContainer: {
         padding: 20,
@@ -148,6 +153,9 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         width: '100%',
     },
+    sectionTitleDark: {
+        color: '#ddd',
+    },
     listItemButton: {
         backgroundColor: '#ffffff',
         padding: 15,
@@ -163,15 +171,25 @@ const styles = StyleSheet.create({
         borderLeftWidth: 5,
         borderLeftColor: '#0096b2',
     },
+    listItemButtonDark: {
+        backgroundColor: '#232323',
+        borderLeftColor: '#00505e',
+    },
     listItemTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
         marginBottom: 5,
     },
+    listItemTitleDark: {
+        color: '#eee',
+    },
     listItemSubtitle: {
         fontSize: 14,
         color: '#666',
+    },
+    listItemSubtitleDark: {
+        color: '#aaa',
     },
     eventListItemButton: {
         backgroundColor: '#ffffff',
@@ -188,6 +206,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 15,
         justifyContent: 'space-between',
+    },
+    eventListItemButtonDark: {
+        backgroundColor: '#232323',
     },
     eventSmallImage: {
         width: 80,
@@ -206,15 +227,24 @@ const styles = StyleSheet.create({
         color: '#004a99',
         marginBottom: 5,
     },
+    eventTitleDark: {
+        color: '#7fd6e7',
+    },
     eventSubtitle: {
         fontSize: 13,
         color: '#555',
         marginBottom: 5,
     },
+    eventSubtitleDark: {
+        color: '#aaa',
+    },
     eventLocation: {
         fontSize: 13,
         fontStyle: 'italic',
         color: '#777',
+    },
+    eventLocationDark: {
+        color: '#bbb',
     },
     showMoreButton: {
         backgroundColor: '#004a99',

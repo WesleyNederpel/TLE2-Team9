@@ -15,10 +15,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const EditFishCatchScreen = ({ route }) => {
     const navigation = useNavigation();
     const { fishCatch } = route.params;
+    const { darkMode } = useLocationSetting();
 
     const [title, setTitle] = useState(fishCatch.title);
     const [species, setSpecies] = useState(fishCatch.species);
@@ -98,52 +100,57 @@ const EditFishCatchScreen = ({ route }) => {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.formSection}>
-                <Text style={styles.label}>Titel:</Text>
+        <ScrollView style={[styles.container, darkMode && styles.containerDark]}>
+            <View style={[styles.formSection, darkMode && styles.formSectionDark]}>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Titel:</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, darkMode && styles.inputDark]}
                     value={title}
                     onChangeText={setTitle}
                     placeholder="Titel van de vangst"
+                    placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                 />
 
-                <Text style={styles.label}>Soort:</Text>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Soort:</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, darkMode && styles.inputDark]}
                     value={species}
                     onChangeText={setSpecies}
                     placeholder="Soort vis (bijv. Snoek, Baars)"
+                    placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                 />
 
-                <Text style={styles.label}>Beschrijving:</Text>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Beschrijving:</Text>
                 <TextInput
-                    style={[styles.input, styles.textArea]}
+                    style={[styles.input, styles.textArea, darkMode && styles.inputDark]}
                     value={description}
                     onChangeText={setDescription}
                     placeholder="Voeg details toe over de vangst, omstandigheden, etc."
                     multiline
+                    placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                 />
 
-                <Text style={styles.label}>Lengte (cm):</Text>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Lengte (cm):</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, darkMode && styles.inputDark]}
                     value={length}
                     onChangeText={setLength}
                     keyboardType="numeric"
                     placeholder="Optioneel"
+                    placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                 />
 
-                <Text style={styles.label}>Gewicht (kg):</Text>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Gewicht (kg):</Text>
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, darkMode && styles.inputDark]}
                     value={weight}
                     onChangeText={setWeight}
                     keyboardType="numeric"
                     placeholder="Optioneel"
+                    placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                 />
 
-                <Text style={styles.label}>Datum:</Text>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Datum:</Text>
                 <TouchableOpacity style={styles.dateDisplayContainer} onPress={() => setShowDatePicker(true)}>
                     <Text style={styles.dateDisplayText}>
                         {timestamp.toLocaleDateString()}
@@ -163,17 +170,17 @@ const EditFishCatchScreen = ({ route }) => {
                     />
                 )}
 
-                <Text style={styles.label}>Gekoppelde Spot:</Text>
+                <Text style={[styles.label, darkMode && styles.labelDark]}>Gekoppelde Spot:</Text>
                 <TouchableOpacity
-                    style={styles.pickerDisplayButton}
+                    style={[styles.pickerDisplayButton, darkMode && styles.inputDark]}
                     onPress={() => setShowSpotPickerModal(true)} // Open de modal
                 >
-                    <Text style={styles.pickerDisplayText}>{getSelectedSpotName()}</Text>
-                    <Ionicons name="caret-down-outline" size={20} color="#666" />
+                    <Text style={[styles.pickerDisplayText, darkMode && { color: '#fff' }]}>{getSelectedSpotName()}</Text>
+                    <Ionicons name="caret-down-outline" size={20} color={darkMode ? "#0096b2" : "#666"} />
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSaveFishCatch}>
+            <TouchableOpacity style={[styles.saveButton, darkMode && styles.saveButtonDark]} onPress={handleSaveFishCatch}>
                 <Text style={styles.saveButtonText}>Wijzigingen opslaan</Text>
             </TouchableOpacity>
 
@@ -186,9 +193,9 @@ const EditFishCatchScreen = ({ route }) => {
                     setShowSpotPickerModal(false); // Sluit de modal bij hardware terugknop
                 }}
             >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.spotPickerModalContent}>
-                        <Text style={styles.spotPickerModalTitle}>Kies een Spot Locatie</Text>
+                <View style={[styles.modalOverlay, darkMode && styles.modalOverlayDark]}>
+                    <View style={[styles.spotPickerModalContent, darkMode && styles.spotPickerModalContentDark]}>
+                        <Text style={[styles.spotPickerModalTitle, darkMode && { color: '#0096b2' }]}>Kies een Spot Locatie</Text>
                         <FlatList
                             data={markers}
                             keyExtractor={(item) => item.id}
@@ -211,7 +218,7 @@ const EditFishCatchScreen = ({ route }) => {
                                 <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
                             )}
                         />
-                        <TouchableOpacity style={styles.spotPickerCloseButton} onPress={() => setShowSpotPickerModal(false)}>
+                        <TouchableOpacity style={[styles.spotPickerCloseButton, darkMode && styles.saveButtonDark]} onPress={() => setShowSpotPickerModal(false)}>
                             <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
                         </TouchableOpacity>
                     </View>
@@ -225,6 +232,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f8f8f8',
+    },
+    containerDark: {
+        backgroundColor: '#181818',
     },
     header: {
         backgroundColor: '#004a99',
@@ -256,11 +266,17 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
+    formSectionDark: {
+        backgroundColor: '#232323',
+    },
     label: {
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 5,
         color: '#005f99',
+    },
+    labelDark: {
+        color: '#0096b2',
     },
     input: {
         borderWidth: 1,
@@ -270,6 +286,11 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         fontSize: 16,
         color: '#333',
+    },
+    inputDark: {
+        backgroundColor: '#232323',
+        color: '#fff',
+        borderColor: '#0096b2',
     },
     textArea: {
         height: 100,
@@ -314,6 +335,9 @@ const styles = StyleSheet.create({
         margin: 15,
         marginBottom: 30,
     },
+    saveButtonDark: {
+        backgroundColor: '#00505e',
+    },
     saveButtonText: {
         color: 'white',
         fontSize: 18,
@@ -326,6 +350,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    modalOverlayDark: {
+        backgroundColor: 'rgba(10,20,30,0.85)',
+    },
     spotPickerModalContent: {
         backgroundColor: 'white',
         width: '85%', // Iets breder voor betere bruikbaarheid
@@ -337,6 +364,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
+    },
+    spotPickerModalContentDark: {
+        backgroundColor: '#232323',
     },
     spotPickerModalTitle: {
         fontSize: 20, // Grotere titel

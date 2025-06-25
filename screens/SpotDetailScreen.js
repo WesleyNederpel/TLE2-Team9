@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,6 +26,7 @@ const SpotDetailScreen = ({ route }) => {
     const navigation = useNavigation();
     const { spot } = route.params;
     const [spotDetails, setSpotDetails] = useState(spot);
+    const { darkMode } = useLocationSetting();
 
     const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -124,8 +126,8 @@ const SpotDetailScreen = ({ route }) => {
     };
     if (!spotDetails) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>Spot niet gevonden.</Text>
+            <View style={[styles.container, darkMode && styles.containerDark]}>
+                <Text style={[styles.errorText, darkMode && styles.textLight]}>Spot niet gevonden.</Text>
             </View>
         );
     }
@@ -189,14 +191,14 @@ const SpotDetailScreen = ({ route }) => {
     );
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, darkMode && styles.containerDark]}>
             {/*<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>*/}
             {/*    <Ionicons name="arrow-back" size={28} color="#004a99" />*/}
             {/*</TouchableOpacity>*/}
 
             {spotDetails.latitude && spotDetails.longitude ? (
                 <MapView
-                    style={styles.map}
+                    style={[styles.map, darkMode && styles.mapDark]}
                     initialRegion={{
                         latitude: spotDetails.latitude,
                         longitude: spotDetails.longitude,
@@ -207,60 +209,105 @@ const SpotDetailScreen = ({ route }) => {
                     zoomEnabled={false}
                     pitchEnabled={false}
                     rotateEnabled={false}
+                    customMapStyle={darkMode ? [
+                        { elementType: 'geometry', stylers: [{ color: '#1a2326' }] },
+                        { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2326' }] },
+                        { elementType: 'labels.text.fill', stylers: [{ color: '#0096b2' }] },
+                        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#222f3e' }] },
+                        { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#222' }] },
+                        { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+                        { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+                        { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+                        { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+                    ] : []}
                 >
                     <Marker
                         coordinate={{ latitude: spotDetails.latitude, longitude: spotDetails.longitude }}
-                    // title={spotDetails.title}
-                    // description={spotDetails.description}
                     />
                 </MapView>
             ) : (
-                <View style={styles.mapPlaceholder}>
-                    <Text style={styles.mapPlaceholderText}>Kaart niet beschikbaar (geen coördinaten)</Text>
+                <View style={[styles.mapPlaceholder, darkMode && styles.mapPlaceholderDark]}>
+                    <Text style={[styles.mapPlaceholderText, darkMode && styles.textLight]}>Kaart niet beschikbaar (geen coördinaten)</Text>
                 </View>
             )}
 
-            <View style={styles.contentSection}>
-                <View style={styles.infoSection}>
-                    <Text style={styles.spotDetailTitle}>{spotDetails.title}</Text>
-                    {spotDetails.description && <Text style={styles.spotDetailDescription}>{spotDetails.description}</Text>}
+            <View style={[styles.contentSection, darkMode && styles.contentSectionDark]}>
+                <View style={[styles.infoSection, darkMode && styles.infoSectionDark]}>
+                    <Text style={[styles.spotDetailTitle, darkMode && styles.textAccent]}>{spotDetails.title}</Text>
+                    {spotDetails.description && <Text style={[styles.spotDetailDescription, darkMode && styles.textLight]}>{spotDetails.description}</Text>}
 
                     {spotDetails.latitude && spotDetails.longitude && (
-                        <Text style={styles.spotDetailCoordinates}>
+                        <Text style={[styles.spotDetailCoordinates, darkMode && styles.textLight]}>
                             Coördinaten: {spotDetails.latitude.toFixed(6)}, {spotDetails.longitude.toFixed(6)}
                         </Text>
                     )}
 
-                    <TouchableOpacity style={styles.googleMapsButton} onPress={openGoogleMaps}>
+                    <TouchableOpacity style={[styles.googleMapsButton, darkMode && styles.googleMapsButtonDark]} onPress={openGoogleMaps}>
                         <Ionicons name="navigate-outline" size={20} color="white" style={{ marginRight: 5 }} />
                         <Text style={styles.googleMapsButtonText}>Open in Google Maps</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.deleteSpotButton} onPress={handleDeleteSpot}>
+                    <TouchableOpacity style={[styles.deleteSpotButton, darkMode && styles.deleteSpotButtonDark]} onPress={handleDeleteSpot}>
                         <Ionicons name="trash-outline" size={20} color="white" style={{ marginRight: 5 }} />
                         <Text style={styles.deleteSpotButtonText}>Verwijder Spot</Text>
                     </TouchableOpacity>
-
                 </View>
 
-                <View style={styles.fishCatchesSection}>
-                    <Text style={styles.sectionHeader}>Gevangen Vissen</Text>
+                <View style={[styles.fishCatchesSection, darkMode && styles.fishCatchesSectionDark]}>
+                    <Text style={[styles.sectionHeader, darkMode && styles.textAccent]}>Gevangen Vissen</Text>
                     {loadingFishCatches ? (
                         <View style={styles.loadingFishCatchesContainer}>
                             <ActivityIndicator size="small" color="#005f99" />
-                            <Text style={styles.loadingFishCatchesText}>Vissen laden...</Text>
+                            <Text style={[styles.loadingFishCatchesText, darkMode && styles.textLight]}>Vissen laden...</Text>
                         </View>
                     ) : spotDetails.fishCatches && spotDetails.fishCatches.length > 0 ? (
                         <FlatList
                             data={spotDetails.fishCatches}
                             keyExtractor={(fish) => fish.id.toString()}
-                            renderItem={renderFishItem}
+                            renderItem={({ item }) => (
+                                <View style={[styles.fishItem, darkMode && styles.fishItemDark]}>
+                                    <View style={styles.fishItemHeader}>
+                                        <Text style={[styles.fishTitle, darkMode && styles.textAccent]}>{item.title}</Text>
+                                        <TouchableOpacity
+                                            style={[styles.viewDetailsButton, darkMode && styles.viewDetailsButtonDark]}
+                                            onPress={() => navigation.navigate('FishCatchDetail', { fishCatch: item })}
+                                        >
+                                            <Text style={styles.viewDetailsButtonText}>Details</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <Text style={[styles.fishSpecies, darkMode && styles.textLight]}>{item.species}</Text>
+                                    <Text style={[styles.fishDate, darkMode && styles.textLight]}>{new Date(item.timestamp).toLocaleDateString()}</Text>
+                                    {item.length && <Text style={[styles.fishInfo, darkMode && styles.textLight]}>Lengte: {item.length} cm</Text>}
+                                    {item.weight && <Text style={[styles.fishInfo, darkMode && styles.textLight]}>Gewicht: {item.weight} kg</Text>}
+                                    {item.description && <Text style={[styles.fishDescription, darkMode && styles.textLight]}>{item.description}</Text>}
+
+                                    {item.imageUris && item.imageUris.length > 0 ? (
+                                        <FlatList
+                                            data={item.imageUris}
+                                            horizontal
+                                            showsHorizontalScrollIndicator={false}
+                                            keyExtractor={(uri, index) => `${item.id}-${index}`}
+                                            renderItem={({ item: uri, index }) => (
+                                                <TouchableOpacity onPress={() => openImageViewer(item.imageUris, index)}>
+                                                    <Image source={{ uri }} style={styles.fishImage} />
+                                                </TouchableOpacity>
+                                            )}
+                                            style={styles.fishImagesContainer}
+                                        />
+                                    ) : (
+                                        <View style={styles.fishImagePlaceholderContainer}>
+                                            <Ionicons name="fish-outline" size={50} color="#ccc" />
+                                            <Text style={[styles.noImageText, darkMode && styles.textLight]}>Geen foto beschikbaar</Text>
+                                        </View>
+                                    )}
+                                </View>
+                            )}
                             scrollEnabled={false}
                         />
                     ) : (
                         <View style={{ alignItems: 'center', marginTop: 20 }}>
-                            <Text style={styles.emptyFishMessage}>Nog geen vissen gevangen op deze spot.</Text>
-                            <Text style={styles.emptyFishMessage}>Je kan een vis toevoegen aan deze spot via de galerij.</Text>
+                            <Text style={[styles.emptyFishMessage, darkMode && styles.textLight]}>Nog geen vissen gevangen op deze spot.</Text>
+                            <Text style={[styles.emptyFishMessage, darkMode && styles.textLight]}>Je kan een vis toevoegen aan deze spot via de galerij.</Text>
                         </View >
                     )}
                 </View>
@@ -291,6 +338,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f8f8f8',
     },
+    containerDark: {
+        backgroundColor: '#181818',
+    },
     backButton: {
         position: 'absolute',
         top: 40,
@@ -306,6 +356,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
     },
+    mapDark: {
+        borderBottomColor: '#333',
+    },
     mapPlaceholder: {
         width: '100%',
         height: 200,
@@ -313,13 +366,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    mapPlaceholderText: {
-        color: '#666',
-        fontSize: 16,
-        fontStyle: 'italic',
+    mapPlaceholderDark: {
+        backgroundColor: '#232323',
     },
     contentSection: {
         padding: 15,
+    },
+    contentSectionDark: {
+        backgroundColor: '#232323',
     },
     infoSection: {
         marginBottom: 20,
@@ -332,17 +386,26 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
+    infoSectionDark: {
+        backgroundColor: '#181818',
+    },
     spotDetailTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 5,
         color: '#004a99',
     },
+    textAccent: {
+        color: '#0096b2',
+    },
     spotDetailDescription: {
         fontSize: 16,
         color: '#555',
         lineHeight: 22,
         marginBottom: 10,
+    },
+    textLight: {
+        color: '#fff',
     },
     spotDetailCoordinates: {
         fontSize: 14,
@@ -358,6 +421,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginTop: 10,
     },
+    googleMapsButtonDark: {
+        backgroundColor: '#00505e',
+    },
     googleMapsButtonText: {
         color: 'white',
         fontSize: 16,
@@ -372,6 +438,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginTop: 10,
     },
+    deleteSpotButtonDark: {
+        backgroundColor: '#7c1c1c',
+    },
     deleteSpotButtonText: {
         color: 'white',
         fontSize: 16,
@@ -379,6 +448,9 @@ const styles = StyleSheet.create({
     },
     fishCatchesSection: {
         marginBottom: 20,
+    },
+    fishCatchesSectionDark: {
+        backgroundColor: '#232323',
     },
     sectionHeader: {
         fontSize: 20,
@@ -398,6 +470,9 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
+    fishItemDark: {
+        backgroundColor: '#181818',
+    },
     fishItemHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -416,6 +491,9 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         paddingHorizontal: 10,
         borderRadius: 5,
+    },
+    viewDetailsButtonDark: {
+        backgroundColor: '#00505e',
     },
     viewDetailsButtonText: {
         color: 'white',

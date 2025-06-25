@@ -3,6 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View, ScrollView, TouchableOpacity 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import waters from "../data/waters.json"; // Importeer de waters data
+import { useLocationSetting } from '../LocationSettingContext';
 
 export default function LocationsScreen({ navigation }) {
 
@@ -27,6 +28,7 @@ export default function LocationsScreen({ navigation }) {
     });
 
     const [expandedFishLists, setExpandedFishLists] = useState({});
+    const { darkMode } = useLocationSetting();
 
     const toggleFishList = (spotId) => {
         setExpandedFishLists(prev => ({
@@ -134,37 +136,35 @@ export default function LocationsScreen({ navigation }) {
 
     const renderMySpots = (spots) =>
         spots.map((spot) => (
-            <View key={spot.id} style={styles.mySpotContainer}>
-                {/* De header voor de spotnaam en details knop */}
+            <View key={spot.id} style={[styles.mySpotContainer, darkMode && styles.mySpotContainerDark]}>
                 <View style={styles.spotHeaderRow}>
-                    <Ionicons name="location-outline" size={18} color="#005f99" style={styles.spotIcon} />
+                    <Ionicons name="location-outline" size={18} color={darkMode ? "#0096b2" : "#005f99"} style={styles.spotIcon} />
                     <View style={styles.spotTextContainer}>
-                        <Text style={styles.spotTitle}>{spot.title}</Text>
+                        <Text style={[styles.spotTitle, darkMode && styles.spotTitleDark]}>{spot.title}</Text>
                     </View>
                     <TouchableOpacity
-                        style={styles.detailsButton}
+                        style={[styles.detailsButton, darkMode && styles.detailsButtonDark]}
                         onPress={() => navigation.navigate('SpotDetail', { spot: spot })}
                     >
-                        <Text style={styles.detailsButtonText}>Details</Text>
+                        <Text style={[styles.detailsButtonText, darkMode ? styles.detailsButtonTextDark : styles.detailsButtonTextLight]}>Details</Text>
                     </TouchableOpacity>
                 </View>
 
-                {spot.description ? <Text style={styles.spotDescription}>{spot.description}</Text> : null}
+                {spot.description ? <Text style={[styles.spotDescription, darkMode && styles.textLight]}>{spot.description}</Text> : null}
 
                 <Pressable
                     style={styles.toggleFishListButton}
                     onPress={() => toggleFishList(spot.id)}
                 >
-                    <Text style={styles.toggleFishListText}>
+                    <Text style={[styles.toggleFishListText, darkMode ? styles.toggleFishListTextDark : styles.toggleFishListTextLight]}>
                         Vissen ({getFishCountText(spot.fishCatches?.length || 0)}) {expandedFishLists[spot.id] ? '▲' : '▼'}
                     </Text>
                 </Pressable>
 
-
                 {expandedFishLists[spot.id] && spot.fishCatches && spot.fishCatches.length > 0 ? (
-                    <View style={styles.fishListContainer}>
+                    <View style={[styles.fishListContainer, darkMode && styles.fishListContainerDark]}>
                         {spot.fishCatches.map((fish) => (
-                            <View key={fish.id} style={styles.fishCatchItem}>
+                            <View key={fish.id} style={[styles.fishItem, darkMode && styles.fishItemDark]}>
                                 {fish.imageUris && fish.imageUris.length > 0 ? (
                                     <Image
                                         source={{ uri: fish.imageUris[0] }}
@@ -176,17 +176,17 @@ export default function LocationsScreen({ navigation }) {
                                     </View>
                                 )}
                                 <View style={styles.fishDetails}>
-                                    <Text style={styles.fishTitle}>{fish.title}</Text>
-                                    <Text style={styles.fishDate}>
+                                    <Text style={[styles.fishTitle, darkMode && styles.textAccent]}>{fish.title}</Text>
+                                    <Text style={[styles.fishDate, darkMode && styles.textLight]}>
                                         {new Date(fish.timestamp).toLocaleDateString()}
                                     </Text>
-                                    <Text style={styles.fishSpecies}>{fish.species}</Text>
+                                    <Text style={[styles.fishSpecies, darkMode && styles.textLight]}>{fish.species}</Text>
                                 </View>
                             </View>
                         ))}
                     </View>
                 ) : expandedFishLists[spot.id] ? (
-                    <Text style={styles.emptyFishText}>(Nog geen vissen gevangen op deze spot)</Text>
+                    <Text style={[styles.emptyFishText, darkMode && styles.textLight]}>(Nog geen vissen gevangen op deze spot)</Text>
                 ) : null}
             </View>
         ));
@@ -195,15 +195,13 @@ export default function LocationsScreen({ navigation }) {
         spots.map((spot) => (
             <Pressable
                 key={spot.id}
-                style={styles.spotRow}
+                style={[styles.spotRow, darkMode && styles.spotRowDark]}
                 onPress={() => navigation.navigate('WaterInfo', { waterName: spot.name })}
             >
-                <Text style={styles.spotTitle}>{spot.name}</Text>
-                {/* Zorg ervoor dat spot.images[0] of spot.image de juiste afbeeldingsnaam bevat */}
+                <Text style={[styles.spotTitle, darkMode && styles.spotTitleDark]}>{spot.name}</Text>
                 {spot.images && spot.images.length > 0 && (
                     <Image source={getImage(spot.images[0])} style={styles.image} />
                 )}
-                {/* Als de afbeelding direct onder de 'image' property staat (zoals in waters.json) */}
                 {spot.image && !spot.images && (
                     <Image source={getImage(spot.image)} style={styles.image} />
                 )}
@@ -220,14 +218,13 @@ export default function LocationsScreen({ navigation }) {
         ));
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, darkMode && styles.containerDark]}>
             <View style={styles.paddingBottom} >
-
-                <Text style={styles.title}>Locaties</Text>
+                <Text style={[styles.title, darkMode && styles.textAccent]}>Locaties</Text>
 
                 <Pressable style={styles.sectionHeader} onPress={() => toggleSection('mySpots')}>
                     <Text style={styles.sectionIcon}>⭐</Text>
-                    <Text style={styles.sectionTitle}>Mijn spots</Text>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Mijn spots</Text>
                     <Text style={styles.arrow}>{visibleSections.mySpots ? '▲' : '▼'}</Text>
                 </Pressable>
                 {visibleSections.mySpots && (
@@ -240,7 +237,7 @@ export default function LocationsScreen({ navigation }) {
 
                 <Pressable style={styles.sectionHeader} onPress={() => toggleSection('favorites')}>
                     <Text style={styles.sectionIcon}>❤️</Text>
-                    <Text style={styles.sectionTitle}>Favorieten</Text>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Favorieten</Text>
                     <Text style={styles.arrow}>{visibleSections.favorites ? '▲' : '▼'}</Text>
                 </Pressable>
                 {visibleSections.favorites && (
@@ -253,7 +250,7 @@ export default function LocationsScreen({ navigation }) {
 
                 <Pressable style={styles.sectionHeader} onPress={() => toggleSection('wantToGo')}>
                     <Text style={styles.sectionIcon}>🚩</Text>
-                    <Text style={styles.sectionTitle}>Wil ik heen</Text>
+                    <Text style={[styles.sectionTitle, darkMode && styles.sectionTitleDark]}>Wil ik heen</Text>
                     <Text style={styles.arrow}>{visibleSections.wantToGo ? '▲' : '▼'}</Text>
                 </Pressable>
                 {visibleSections.wantToGo && (
@@ -274,6 +271,9 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#fff',
     },
+    containerDark: {
+        backgroundColor: '#181818',
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -288,6 +288,15 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         paddingVertical: 12,
         marginTop: 10,
+        backgroundColor: 'transparent',
+        borderTopLeftRadius: 0,
+        borderTopRightRadius: 0,
+    },
+    sectionHeaderDark: {
+        borderBottomColor: '#0096b2',
+        borderBottomWidth: 1.5,
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
     },
     sectionIcon: {
         fontSize: 18,
@@ -299,9 +308,15 @@ const styles = StyleSheet.create({
         color: '#004a99',
         flex: 1,
     },
+    sectionTitleDark: {
+        color: '#0096b2',
+    },
     arrow: {
         color: '#004a99',
         fontSize: 16,
+    },
+    arrowDark: {
+        color: '#0096b2',
     },
     spotRow: {
         flexDirection: 'row',
@@ -313,6 +328,13 @@ const styles = StyleSheet.create({
         gap: 12,
         marginLeft: 20,
         paddingRight: 10,
+        backgroundColor: 'transparent',
+        borderRadius: 0,
+    },
+    spotRowDark: {
+        borderBottomColor: '#0096b2',
+        borderBottomWidth: 1.5,
+        borderRadius: 8,
     },
     spotTitle: {
         fontSize: 16,
@@ -320,12 +342,21 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         flex: 1,
     },
+    spotTitleDark: {
+        color: '#0096b2',
+    },
     spotDescription: {
         fontSize: 14,
         color: '#666',
         marginLeft: 10,
         flexShrink: 1,
         marginBottom: 5,
+    },
+    textLight: {
+        color: '#eee',
+    },
+    textAccent: {
+        color: '#0096b2',
     },
     spotIcon: {
         marginRight: 5,
@@ -340,6 +371,9 @@ const styles = StyleSheet.create({
         borderBottomColor: '#cce0f5',
         paddingVertical: 10,
         marginLeft: 20,
+    },
+    waterItemDark: {
+        borderBottomColor: '#0096b2',
     },
     waterTitle: {
         fontSize: 16,
@@ -378,6 +412,11 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 1,
     },
+    mySpotContainerDark: {
+        backgroundColor: '#000',
+        borderColor: '#0096b2',
+        borderWidth: 1.5,
+    },
     spotHeaderRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -400,25 +439,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 5,
     },
+    detailsButtonDark: {
+        backgroundColor: '#0096b2',
+    },
     detailsButtonText: {
-        color: 'white',
         fontSize: 14,
         fontWeight: 'bold',
     },
-    toggleFishListButton: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 8,
-        borderTopColor: '#e0f2f7',
-        borderTopWidth: 1,
-        marginTop: 5,
-        marginBottom: -5,
+    detailsButtonTextLight: {
+        color: '#fff',
     },
-    toggleFishListText: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#005f99',
+    detailsButtonTextDark: {
+        color: '#232323',
     },
     fishListContainer: {
         marginTop: 10,
@@ -427,7 +459,12 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         marginLeft: 10,
     },
-    fishCatchItem: {
+    fishListContainerDark: {
+        backgroundColor: '#232323',
+        borderTopColor: '#0096b2',
+        borderTopWidth: 1.5,
+    },
+    fishItem: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 8,
@@ -439,6 +476,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 1,
         elevation: 1,
+    },
+    fishItemDark: {
+        backgroundColor: '#000',
     },
     fishImage: {
         width: 60,
@@ -463,6 +503,9 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: 'bold',
         color: '#005f99',
+    },
+    fishTitleDark: {
+        color: '#0096b2',
     },
     fishDate: {
         fontSize: 12,

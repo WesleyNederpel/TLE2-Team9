@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const { width, height } = Dimensions.get('window');
 const itemWidth = width / 2 - 15; // Zorgt voor twee kolommen met wat marge
@@ -28,6 +29,8 @@ export default function GalleryScreen({ navigation, route }) {
     const [spotPickerModalVisible, setSpotPickerModalVisible] = useState(false);
     // Add a new state to track which "mode" the modal is in
     const [modalMode, setModalMode] = useState('fish'); // 'fish' or 'spotPicker'
+
+    const { darkMode } = useLocationSetting();
 
     // useCallback voor loadPhotos en loadFishCatches om stabiele referenties te garanderen
     const loadPhotos = useCallback(async () => {
@@ -218,9 +221,9 @@ export default function GalleryScreen({ navigation, route }) {
 
     if (loading) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={[styles.loadingContainer, darkMode && styles.loadingContainerDark]}>
                 <ActivityIndicator size="large" color="#005f99" />
-                <Text style={styles.loadingText}>Galerij laden...</Text>
+                <Text style={[styles.loadingText, darkMode && styles.textDark]}>Galerij laden...</Text>
             </View>
         );
     }
@@ -229,11 +232,10 @@ export default function GalleryScreen({ navigation, route }) {
         if (item.type === 'photo') {
             // Dit is een standalone foto
             return (
-                <View style={styles.photoContainer}>
-                    {/* De onPress handler die de standalone modal opende is verwijderd */}
+                <View style={[styles.photoContainer, darkMode && styles.photoContainerDark]}>
                     <Image source={{ uri: item.uri }} style={styles.photo} />
                     <View style={styles.photoInfoContainer}>
-                        <Text style={styles.timestamp}>
+                        <Text style={[styles.timestamp, darkMode && styles.textDark]}>
                             {new Date(item.timestamp).toLocaleDateString()}
                         </Text>
                     </View>
@@ -247,7 +249,7 @@ export default function GalleryScreen({ navigation, route }) {
 
             return (
                 <TouchableOpacity
-                    style={styles.fishCatchContainer}
+                    style={[styles.fishCatchContainer, darkMode && styles.fishCatchContainerDark]}
                     onPress={() => navigation.navigate('FishCatchDetail', { fishCatch: item })}
                 >
                     {firstImageUri ? (
@@ -255,15 +257,20 @@ export default function GalleryScreen({ navigation, route }) {
                     ) : (
                         <View style={styles.fishCatchPlaceholder}>
                             <Ionicons name="fish-outline" size={50} color="#0096b2" />
-                            <Text style={styles.fishCatchNoImageText}>Geen foto</Text>
+                            <Text style={[styles.fishCatchNoImageText, darkMode && styles.textDark]}>Geen foto</Text>
                         </View>
                     )}
                     <View style={styles.fishCatchInfo}>
-                        <Text style={styles.fishCatchTitle}>{item.title}</Text>
-                        <Text style={styles.fishCatchDate}>
+                        <Text style={[styles.fishCatchTitle, darkMode && styles.textDark]}>{item.title}</Text>
+                        <Text style={[styles.fishCatchDate, darkMode && styles.textDark]}>
                             {new Date(item.timestamp).toLocaleDateString()}
                         </Text>
-                        <Text style={styles.fishCatchLocation}>{locationName}</Text>
+                        <Text style={[
+                            styles.fishCatchLocation,
+                            darkMode && styles.fishCatchLocationDark
+                        ]}>
+                            {locationName}
+                        </Text>
                     </View>
                 </TouchableOpacity>
             );
@@ -272,7 +279,7 @@ export default function GalleryScreen({ navigation, route }) {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, darkMode && styles.containerDark]}>
             <FlatList
                 data={combinedData}
                 keyExtractor={(item) => item.id}
@@ -280,11 +287,11 @@ export default function GalleryScreen({ navigation, route }) {
                 renderItem={renderGalleryItem}
                 contentContainerStyle={styles.photoGrid}
                 ListEmptyComponent={() => (
-                    <View style={styles.emptyContainer}>
+                    <View style={[styles.emptyContainer, darkMode && styles.containerDark]}>
                         <Ionicons name="images-outline" size={64} color="#0096b2" />
-                        <Text style={styles.emptyMessage}>Geen foto's of visvangsten gevonden</Text>
-                        <Text style={styles.emptySubMessage}>Voeg een foto of visvangst toe om te beginnen!</Text>
-                        <TouchableOpacity style={styles.addFishButtonLarge} onPress={openAddFishModal}>
+                        <Text style={[styles.emptyMessage, darkMode && styles.textDark]}>Geen foto's of visvangsten gevonden</Text>
+                        <Text style={[styles.emptySubMessage, darkMode && styles.textDark]}>Voeg een foto of visvangst toe om te beginnen!</Text>
+                        <TouchableOpacity style={[styles.addFishButtonLarge, darkMode && styles.addFishButtonLargeDark]} onPress={openAddFishModal}>
                             <Ionicons name="add" size={30} color="white" />
                             <Text style={styles.addFishButtonLargeText}>Voeg Vis Toe</Text>
                         </TouchableOpacity>
@@ -292,30 +299,30 @@ export default function GalleryScreen({ navigation, route }) {
                 )}
             />
 
-            <TouchableOpacity style={styles.addFishButton} onPress={openAddFishModal}>
+            <TouchableOpacity style={[styles.addFishButton, darkMode && styles.addFishButtonDark]} onPress={openAddFishModal}>
                 <Ionicons name="add" size={30} color="white" />
             </TouchableOpacity>
 
             {/* Modal voor Vis Toevoegen - (deze blijft zoals die was) */}
             {/* In your render: */}
             <Modal visible={addFishModalVisible} transparent animationType="slide" onRequestClose={closeAddFishModal}>
-                <View style={styles.modalOverlay}>
+                <View style={[styles.modalOverlay, darkMode && styles.modalOverlayDark]}>
                     {modalMode === 'fish' ? (
-                        <ScrollView contentContainerStyle={styles.scrollModalContent}>
-                            <Text style={styles.modalTitle}>Vis Informatie Invoeren</Text>
+                        <ScrollView contentContainerStyle={[styles.scrollModalContent, darkMode && styles.scrollModalContentDark]}>
+                            <Text style={[styles.modalTitle, darkMode && styles.modalTitleDark]}>Vis Informatie Invoeren</Text>
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, darkMode && styles.inputDark]}
                                 placeholder="Titel"
                                 value={fishInfo.title}
                                 onChangeText={(text) => setFishInfo({ ...fishInfo, title: text })}
-                                placeholderTextColor="#888"
+                                placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                             />
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, darkMode && styles.inputDark]}
                                 placeholder="Beschrijving"
                                 value={fishInfo.description}
                                 onChangeText={(text) => setFishInfo({ ...fishInfo, description: text })}
-                                placeholderTextColor="#888"
+                                placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                                 multiline
                             />
 
@@ -333,39 +340,37 @@ export default function GalleryScreen({ navigation, route }) {
                             )}
 
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, darkMode && styles.inputDark]}
                                 placeholder="Soort"
                                 value={fishInfo.species}
                                 onChangeText={(text) => setFishInfo({ ...fishInfo, species: text })}
-                                placeholderTextColor="#888"
+                                placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                             />
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, darkMode && styles.inputDark]}
                                 placeholder="Lengte (cm)"
                                 keyboardType="numeric"
                                 value={fishInfo.length}
                                 onChangeText={(text) => setFishInfo({ ...fishInfo, length: text })}
-                                placeholderTextColor="#888"
+                                placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                             />
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, darkMode && styles.inputDark]}
                                 placeholder="Gewicht (kg)"
                                 keyboardType="numeric"
                                 value={fishInfo.weight}
                                 onChangeText={(text) => setFishInfo({ ...fishInfo, weight: text })}
-                                placeholderTextColor="#888"
+                                placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                             />
 
-                            {/* Replace the TouchableOpacity with this: */}
                             <TouchableOpacity
-                                style={styles.pickerDisplayButton}
+                                style={[styles.pickerDisplayButton, darkMode && styles.inputDark]}
                                 onPress={() => setModalMode('spotPicker')}
                             >
-                                <Text style={styles.pickerDisplayText}>{getSelectedSpotName()}</Text>
-                                <Ionicons name="caret-down-outline" size={20} color="#666" />
+                                <Text style={[styles.pickerDisplayText, darkMode && { color: '#fff' }]}>{getSelectedSpotName()}</Text>
+                                <Ionicons name="caret-down-outline" size={20} color={darkMode ? "#0096b2" : "#666"} />
                             </TouchableOpacity>
 
-                            {/* Rest of fish modal content */}
                             <TouchableOpacity style={styles.button} onPress={addFish}>
                                 <Text style={styles.buttonText}>Vis Toevoegen</Text>
                             </TouchableOpacity>
@@ -459,16 +464,25 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f8f8f8',
     },
+    containerDark: {
+        backgroundColor: '#181818',
+    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#f8f8f8',
     },
+    loadingContainerDark: {
+        backgroundColor: '#181818',
+    },
     loadingText: {
         marginTop: 10,
         fontSize: 16,
         color: '#005f99',
+    },
+    textDark: {
+        color: '#eee',
     },
     emptyContainer: {
         flex: 1,
@@ -503,11 +517,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    addFishButtonLargeText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginLeft: 10,
+    addFishButtonLargeDark: {
+        backgroundColor: '#00505e',
     },
     photoGrid: {
         padding: 5,
@@ -524,6 +535,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
+    },
+    photoContainerDark: {
+        backgroundColor: '#232323',
     },
     photo: {
         width: '100%',
@@ -556,6 +570,9 @@ const styles = StyleSheet.create({
         elevation: 2,
         alignItems: 'center',
         paddingBottom: 8,
+    },
+    fishCatchContainerDark: {
+        backgroundColor: '#232323',
     },
     fishCatchImage: {
         width: '100%',
@@ -601,6 +618,9 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         textAlign: 'center',
     },
+    fishCatchLocationDark: {
+        color: '#0096b2',
+    },
 
 
     // Stijlen voor de "Vis Toevoegen" modal
@@ -610,6 +630,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.6)',
     },
+    modalOverlayDark: {
+        backgroundColor: 'rgba(10,20,30,0.85)',
+    },
     scrollModalContent: {
         backgroundColor: 'white',
         padding: 20,
@@ -618,12 +641,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: '15%',
     },
+    scrollModalContentDark: {
+        backgroundColor: '#232323',
+    },
     modalTitle: {
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
         color: '#004a99',
+    },
+    modalTitleDark: {
+        color: '#0096b2',
     },
     input: {
         width: '100%',
@@ -632,6 +661,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
         borderRadius: 5,
+        color: '#333',
+    },
+    inputDark: {
+        backgroundColor: '#232323',
+        color: '#fff',
+        borderBottomColor: '#0096b2',
     },
     button: {
         backgroundColor: '#0096b2',
@@ -700,6 +735,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
+    addFishButtonDark: {
+        backgroundColor: '#00505e',
+    },
     pickerDisplayButton: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -711,10 +749,6 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 5,
         backgroundColor: '#f9f9f9',
-    },
-    pickerDisplayText: {
-        fontSize: 16,
-        color: '#333',
     },
     spotPickerModalOverlay: {
         flex: 1,

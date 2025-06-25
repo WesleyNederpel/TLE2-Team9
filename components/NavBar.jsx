@@ -8,6 +8,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LocationsScreen from '../screens/LocationsScreen';
 // import WaterInfo from "../screens/waterinfo";
 import CommunityScreen from '../screens/CommunityScreen';
+import React from 'react';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const LocationsStack = createNativeStackNavigator();
 
@@ -47,7 +49,10 @@ const getIconName = (routeName, focused) => {
     return icons[routeName];
 }
 
-export default function NavBar({ navigation }) {
+export default function NavBar({ navigation, darkMode: darkModeProp }) {
+    const context = useLocationSetting ? useLocationSetting() : {};
+    const darkMode = typeof darkModeProp === 'boolean' ? darkModeProp : context.darkMode;
+
     return (
         <Tab.Navigator
             initialRouteName="Map"
@@ -57,11 +62,17 @@ export default function NavBar({ navigation }) {
                     return <Ionicons name={iconName} size={24} color={color} />;
                 },
                 tabBarLabelStyle: styles.tabLabel,
-                tabBarStyle: styles.tabBar,
+                tabBarStyle: [
+                    styles.tabBar,
+                    { backgroundColor: darkMode ? '#00505e' : '#0096b2' }
+                ],
                 tabBarActiveTintColor: '#fff',
                 tabBarInactiveTintColor: '#fff',
                 headerTitle: '',
-                headerStyle: styles.header,
+                headerStyle: [
+                    styles.header,
+                    { backgroundColor: darkMode ? '#00505e' : '#0096b2' }
+                ],
                 headerTintColor: '#fff',
                 headerLeft: () => (
                     <Image
@@ -102,7 +113,7 @@ export default function NavBar({ navigation }) {
 
 const styles = StyleSheet.create({
     tabBar: {
-        backgroundColor: '#0096b2',
+        backgroundColor: '#00505e',
         borderTopWidth: 0,
         height: 100,
         paddingTop: 10,
@@ -112,7 +123,7 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
     },
     header: {
-        backgroundColor: '#0096b2',
+        backgroundColor: '#00505e',
         elevation: 0, // Remove shadow on Android
         shadowOpacity: 0, // Remove shadow on iOS
         borderBottomWidth: 0,

@@ -33,6 +33,19 @@ const getAfbeelding = (name) => {
     }
 };
 
+// Voeg een custom dark map style toe
+const darkMapStyle = [
+    { elementType: 'geometry', stylers: [{ color: '#1a2326' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#1a2326' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#0096b2' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#222f3e' }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#222' }] },
+    { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+    { featureType: 'transit', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+    { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+    { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#232323' }] },
+];
+
 const MapScreen = ({ navigation }) => {
     const [selectedFeature, setSelectedFeature] = useState(null);
 
@@ -43,7 +56,7 @@ const MapScreen = ({ navigation }) => {
     const [isPickingLocation, setIsPickingLocation] = useState(false);
     const [locationSource, SetLocationSource] = useState('current'); // 'current', 'picked', 'manual'
 
-    const { showLocation } = useLocationSetting();
+    const { showLocation, darkMode } = useLocationSetting();
 
     const region = {
         latitude: 51.9225,
@@ -232,7 +245,7 @@ const MapScreen = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, darkMode && styles.containerDark]}>
             <MapView
                 style={styles.map}
                 initialRegion={region}
@@ -250,6 +263,8 @@ const MapScreen = ({ navigation }) => {
                     setAddMarkerModalVisible(true);
                 }}
                 showsUserLocation={showLocation}
+                mapType="standard"
+                customMapStyle={darkMode ? darkMapStyle : []}
             >
                 {renderPolygons()}
                 {markers.map((m) => (
@@ -272,9 +287,14 @@ const MapScreen = ({ navigation }) => {
                     />
                 )} */}
             </MapView>
-
-            <TouchableOpacity style={styles.roundButton} onPress={openAddMarkerModal}>
-                <Ionicons name="add" size={30} color="white" />
+            <TouchableOpacity
+                style={[
+                    styles.roundButton,
+                    darkMode && { backgroundColor: '#00505e' }
+                ]}
+                onPress={openAddMarkerModal}
+            >
+                <Ionicons name="add" size={30} color="#fff" />
             </TouchableOpacity>
 
             {/* Modal voor waterinformatie */}
@@ -284,10 +304,10 @@ const MapScreen = ({ navigation }) => {
                 animationType="slide"
                 onRequestClose={() => setSelectedFeature(null)}
             >
-                <View style={styles.modalOverlay}>
+                <View style={[styles.modalOverlay, darkMode && styles.modalOverlayDark]}>
                     <TouchableOpacity
                         activeOpacity={0.9}
-                        style={styles.modalContent}
+                        style={[styles.modalContent, darkMode && styles.modalContentDark]}
                         onPress={() => {
                             const name = selectedFeature?.properties?.name || 'Onbekend';
                             const coords = selectedFeature?.geometry?.coordinates;
@@ -332,102 +352,106 @@ const MapScreen = ({ navigation }) => {
                                     borderRadius: 8,
                                 }}
                             >
-                                <Text>Geen afbeelding</Text>
+                                <Text style={[darkMode && { color: '#eee' }]}>Geen afbeelding</Text>
                             </View>
                         )}
 
-                        <Text style={styles.modalTitle}>
+                        <Text style={[
+                            styles.modalTitle,
+                            darkMode && { color: '#0096b2' }
+                        ]}>
                             {selectedFeature?.properties?.name || 'Onbekende locatie'}
                         </Text>
 
                         {
                             selectedFeature?.properties?.name === 'Nieuwe Maas' ? (
                                 <View style={styles.permissionsScrollView}>
-                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
-                                    <Text style={styles.modalText}>• VISpas of Kleine VISpas</Text>
+                                    <Text style={[styles.modalSubTitle, darkMode && { color: '#0096b2' }]}>🎣 Nodige Vergunningen:</Text>
+                                    <Text style={[styles.modalText, darkMode && { color: '#eee' }]}>• VISpas of Kleine VISpas</Text>
                                 </View>
                             ) : selectedFeature?.properties?.water === 'harbour' ? (
                                 <View style={styles.permissionsScrollView}>
-                                    <Text style={styles.modalSubTitle}>🚫 Verboden te Vissen:</Text>
-                                    <Text style={styles.modalText}>Het is hier niet toegestaan om te vissen.</Text>
+                                    <Text style={[styles.modalSubTitle, darkMode && { color: '#0096b2' }]}>🚫 Verboden te Vissen:</Text>
+                                    <Text style={[styles.modalText, darkMode && { color: '#eee' }]}>Het is hier niet toegestaan om te vissen.</Text>
                                 </View>
                             ) : selectedFeature?.waterData?.AdditionalPermissions?.length > 0 ? (
                                 <ScrollView style={styles.permissionsScrollView}>
-                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
+                                    <Text style={[styles.modalSubTitle, darkMode && { color: '#0096b2' }]}>🎣 Nodige Vergunningen:</Text>
                                     {selectedFeature.waterData.AdditionalPermissions.map((permission, index) => (
                                         <View key={permission.id || index} style={styles.permissionRow}>
                                             {permission.name === "NachtVISpas" ? (
-                                                <Ionicons name="moon" size={20} color="#1A3A91" style={styles.permissionIcon} />
+                                                <Ionicons name="moon" size={20} color={darkMode ? "#0096b2" : "#1A3A91"} style={styles.permissionIcon} />
                                             ) : (
                                                 <View style={styles.permissionIconPlaceholder} />
                                             )}
                                             <View style={styles.permissionTextContainer}>
-                                                <Text style={styles.permissionNameModal}>{permission.name}</Text>
-                                                <Text style={styles.permissionDescriptionModal}>{permission.description}</Text>
+                                                <Text style={[styles.permissionNameModal, darkMode && { color: '#0096b2' }]}>{permission.name}</Text>
+                                                <Text style={[styles.permissionDescriptionModal, darkMode && { color: '#eee' }]}>{permission.description}</Text>
                                             </View>
                                         </View>
                                     ))}
                                 </ScrollView>
                             ) : (
                                 <View style={styles.noPermissionsContainer}>
-                                    <Text style={styles.modalSubTitle}>🎣 Nodige Vergunningen:</Text>
-                                    <Text style={styles.modalText}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
-                                    <Text style={styles.modalText}>• Sportvisserijbelangen Delfland (DELFT)</Text>
-                                    <Text style={styles.modalText}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
+                                    <Text style={[styles.modalSubTitle, darkMode && { color: '#0096b2' }]}>🎣 Nodige Vergunningen:</Text>
+                                    <Text style={[styles.modalText, darkMode && { color: '#eee' }]}>• HSV Groot Rotterdam (ROTTERDAM)</Text>
+                                    <Text style={[styles.modalText, darkMode && { color: '#eee' }]}>• Sportvisserijbelangen Delfland (DELFT)</Text>
+                                    <Text style={[styles.modalText, darkMode && { color: '#eee' }]}>• HSV GHV - Groene Hart (DEN HAAG)</Text>
                                 </View>
                             )
                         }
 
-
                         <Text
                             style={[
                                 styles.modalText,
-                                { marginTop: 15, fontWeight: 'bold', color: '#005f99' },
+                                { marginTop: 15, fontWeight: 'bold', color: darkMode ? '#0096b2' : '#005f99' }
                             ]}
                         >
                             Tik om meer informatie te zien
                         </Text>
-                    </TouchableOpacity >
-
+                    </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.closeButton, { marginTop: 15 }]}
+                        style={[styles.closeButton, { marginTop: 15 }, darkMode && styles.closeButtonDark]}
                         onPress={() => setSelectedFeature(null)}
                     >
-                        <Text style={styles.closeButtonText}>Sluiten</Text>
+                        <Text style={[styles.closeButtonText, darkMode && { color: '#fff' }]}>Sluiten</Text>
                     </TouchableOpacity>
-                </View >
-            </Modal >
+                </View>
+            </Modal>
 
             {/* Modal voor marker informatie invoeren */}
-            < Modal
+            <Modal
                 visible={addMarkerModalVisible}
                 transparent
                 animationType="slide"
                 onRequestClose={() => setAddMarkerModalVisible(false)}
             >
-                <View style={styles.modalOverlay}>
-                    <ScrollView contentContainerStyle={styles.scrollModalContent}>
-                        <Text style={styles.modalTitle}>Spot Informatie Invoeren</Text>
+                <View style={[styles.modalOverlay, darkMode && styles.modalOverlayDark]}>
+                    <ScrollView contentContainerStyle={[styles.scrollModalContent, darkMode && styles.modalContentDark]}>
+                        <Text style={[styles.modalTitle, darkMode && { color: '#0096b2' }]}>Spot Informatie Invoeren</Text>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, darkMode && styles.inputDark]}
                             placeholder="Titel"
+                            placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                             value={markerInfo.title}
                             onChangeText={(text) => setMarkerInfo({ ...markerInfo, title: text })}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, darkMode && styles.inputDark]}
                             placeholder="Beschrijving"
+                            placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                             value={markerInfo.description}
                             onChangeText={(text) => setMarkerInfo({ ...markerInfo, description: text })}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, darkMode && styles.inputDark]}
                             placeholder={
                                 locationSource === 'current'
                                     ? 'Locatie: Huidige locatie'
                                     : 'Locatie: Gekozen locatie'
                             }
                             editable={false}
+                            placeholderTextColor={darkMode ? "#80d8e6" : "#888"}
                         />
 
                         <TouchableOpacity
@@ -448,7 +472,7 @@ const MapScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </ScrollView>
                 </View>
-            </Modal >
+            </Modal>
 
             {/* Visuele cue wanneer in picking mode */}
             {
@@ -458,12 +482,13 @@ const MapScreen = ({ navigation }) => {
                     </View>
                 )
             }
-        </View >
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: { flex: 1, backgroundColor: '#f8f8f8' },
+    containerDark: { backgroundColor: '#181818' },
     map: { flex: 1 },
     roundButton: {
         position: 'absolute',
@@ -481,7 +506,15 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)'
+    },
+    modalOverlayDark: {
+        backgroundColor: 'rgba(10,20,30,0.85)',
+    },
     scrollModalContent: {
         backgroundColor: 'white',
         padding: 20,
@@ -498,6 +531,9 @@ const styles = StyleSheet.create({
         maxHeight: '70%',
         alignItems: 'center',
     },
+    modalContentDark: {
+        backgroundColor: '#232323',
+    },
     modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
     modalSubTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10, marginTop: 5, color: '#1A3A91' }, // Nieuwe stijl
     modalText: { marginBottom: 5, fontSize: 16 },
@@ -508,6 +544,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
         borderRadius: 5,
+    },
+    inputDark: {
+        backgroundColor: '#232323',
+        color: '#fff',
+        borderBottomColor: '#0096b2',
     },
     button: {
         backgroundColor: '#0096b2',
@@ -526,6 +567,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
         alignItems: 'center',
+    },
+    closeButtonDark: {
+        backgroundColor: '#00505e',
     },
     closeButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
     permissionsScrollView: {

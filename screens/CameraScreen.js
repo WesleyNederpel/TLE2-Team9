@@ -5,6 +5,7 @@ import { CameraView } from 'expo-camera';
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import { useIsFocused } from '@react-navigation/native';
+import { useLocationSetting } from '../LocationSettingContext';
 
 export default function CameraScreen({ navigation }) {
     const [type] = useState('back');
@@ -14,6 +15,7 @@ export default function CameraScreen({ navigation }) {
     const [zoom, setZoom] = useState(0);
 
     const isFocused = useIsFocused();
+    const { darkMode } = useLocationSetting();
 
     useEffect(() => {
         (async () => {
@@ -127,7 +129,10 @@ export default function CameraScreen({ navigation }) {
             </View>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    style={styles.shutterButton}
+                    style={[
+                        styles.shutterButton,
+                        darkMode && styles.shutterButtonDark
+                    ]}
                     onPress={takePicture}
                     disabled={isTakingPicture || !isFocused}
                 >
@@ -174,6 +179,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderWidth: 4,
         borderColor: 'white',
+    },
+    shutterButtonDark: {
+        backgroundColor: '#00505e',
     },
     zoomControlsContainer: {
         position: 'absolute',

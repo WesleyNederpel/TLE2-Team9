@@ -16,12 +16,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const { width } = Dimensions.get('window');
 
 const FishCatchDetailScreen = ({ route }) => {
     const navigation = useNavigation();
     const initialCatch = route.params.fishCatch;
+    const { darkMode } = useLocationSetting();
 
     const [updatedCatch, setUpdatedCatch] = useState(initialCatch);
     const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
@@ -120,8 +122,8 @@ const FishCatchDetailScreen = ({ route }) => {
 
     if (!updatedCatch) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>Visvangst details niet gevonden.</Text>
+            <View style={[styles.container, darkMode && styles.containerDark]}>
+                <Text style={[styles.errorText, darkMode && styles.textLight]}>Visvangst details niet gevonden.</Text>
             </View>
         );
     }
@@ -140,7 +142,7 @@ const FishCatchDetailScreen = ({ route }) => {
     );
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, darkMode && styles.containerDark]}>
             <View style={styles.topButtonsContainer}>
                 {/*<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>*/}
                 {/*    <Ionicons name="arrow-back" size={28} color="#004a99" />*/}
@@ -160,38 +162,38 @@ const FishCatchDetailScreen = ({ route }) => {
             {/*    {updatedCatch.species && <Text style={styles.species}>{updatedCatch.species}</Text>}*/}
             {/*</View>*/}
 
-            <View style={styles.detailsSection}>
-                <Text style={styles.detailText}>
-                    <Text style={styles.detailLabel}>Soort:</Text>{' '}
+            <View style={[styles.detailsSection, darkMode && styles.detailsSectionDark]}>
+                <Text style={[styles.detailText, darkMode && styles.textLight]}>
+                    <Text style={[styles.detailLabel, darkMode && styles.textAccent]}>Soort:</Text>{' '}
                     {updatedCatch.species && <Text>{updatedCatch.species}</Text>}
                 </Text>
-                <Text style={styles.detailText}>
+                <Text style={[styles.detailText, darkMode && styles.textLight]}>
                     <Text style={styles.detailLabel}>Datum:</Text>{' '}
                     {new Date(updatedCatch.timestamp).toLocaleDateString()}
                 </Text>
-                <Text style={styles.detailText}>
+                <Text style={[styles.detailText, darkMode && styles.textLight]}>
                     <Text style={styles.detailLabel}>Spot:</Text>{' '}
                     {spotName}
                 </Text>
                 {updatedCatch.length && (
-                    <Text style={styles.detailText}>
+                    <Text style={[styles.detailText, darkMode && styles.textLight]}>
                         <Text style={styles.detailLabel}>Lengte:</Text> {updatedCatch.length} cm
                     </Text>
                 )}
                 {updatedCatch.weight && (
-                    <Text style={styles.detailText}>
+                    <Text style={[styles.detailText, darkMode && styles.textLight]}>
                         <Text style={styles.detailLabel}>Gewicht:</Text> {updatedCatch.weight} kg
                     </Text>
                 )}
                 {updatedCatch.description && (
-                    <Text style={styles.descriptionText}>
+                    <Text style={[styles.descriptionText, darkMode && styles.textLight]}>
                         <Text style={styles.detailLabel}>Beschrijving:</Text> {updatedCatch.description}
                     </Text>
                 )}
             </View>
 
             <View style={styles.imagesSection}>
-                <Text style={styles.sectionHeader}>Foto's</Text>
+                <Text style={[styles.sectionHeader, darkMode && styles.textAccent]}>Foto's</Text>
                 {updatedCatch.imageUris && updatedCatch.imageUris.length > 0 ? (
                     <FlatList
                         data={updatedCatch.imageUris}
@@ -231,6 +233,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f8f8f8',
+    },
+    containerDark: {
+        backgroundColor: '#181818',
     },
     topButtonsContainer: {
         position: 'absolute',
@@ -292,6 +297,9 @@ const styles = StyleSheet.create({
         // shadowOpacity: 0.1,
         // shadowRadius: 3,
         elevation: 3,
+    },
+    detailsSectionDark: {
+        backgroundColor: '#232323',
     },
     detailText: {
         fontSize: 16,
@@ -363,6 +371,12 @@ const styles = StyleSheet.create({
     imageViewerCloseButton: {
         padding: 5,
         zIndex: 3,
+    },
+    textLight: {
+        color: '#fff',
+    },
+    textAccent: {
+        color: '#0096b2',
     },
 });
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, Linking, Platform } from 'react-native';
+import { useLocationSetting } from '../LocationSettingContext';
 
 // Helperfunctie om datums te formatteren
 const formatDate = (dateString) => {
@@ -11,12 +12,13 @@ const formatDate = (dateString) => {
 export default function EventScreen({ route }) {
     // Haal het volledige evenement object op uit de navigatieparameters
     const { event } = route.params;
+    const { darkMode } = useLocationSetting();
 
     // Toon een foutmelding als het evenement niet gevonden is
     if (!event) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>Evenement niet gevonden.</Text>
+            <View style={[styles.container, darkMode && styles.containerDark]}>
+                <Text style={[styles.errorText, darkMode && styles.errorTextDark]}>Evenement niet gevonden.</Text>
             </View>
         );
     }
@@ -83,50 +85,57 @@ export default function EventScreen({ route }) {
     };
 
     return (
-        <ScrollView style={styles.scrollViewContainer} contentContainerStyle={styles.contentContainer}>
+        <ScrollView
+            style={[styles.scrollViewContainer, darkMode && styles.scrollViewContainerDark]}
+            contentContainerStyle={styles.contentContainer}
+        >
             {event.afbeelding && (
-                <Image
-                    source={{ uri: event.afbeelding }}
-                    style={styles.eventImage}
-                    accessibilityLabel={`Afbeelding van ${event.naam}`}
-                />
+                <View style={styles.eventImageWrapper}>
+                    <Image
+                        source={{ uri: event.afbeelding }}
+                        style={styles.eventImage}
+                        accessibilityLabel={`Afbeelding van ${event.naam}`}
+                    />
+                    {/* Alleen overlay in darkmode */}
+                    {darkMode && <View style={styles.eventImageOverlay} pointerEvents="none" />}
+                </View>
             )}
 
-            <View style={styles.eventDetailsCard}>
-                <Text style={styles.eventName}>{event.naam}</Text>
-                <Text style={styles.eventDate}>
+            <View style={[styles.eventDetailsCard, darkMode && styles.eventDetailsCardDark]}>
+                <Text style={[styles.eventName, darkMode && styles.eventNameDark]}>{event.naam}</Text>
+                <Text style={[styles.eventDate, darkMode && styles.textLight]}>
                     {formatDate(event.datum)} van {event.begintijd} tot {event.eindtijd}
                 </Text>
-                <Text style={styles.eventLocation}>Locatie: {event.locatie}</Text>
-                <Text style={styles.eventCity}>Plaats: {getCityFromLocation(event.locatie)}</Text>
-                <Text style={styles.eventCosts}>Kosten: {event.kosten}</Text>
+                <Text style={[styles.eventLocation, darkMode && styles.textLight]}>Locatie: {event.locatie}</Text>
+                <Text style={[styles.eventCity, darkMode && styles.textLight]}>Plaats: {getCityFromLocation(event.locatie)}</Text>
+                <Text style={[styles.eventCosts, darkMode && styles.textLight]}>Kosten: {event.kosten}</Text>
 
-                <Text style={styles.eventDescriptionTitle}>Beschrijving:</Text>
-                <Text style={styles.eventDescription}>{event.beschrijving}</Text>
+                <Text style={[styles.eventDescriptionTitle, darkMode && styles.textAccent]}>Beschrijving:</Text>
+                <Text style={[styles.eventDescription, darkMode && styles.textLight]}>{event.beschrijving}</Text>
 
                 {/* Nieuwe sectie voor extra details */}
                 <View style={styles.additionalDetailsSection}>
-                    {event.organisatie && <Text style={styles.detailText}><Text style={styles.detailLabel}>Organisatie:</Text> {event.organisatie}</Text>}
-                    {event.contactpersoon && <Text style={styles.detailText}><Text style={styles.detailLabel}>Contactpersoon:</Text> {event.contactpersoon}</Text>}
-                    {event.contactemail && <Text style={styles.detailText}><Text style={styles.detailLabel}>E-mail:</Text> {event.contactemail}</Text>}
-                    {event.contacttelefoon && <Text style={styles.detailText}><Text style={styles.detailLabel}>Telefoon:</Text> {event.contacttelefoon}</Text>}
-                    {event.discipline && <Text style={styles.detailText}><Text style={styles.detailLabel}>Discipline:</Text> {event.discipline}</Text>}
-                    {event.water && <Text style={styles.detailText}><Text style={styles.detailLabel}>Water:</Text> {event.water}</Text>}
-                    {event.score_eenheden && <Text style={styles.detailText}><Text style={styles.detailLabel}>Score-eenheden:</Text> {event.score_eenheden}</Text>}
-                    {event.gebruikt_app && <Text style={styles.detailText}><Text style={styles.detailLabel}>Gebruikt app:</Text> {event.gebruikt_app}</Text>}
+                    {event.organisatie && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Organisatie:</Text> {event.organisatie}</Text>}
+                    {event.contactpersoon && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Contactpersoon:</Text> {event.contactpersoon}</Text>}
+                    {event.contactemail && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>E-mail:</Text> {event.contactemail}</Text>}
+                    {event.contacttelefoon && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Telefoon:</Text> {event.contacttelefoon}</Text>}
+                    {event.discipline && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Discipline:</Text> {event.discipline}</Text>}
+                    {event.water && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Water:</Text> {event.water}</Text>}
+                    {event.score_eenheden && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Score-eenheden:</Text> {event.score_eenheden}</Text>}
+                    {event.gebruikt_app && <Text style={[styles.detailText, darkMode && styles.textLight]}><Text style={styles.detailLabel}>Gebruikt app:</Text> {event.gebruikt_app}</Text>}
                 </View>
 
                 {/* Onderdelen sectie */}
                 {event.onderdelen && event.onderdelen.length > 0 && (
-                    <View style={styles.onderdelenSection}>
-                        <Text style={styles.onderdelenTitle}>Onderdelen:</Text>
+                    <View style={[styles.onderdelenSection, darkMode && styles.onderdelenSectionDark]}>
+                        <Text style={[styles.onderdelenTitle, darkMode && styles.textAccent]}>Onderdelen:</Text>
                         {event.onderdelen.map((onderdeel, idx) => (
-                            <View key={idx} style={styles.onderdeelItem}>
-                                <Text style={styles.onderdeelName}>{onderdeel.naam}</Text>
-                                {onderdeel.niveau && <Text style={styles.onderdeelDetail}>Niveau: {onderdeel.niveau}</Text>}
-                                {onderdeel.geslacht && <Text style={styles.onderdeelDetail}>Geslacht: {onderdeel.geslacht}</Text>}
-                                {onderdeel.leeftijdsgroep && <Text style={styles.onderdeelDetail}>Leeftijdsgroep: {onderdeel.leeftijdsgroep}</Text>}
-                                {onderdeel.inschrijfgeld_per_basisteamlid && <Text style={styles.onderdeelDetail}>Inschrijfgeld: {onderdeel.inschrijfgeld_per_basisteamlid}</Text>}
+                            <View key={idx} style={[styles.onderdeelItem, darkMode && styles.onderdeelItemDark]}>
+                                <Text style={[styles.onderdeelName, darkMode && styles.textLight]}>{onderdeel.naam}</Text>
+                                {onderdeel.niveau && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Niveau: {onderdeel.niveau}</Text>}
+                                {onderdeel.geslacht && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Geslacht: {onderdeel.geslacht}</Text>}
+                                {onderdeel.leeftijdsgroep && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Leeftijdsgroep: {onderdeel.leeftijdsgroep}</Text>}
+                                {onderdeel.inschrijfgeld_per_basisteamlid && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Inschrijfgeld: {onderdeel.inschrijfgeld_per_basisteamlid}</Text>}
                             </View>
                         ))}
                     </View>
@@ -152,14 +161,34 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f0f2f5', // Lichte grijze achtergrond
     },
+    scrollViewContainerDark: {
+        backgroundColor: '#181818',
+    },
     contentContainer: {
         paddingBottom: 20, // Padding aan de onderkant
     },
+    eventImageWrapper: {
+        width: '100%',
+        height: 250,
+        marginBottom: 20,
+        position: 'relative',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     eventImage: {
         width: '100%',
-        height: 250, // Grotere hoogte voor de hoofdafbeelding
+        height: 250,
         resizeMode: 'cover',
-        marginBottom: 20,
+        borderRadius: 10,
+    },
+    eventImageOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: 250,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        borderRadius: 10,
     },
     eventDetailsCard: {
         backgroundColor: '#ffffff',
@@ -172,11 +201,17 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 3,
     },
+    eventDetailsCardDark: {
+        backgroundColor: '#232323',
+    },
     eventName: {
         fontSize: 26,
         fontWeight: 'bold',
-        color: '#1e3a8a', // Donkerblauwe kleur
+        color: '#1e3a8a',
         marginBottom: 10,
+    },
+    eventNameDark: {
+        color: '#7fd6e7',
     },
     eventDate: {
         fontSize: 16,
@@ -216,6 +251,12 @@ const styles = StyleSheet.create({
         color: '#333',
         marginBottom: 20,
     },
+    textLight: {
+        color: '#eee',
+    },
+    textAccent: {
+        color: '#0096b2',
+    },
     // Nieuwe stijlen voor aanvullende details
     additionalDetailsSection: {
         marginTop: 15,
@@ -239,6 +280,12 @@ const styles = StyleSheet.create({
         borderTopColor: '#eee',
         paddingTop: 15,
         marginBottom: 20,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
+    },
+    onderdelenSectionDark: {
+        backgroundColor: '#181818',
+        borderTopColor: '#333',
     },
     onderdelenTitle: {
         fontSize: 18,
@@ -252,7 +299,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginBottom: 8,
         borderLeftWidth: 3,
-        borderLeftColor: '#cce5ff', // Lichte blauwe accentkleur
+        borderLeftColor: '#cce5ff',
+    },
+    onderdeelItemDark: {
+        backgroundColor: '#232323',
+        borderLeftColor: '#0096b2',
     },
     onderdeelName: {
         fontSize: 16,
@@ -294,5 +345,8 @@ const styles = StyleSheet.create({
         color: 'red',
         textAlign: 'center',
         marginTop: 50,
+    },
+    errorTextDark: {
+        color: '#ffb3b3',
     }
 });

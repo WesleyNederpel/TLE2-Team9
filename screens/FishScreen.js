@@ -12,23 +12,23 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const FishScreen = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const { fish } = route.params;
+    const { darkMode } = useLocationSetting();
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-
-            <View style={styles.header}>
+        <SafeAreaView style={[styles.safeArea, darkMode && styles.safeAreaDark]}>
+            <View style={[styles.header, darkMode && styles.headerDark]}>
                 <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="#ffffff" />
                 </Pressable>
                 <Text style={styles.title}>{fish.naam}</Text>
             </View>
 
-            {/* SCROLLBARE INHOUD */}
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 {fish.afbeelding_url ? (
                     <Image
@@ -37,24 +37,25 @@ const FishScreen = () => {
                         resizeMode="contain"
                     />
                 ) : (
-                    <View style={styles.placeholderImage}>
-                        <Text style={styles.placeholderText}>Geen afbeelding beschikbaar</Text>
+                    <View style={[styles.placeholderImage, darkMode && styles.placeholderImageDark]}>
+                        <Text style={[styles.placeholderText, darkMode && styles.textLight]}>Geen afbeelding beschikbaar</Text>
                     </View>
                 )}
 
-                <View style={styles.card}>
-                    <Info label="Leefomgeving" value={fish.leefomgeving} />
-                    <Info label="Aas" value={fish.aas} />
-                    <Info label="Hengeltype" value={fish.hengeltype} />
-                    <Info label="Lengte (cm)" value={`${fish.lengte_cm.min} - ${fish.lengte_cm.max}`} />
-                    <Info label="Gewicht (kg)" value={`${fish.gewicht_kg.min} - ${fish.gewicht_kg.max}`} />
-                    <Info label="Moeilijkheidsgraad" value={fish.moeilijkheidsgraad} />
-                    <Info label="Beste seizoen" value={fish.seizoen} />
+                <View style={[styles.card, darkMode && styles.cardDark]}>
+                    <Info label="Leefomgeving" value={fish.leefomgeving} darkMode={darkMode} />
+                    <Info label="Aas" value={fish.aas} darkMode={darkMode} />
+                    <Info label="Hengeltype" value={fish.hengeltype} darkMode={darkMode} />
+                    <Info label="Lengte (cm)" value={`${fish.lengte_cm.min} - ${fish.lengte_cm.max}`} darkMode={darkMode} />
+                    <Info label="Gewicht (kg)" value={`${fish.gewicht_kg.min} - ${fish.gewicht_kg.max}`} darkMode={darkMode} />
+                    <Info label="Moeilijkheidsgraad" value={fish.moeilijkheidsgraad} darkMode={darkMode} />
+                    <Info label="Beste seizoen" value={fish.seizoen} darkMode={darkMode} />
                     {fish.duurzaam_vangen && (
                         <Info
                             label="Duurzaam te vangen"
                             value={fish.duurzaam_vangen}
                             multiline={true}
+                            darkMode={darkMode}
                         />
                     )}
                 </View>
@@ -63,10 +64,14 @@ const FishScreen = () => {
     );
 };
 
-const Info = ({ label, value, multiline }) => (
-    <View style={styles.section}>
-        <Text style={styles.label}>{label}:</Text>
-        <Text style={[styles.value, multiline && styles.multilineValue]}>{value}</Text>
+const Info = ({ label, value, multiline, darkMode }) => (
+    <View style={[styles.section, darkMode && styles.sectionDark]}>
+        <Text style={[styles.label, darkMode && styles.labelDark]}>{label}:</Text>
+        <Text style={[
+            styles.value,
+            multiline && styles.multilineValue,
+            darkMode && styles.valueDark
+        ]}>{value}</Text>
     </View>
 );
 
@@ -74,6 +79,9 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#e0f2fe',
+    },
+    safeAreaDark: {
+        backgroundColor: '#181818',
     },
     header: {
         left: 0,
@@ -86,6 +94,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
+    },
+    headerDark: {
+        backgroundColor: '#00505e',
     },
     scrollContent: {
         paddingTop: 80,
@@ -117,9 +128,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 25,
     },
+    placeholderImageDark: {
+        backgroundColor: '#232323',
+    },
     placeholderText: {
         color: '#475569',
         fontStyle: 'italic',
+    },
+    textLight: {
+        color: '#fff',
     },
     card: {
         backgroundColor: '#ffffff',
@@ -131,22 +148,34 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 3,
     },
+    cardDark: {
+        backgroundColor: '#232323',
+    },
     section: {
         marginBottom: 15,
         borderBottomWidth: 1,
         borderBottomColor: '#e2e8f0',
         paddingBottom: 10,
     },
+    sectionDark: {
+        borderBottomColor: '#333',
+    },
     label: {
         fontSize: 15,
         fontWeight: '600',
         color: '#334155',
+    },
+    labelDark: {
+        color: '#0096b2',
     },
     value: {
         fontSize: 16,
         color: '#1e293b',
         marginTop: 4,
         lineHeight: 24,
+    },
+    valueDark: {
+        color: '#fff',
     },
     multilineValue: {
         textAlign: 'left',

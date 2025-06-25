@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import waters from "../data/waters.json";
 import fishesData from "../assets/fish_data_of_the_netherlands.json";
 import { useRoute } from '@react-navigation/native';
+import { useLocationSetting } from '../LocationSettingContext';
 
 
 const getImage = (name) => {
@@ -39,6 +40,7 @@ const getImage = (name) => {
 export default function WaterInfo({ route }) {
     const navigation = useNavigation();
     const { waterName, latitude, longitude } = route.params;
+    const { darkMode } = useLocationSetting();
 
     const location = waters.find(
         (w) => w.name.trim().toLowerCase() === waterName.trim().toLowerCase()
@@ -149,8 +151,8 @@ export default function WaterInfo({ route }) {
 
     if (!location) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.h1}>Water niet gevonden</Text>
+            <View style={[styles.container, darkMode && styles.containerDark]}>
+                <Text style={[styles.h1, darkMode && styles.textAccent]}>Water niet gevonden</Text>
             </View>
         );
     }
@@ -158,60 +160,45 @@ export default function WaterInfo({ route }) {
     const caughtFish = []; // Later uitbreidbaar
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, darkMode && styles.containerDark]}>
             <View style={styles.headerImageContainer}>
                 <Image source={getImage(location.image)} style={styles.headerImage} />
             </View>
 
             <View style={styles.bottomButtonsContainer}>
-                <Pressable style={styles.bottomButton} onPress={openDirections}>
-                    <Text style={styles.bottomButtonText}>Route</Text>
+                <Pressable style={[styles.bottomButton, darkMode && styles.bottomButtonDark]} onPress={openDirections}>
+                    <Text style={[styles.bottomButtonText, darkMode && styles.textAccent]}>Route</Text>
                 </Pressable>
-                <Pressable style={styles.bottomButton} onPress={() => setModalVisible(true)}>
-                    <Text style={styles.bottomButtonText}>Opslaan</Text>
+                <Pressable style={[styles.bottomButton, darkMode && styles.bottomButtonDark]} onPress={() => setModalVisible(true)}>
+                    <Text style={[styles.bottomButtonText, darkMode && styles.textAccent]}>Opslaan</Text>
                 </Pressable>
             </View>
-            <View style={styles.underline} />
-            <Text style={styles.p}>{location.description}</Text>
+            <View style={[styles.underline, darkMode && styles.underlineDark]} />
+            <Text style={[styles.p, darkMode && styles.textLight]}>{location.description}</Text>
 
             {/* Nieuwe sectie voor AdditionalPermissions */}
             {location.AdditionalPermissions && location.AdditionalPermissions.length > 0 && (
-                <View style={styles.additionalPermissionsSection}>
-                    <Text style={[styles.h2, { color: '#1A3A91' }]}>Aanvullende Vergunningen</Text>
-                    <View style={styles.underline} />
+                <View style={[styles.additionalPermissionsSection, darkMode && styles.additionalPermissionsSectionDark]}>
+                    <Text style={[styles.h2, darkMode && styles.textAccent]}>Aanvullende Vergunningen</Text>
+                    <View style={[styles.underline, darkMode && styles.underlineDark]} />
                     {location.AdditionalPermissions.map((permission, index) => (
-                        <View key={permission.id || index} style={styles.permissionItem}>
+                        <View key={permission.id || index} style={[styles.permissionItem, darkMode && styles.permissionItemDark]}>
                             {permission.name === "NachtVISpas" ? (
-                                <Ionicons name="moon" size={24} color="#1A3A91" style={styles.permissionIcon} />
+                                <Ionicons name="moon" size={24} color={darkMode ? "#0096b2" : "#1A3A91"} style={styles.permissionIcon} />
                             ) : (
-                                // Optioneel: ander icoon voor andere types of leeg laten
                                 <View style={styles.permissionIconPlaceholder} />
                             )}
                             <View style={styles.permissionTextContent}>
-                                <Text style={styles.permissionName}>{permission.name}</Text>
-                                <Text style={styles.permissionDescription}>{permission.description}</Text>
+                                <Text style={[styles.permissionName, darkMode && styles.textAccent]}>{permission.name}</Text>
+                                <Text style={[styles.permissionDescription, darkMode && styles.textLight]}>{permission.description}</Text>
                             </View>
                         </View>
                     ))}
                 </View>
             )}
 
-            {/* <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20 }]}>
-                Gevangen {location.name} <Text style={{ fontSize: 16 }}>{caughtFish.length} 🎣</Text>
-            </Text>
-            <FlatList
-                horizontal
-                data={caughtFish}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <Image source={item.uri} style={styles.caughtFishImage} />
-                )}
-                style={{ marginVertical: 10 }}
-                showsHorizontalScrollIndicator={false}
-            /> */}
-
             <View style={{ marginBottom: 30 }}>
-                <Text style={[styles.h1, { color: '#1A3A91', marginTop: 20, textAlign: 'center' }]}>
+                <Text style={[styles.h1, { color: darkMode ? '#0096b2' : '#1A3A91', marginTop: 20, textAlign: 'center' }]}>
                     Vissen {location.name}
                 </Text>
 
@@ -222,23 +209,30 @@ export default function WaterInfo({ route }) {
                             key={fish.id}
                             style={[
                                 styles.fishItem,
-                                isEven ? styles.fishItemDefault : styles.fishItemSelected,
+                                isEven
+                                    ? (darkMode ? styles.fishItemDefaultDark : styles.fishItemDefault)
+                                    : (darkMode ? styles.fishItemSelectedDark : styles.fishItemSelected),
                             ]}
                             onPress={() => handleFishPress(fish.name)}
                         >
-                            {isEven ? (
-                                <>
-                                    <Image source={getImage(fish.image)} style={styles.fishImageStyle} />
-                                    <Text style={[styles.fishText, { color: '#1A3A91' }]}>{fish.name}</Text>
-                                    <Text style={styles.blueArrow}>{'>'}</Text>
-                                </>
-                            ) : (
-                                <>
-                                    <Image source={getImage(fish.image)} style={[styles.fishImageStyle, { borderColor: '#4C6D4D' }]} />
-                                    <Text style={[styles.fishText, { color: '#4C6D4D' }]}>{fish.name}</Text>
-                                    <Text style={styles.greenArrow}>{'>'}</Text>
-                                </>
-                            )}
+                            <Image source={getImage(fish.image)} style={[
+                                styles.fishImageStyle,
+                                !isEven && { borderColor: darkMode ? '#1b4d2b' : '#4C6D4D' }
+                            ]} />
+                            <Text style={[
+                                styles.fishText,
+                                isEven
+                                    ? { color: darkMode ? '#7fd6e7' : '#1A3A91' }
+                                    : { color: darkMode ? '#7fd6e7' : '#4C6D4D' }
+                            ]}>
+                                {fish.name}
+                            </Text>
+                            <Text style={isEven
+                                ? [styles.blueArrow, darkMode && { color: '#7fd6e7' }]
+                                : [styles.greenArrow, darkMode && { color: '#7fd6e7' }]
+                            }>
+                                {'>'}
+                            </Text>
                         </Pressable>
                     );
                 })}
@@ -250,9 +244,9 @@ export default function WaterInfo({ route }) {
                 transparent={true}
                 onRequestClose={() => setModalVisible(false)}
             >
-                <View style={{ flex: 1, justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)" }}>
-                    <View style={{ backgroundColor: "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
-                        <Text style={[styles.h1, { color: '#1A3A91' }]}>Opslaan in...</Text>
+                <View style={{ flex: 1, justifyContent: "center", backgroundColor: darkMode ? "rgba(10,20,30,0.85)" : "rgba(0,0,0,0.5)" }}>
+                    <View style={{ backgroundColor: darkMode ? "#232323" : "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
+                        <Text style={[styles.h1, { color: '#1A3A91' }, darkMode && styles.textAccent]}>Opslaan in...</Text>
 
                         {["favorites", "wantToGo"].map((type) => {
                             const label =
@@ -282,8 +276,8 @@ export default function WaterInfo({ route }) {
                             );
                         })}
 
-                        <Pressable onPress={() => setModalVisible(false)} style={styles.bottomButton}>
-                            <Text style={styles.bottomButtonText}>Sluiten</Text>
+                        <Pressable onPress={() => setModalVisible(false)} style={[styles.bottomButton, darkMode && styles.bottomButtonDark]}>
+                            <Text style={[styles.bottomButtonText, darkMode && styles.textAccent]}>Sluiten</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -297,12 +291,15 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 10,
     },
+    containerDark: {
+        backgroundColor: '#181818',
+    },
     h1: {
         color: '#E5A83F',
         fontSize: 24,
         fontWeight: 'bold',
     },
-    h2: { // Nieuwe stijl voor subheaders
+    h2: {
         fontSize: 20,
         fontWeight: 'bold',
         marginTop: 15,
@@ -312,12 +309,22 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '400',
         marginTop: 4,
+        color: '#222',
+    },
+    textLight: {
+        color: '#eee',
+    },
+    textAccent: {
+        color: '#0096b2',
     },
     underline: {
         height: 2,
         backgroundColor: '#E5A83F',
         width: '100%',
         marginBottom: 4,
+    },
+    underlineDark: {
+        backgroundColor: '#0096b2',
     },
     headerImageContainer: {
         width: '100%',
@@ -368,6 +375,12 @@ const styles = StyleSheet.create({
     fishItemSelected: {
         backgroundColor: '#C6E5B6',
     },
+    fishItemDefaultDark: {
+        backgroundColor: '#003a4d', // donkerder blauw
+    },
+    fishItemSelectedDark: {
+        backgroundColor: '#184d36', // donkerder groen
+    },
     fishImageStyle: {
         width: 50,
         height: 50,
@@ -409,6 +422,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
+    bottomButtonDark: {
+        backgroundColor: '#00505e',
+    },
     bottomButtonText: {
         color: '#1A3A91',
         fontWeight: '600',
@@ -435,31 +451,39 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
     },
-    // Nieuwe stijlen voor AdditionalPermissions
     additionalPermissionsSection: {
         marginTop: 20,
-        paddingHorizontal: 5, // Kleinere padding voor deze sectie
+        paddingHorizontal: 5,
+    },
+    additionalPermissionsSectionDark: {
+        backgroundColor: '#232323',
+        borderRadius: 8,
+        padding: 10,
     },
     permissionItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F7F7F7', // Lichtgrijze achtergrond
+        backgroundColor: '#F7F7F7',
         padding: 10,
         borderRadius: 8,
         marginBottom: 8,
         borderLeftWidth: 3,
-        borderLeftColor: '#ADDAEF', // Een zachte blauwe kleur
+        borderLeftColor: '#ADDAEF',
+    },
+    permissionItemDark: {
+        backgroundColor: '#00505e',
+        borderLeftColor: '#0096b2',
     },
     permissionIcon: {
         marginRight: 10,
     },
     permissionIconPlaceholder: {
-        width: 24, // Zelfde breedte als icoon voor uitlijning
-        height: 24, // Zelfde hoogte als icoon voor uitlijning
+        width: 24,
+        height: 24,
         marginRight: 10,
     },
     permissionTextContent: {
-        flex: 1, // Zorgt ervoor dat de tekst de resterende ruimte inneemt
+        flex: 1,
     },
     permissionName: {
         fontSize: 16,
