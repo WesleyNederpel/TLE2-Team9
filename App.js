@@ -1,6 +1,6 @@
 import React from 'react';
-import {NavigationContainer} from "@react-navigation/native";
-import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NavBar from './components/NavBar'; // Zorg dat dit pad correct is
 import SettingsScreen from "./screens/SettingsScreen";
 import FishScreen from './screens/FishScreen';
@@ -46,15 +46,15 @@ export default function App() {
                     })}
                 />
 
-                <Stack.Screen name="Galerij" component={GalleryScreen}/>
-                <Stack.Screen name="Camera" component={CameraScreen}/>
+                <Stack.Screen name="Galerij" component={GalleryScreen} />
+                <Stack.Screen name="Camera" component={CameraScreen} />
                 <Stack.Screen
                     name="SpotDetail"
                     component={SpotDetailScreen}
                     options={({ route }) => {
                         const title = route.params?.spot?.title;
                         return {
-                            title: title ? `${capitalizeFirstLetter(title)} Details` : 'Spot Detail',
+                            title: title ? `${capitalizeFirstLetter(title)}` : 'Spot Detail',
                             headerShown: true,
                             headerStyle: {
                                 backgroundColor: '#0096b2',
@@ -70,9 +70,9 @@ export default function App() {
                     name="FishCatchDetail"
                     component={FishCatchDetailScreen}
                     options={({ route }) => {
-                        const species = route.params?.fishCatch?.species;
+                        const title = route.params?.fishCatch?.title;
                         return {
-                            title: species ? `${capitalizeFirstLetter(species)} Details` : 'Gevangen Vis Details',
+                            title: title ? `${capitalizeFirstLetter(title)}` : 'Gevangen Vis Details',
                             headerShown: true,
                             headerStyle: {
                                 backgroundColor: '#0096b2',
@@ -85,20 +85,20 @@ export default function App() {
                     }}
                 />
                 <Stack.Screen name="EditFishCatch" component={EditFishCatchScreen}
-                              options={({ route }) => {
-                                  const species = route.params?.fishCatch?.species;
-                                  return {
-                                      title: species ? `Edit ${capitalizeFirstLetter(species)}` : 'Gevangen Vis Details',
-                                      headerShown: true,
-                                      headerStyle: {
-                                          backgroundColor: '#0096b2',
-                                      },
-                                      headerTintColor: '#fff',
-                                      headerTitleStyle: {
-                                          fontWeight: 'bold',
-                                      },
-                                  };
-                              }}
+                    options={({ route }) => {
+                        const species = route.params?.fishCatch?.species;
+                        return {
+                            title: species ? `Edit ${capitalizeFirstLetter(species)}` : 'Gevangen Vis Details',
+                            headerShown: true,
+                            headerStyle: {
+                                backgroundColor: '#0096b2',
+                            },
+                            headerTintColor: '#fff',
+                            headerTitleStyle: {
+                                fontWeight: 'bold',
+                            },
+                        };
+                    }}
                 />
 
                 <Stack.Screen
@@ -116,7 +116,7 @@ export default function App() {
                         headerShown: false,
                     }}
                 />
-                <Stack.Screen name="Community" component={CommunityScreen}/>
+                <Stack.Screen name="Community" component={CommunityScreen} />
 
                 <Stack.Screen
                     name="BlogPostScreen"

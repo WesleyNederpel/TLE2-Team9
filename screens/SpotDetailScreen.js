@@ -210,8 +210,8 @@ const SpotDetailScreen = ({ route }) => {
                 >
                     <Marker
                         coordinate={{ latitude: spotDetails.latitude, longitude: spotDetails.longitude }}
-                        // title={spotDetails.title}
-                        // description={spotDetails.description}
+                    // title={spotDetails.title}
+                    // description={spotDetails.description}
                     />
                 </MapView>
             ) : (
@@ -258,7 +258,10 @@ const SpotDetailScreen = ({ route }) => {
                             scrollEnabled={false}
                         />
                     ) : (
-                        <Text style={styles.emptyFishMessage}>Nog geen vissen gevangen op deze spot.</Text>
+                        <View style={{ alignItems: 'center', marginTop: 20 }}>
+                            <Text style={styles.emptyFishMessage}>Nog geen vissen gevangen op deze spot.</Text>
+                            <Text style={styles.emptyFishMessage}>Je kan een vis toevoegen aan deze spot via de galerij.</Text>
+                        </View >
                     )}
                 </View>
             </View>
