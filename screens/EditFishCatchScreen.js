@@ -8,6 +8,8 @@ import {
     TouchableOpacity,
     Alert,
     Platform,
+    Modal, // Importeer Modal
+    FlatList, // Importeer FlatList
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -28,8 +30,7 @@ const EditFishCatchScreen = ({ route }) => {
     const [spotName, setSpotName] = useState('Selecteer Locatie');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [markers, setMarkers] = useState([]);
-    const [showSpotPicker, setShowSpotPicker] = useState(false);
-
+    const [showSpotPickerModal, setShowSpotPickerModal] = useState(false); // Nieuwe state voor modal zichtbaarheid
 
     useEffect(() => {
         const loadSpots = async () => {
@@ -61,7 +62,7 @@ const EditFishCatchScreen = ({ route }) => {
         };
 
         loadSpots();
-    }, []);
+    }, [fishCatch.location]); // Voeg fishCatch.location toe aan de dependency array
 
     const handleSaveFishCatch = async () => {
         if (!title || !species || !description) {
@@ -90,15 +91,14 @@ const EditFishCatchScreen = ({ route }) => {
         }
     };
 
+    // Functie om de geselecteerde spot naam te krijgen voor weergave
+    const getSelectedSpotName = () => {
+        const selectedSpot = markers.find(marker => marker.id === selectedLocation);
+        return selectedSpot ? selectedSpot.title : 'Selecteer Locatie';
+    };
+
     return (
         <ScrollView style={styles.container}>
-            {/*<View style={styles.header}>*/}
-            {/*    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>*/}
-            {/*        <Ionicons name="arrow-back" size={28} color="#FFF" />*/}
-            {/*    </TouchableOpacity>*/}
-            {/*    <Text style={styles.headerTitle}>Visvangst bewerken</Text>*/}
-            {/*</View>*/}
-
             <View style={styles.formSection}>
                 <Text style={styles.label}>Titel:</Text>
                 <TextInput
@@ -144,7 +144,6 @@ const EditFishCatchScreen = ({ route }) => {
                 />
 
                 <Text style={styles.label}>Datum:</Text>
-                {/* De tekstweergave van datum blijft, maar er is geen kiezer meer */}
                 <TouchableOpacity style={styles.dateDisplayContainer} onPress={() => setShowDatePicker(true)}>
                     <Text style={styles.dateDisplayText}>
                         {timestamp.toLocaleDateString()}
@@ -164,53 +163,60 @@ const EditFishCatchScreen = ({ route }) => {
                     />
                 )}
 
-
                 <Text style={styles.label}>Gekoppelde Spot:</Text>
                 <TouchableOpacity
-                    style={styles.locationButton}
-                    onPress={() => setShowSpotPicker(true)}
+                    style={styles.pickerDisplayButton}
+                    onPress={() => setShowSpotPickerModal(true)} // Open de modal
                 >
-                    <Text style={styles.locationButtonText}>
-                        {spotName || 'Selecteer een spot'}
-                    </Text>
-                    <Ionicons name="map-outline" size={24} color="#004a99" />
+                    <Text style={styles.pickerDisplayText}>{getSelectedSpotName()}</Text>
+                    <Ionicons name="caret-down-outline" size={20} color="#666" />
                 </TouchableOpacity>
-
-                {/* Spot Picker Modal */}
-                {showSpotPicker && (
-                    <View style={{
-                        backgroundColor: 'rgba(0,0,0,0.6)',
-                        position: 'absolute',
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        justifyContent: 'center', alignItems: 'center'
-                    }}>
-                        <View style={{ backgroundColor: 'white', width: '80%', borderRadius: 10, padding: 15 }}>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Kies een spot:</Text>
-                            {markers.map(marker => (
-                                <TouchableOpacity
-                                    key={marker.id}
-                                    onPress={() => {
-                                        setSelectedLocation(marker.id);
-                                        setSpotName(marker.title);
-                                        setShowSpotPicker(false);
-                                    }}
-                                    style={{ paddingVertical: 10 }}
-                                >
-                                    <Text style={{ fontSize: 16 }}>{marker.title}</Text>
-                                </TouchableOpacity>
-                            ))}
-                            <TouchableOpacity onPress={() => setShowSpotPicker(false)} style={{ marginTop: 10 }}>
-                                <Text style={{ color: '#007bff', textAlign: 'right' }}>Annuleren</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                )}
-
             </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSaveFishCatch}>
                 <Text style={styles.saveButtonText}>Wijzigingen opslaan</Text>
             </TouchableOpacity>
+
+            {/* Spot Picker Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showSpotPickerModal} // Gebruik de nieuwe state
+                onRequestClose={() => {
+                    setShowSpotPickerModal(false); // Sluit de modal bij hardware terugknop
+                }}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.spotPickerModalContent}>
+                        <Text style={styles.spotPickerModalTitle}>Kies een Spot Locatie</Text>
+                        <FlatList
+                            data={markers}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.spotPickerItem}
+                                    onPress={() => {
+                                        setSelectedLocation(item.id);
+                                        setSpotName(item.title); // Update spotName voor weergave
+                                        setShowSpotPickerModal(false); // Sluit de modal na selectie
+                                    }}
+                                >
+                                    <Text style={styles.spotPickerItemText}>{item.title}</Text>
+                                    {selectedLocation === item.id && ( // Controleer of dit de geselecteerde is
+                                        <Ionicons name="checkmark" size={20} color="#0096b2" />
+                                    )}
+                                </TouchableOpacity>
+                            )}
+                            ListEmptyComponent={() => (
+                                <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
+                            )}
+                        />
+                        <TouchableOpacity style={styles.spotPickerCloseButton} onPress={() => setShowSpotPickerModal(false)}>
+                            <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </ScrollView>
     );
 };
@@ -285,7 +291,7 @@ const styles = StyleSheet.create({
         color: '#333',
         paddingVertical: 5,
     },
-    locationButton: {
+    pickerDisplayButton: { // Nieuwe stijl voor de knop die de modal opent
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -296,7 +302,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         backgroundColor: '#f0f8ff',
     },
-    locationButtonText: {
+    pickerDisplayText: { // Nieuwe stijl voor de tekst in de knop
         fontSize: 16,
         color: '#333',
     },
@@ -311,6 +317,63 @@ const styles = StyleSheet.create({
     saveButtonText: {
         color: 'white',
         fontSize: 18,
+        fontWeight: 'bold',
+    },
+    // Modal stijlen
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    spotPickerModalContent: {
+        backgroundColor: 'white',
+        width: '85%', // Iets breder voor betere bruikbaarheid
+        maxHeight: '70%', // Beperk de hoogte
+        borderRadius: 10,
+        padding: 20, // Meer padding
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    spotPickerModalTitle: {
+        fontSize: 20, // Grotere titel
+        fontWeight: 'bold',
+        marginBottom: 15, // Meer ruimte onder de titel
+        textAlign: 'center',
+        color: '#004a99',
+    },
+    spotPickerItem: {
+        paddingVertical: 12, // Meer padding voor elk item
+        paddingHorizontal: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    spotPickerItemText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    noSpotsText: {
+        textAlign: 'center',
+        marginTop: 20,
+        fontSize: 14,
+        color: '#666',
+    },
+    spotPickerCloseButton: {
+        marginTop: 20,
+        padding: 12,
+        backgroundColor: '#ff6347',
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    spotPickerCloseButtonText: {
+        color: '#fff',
+        fontSize: 16,
         fontWeight: 'bold',
     },
 });
