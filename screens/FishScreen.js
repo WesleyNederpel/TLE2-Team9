@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         lineHeight: 24,
     },
     multilineValue: {
-        textAlign: 'justify',
+        textAlign: 'left',
     },
 });
 
