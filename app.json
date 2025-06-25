@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "VisGO",
-    "slug": "VisGO",
+    "name": "GoVis",
+    "slug": "GoVis",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/Go_white.png",
@@ -36,10 +36,22 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(VisGo) to access your camera",
+          "cameraPermission": "Allow $(GoVis) to access your camera",
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a52a1c92-4262-48c3-9d5a-5c0f8f350b66"
+      }
+    },
+    "owner": "wesleynederpel",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a52a1c92-4262-48c3-9d5a-5c0f8f350b66"
+    }
   }
 }
