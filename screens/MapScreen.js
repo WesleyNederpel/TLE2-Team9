@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
+import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, AppState } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
 import waters from "../data/waters.json";
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocationSetting } from '../LocationSettingContext';
 
 const getAfbeelding = (name) => {
     switch (name) {
@@ -41,6 +42,8 @@ const MapScreen = ({ navigation }) => {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [isPickingLocation, setIsPickingLocation] = useState(false);
     const [locationSource, SetLocationSource] = useState('current'); // 'current', 'picked', 'manual'
+
+    const { showLocation } = useLocationSetting();
 
     const region = {
         latitude: 51.9225,
@@ -246,9 +249,10 @@ const MapScreen = ({ navigation }) => {
                     SetLocationSource('picked'); // Set source to 'picked' for long press
                     setAddMarkerModalVisible(true);
                 }}
+                showsUserLocation={showLocation}
             >
                 {renderPolygons()}
-                {markers.map((m) => ( // Gebruik de id van de marker als key
+                {markers.map((m) => (
                     <Marker
                         key={m.id}
                         coordinate={{ latitude: m.latitude, longitude: m.longitude }}
@@ -256,6 +260,17 @@ const MapScreen = ({ navigation }) => {
                         description={m.description}
                     />
                 ))}
+                {/* Verwijder de custom blauwe marker voor de gebruiker */}
+                {/* {showLocation && currentLocation && (
+                    <Marker
+                        coordinate={{
+                            latitude: currentLocation.coords.latitude,
+                            longitude: currentLocation.coords.longitude,
+                        }}
+                        title="Mijn locatie"
+                        pinColor="#0096b2"
+                    />
+                )} */}
             </MapView>
 
             <TouchableOpacity style={styles.roundButton} onPress={openAddMarkerModal}>
