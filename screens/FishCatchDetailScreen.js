@@ -164,7 +164,7 @@ const FishCatchDetailScreen = ({ route }) => {
 
             <View style={[styles.detailsSection, darkMode && styles.detailsSectionDark]}>
                 <Text style={[styles.detailText, darkMode && styles.textLight]}>
-                    <Text style={[styles.detailLabel, darkMode && styles.textAccent]}>Soort:</Text>{' '}
+                    <Text style={[styles.detailLabel, darkMode]}>Soort:</Text>{' '}
                     {updatedCatch.species && <Text>{updatedCatch.species}</Text>}
                 </Text>
                 <Text style={[styles.detailText, darkMode && styles.textLight]}>
