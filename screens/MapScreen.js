@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, AppState } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import waterGeoJSON from '../assets/rotterdam_water_bodies.json';
+import waterGeoJSON from '../assets/brabant_water_bodies.json';
 import waters from "../data/waters.json";
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
