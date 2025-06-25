@@ -86,9 +86,9 @@ export default function App() {
                 />
                 <Stack.Screen name="EditFishCatch" component={EditFishCatchScreen}
                     options={({ route }) => {
-                        const species = route.params?.fishCatch?.species;
+                        const title = route.params?.fishCatch?.title;
                         return {
-                            title: species ? `Edit ${capitalizeFirstLetter(species)}` : 'Gevangen Vis Details',
+                            title: title ? `Edit ${capitalizeFirstLetter(title)}` : 'Gevangen Vis Details',
                             headerShown: true,
                             headerStyle: {
                                 backgroundColor: '#0096b2',
