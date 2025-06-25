@@ -217,7 +217,9 @@ export default function WaterInfo({ route }) {
                         >
                             <Image source={getImage(fish.image)} style={[
                                 styles.fishImageStyle,
-                                !isEven && { borderColor: darkMode ? '#1b4d2b' : '#4C6D4D' }
+                                isEven
+                                    ? (darkMode ? styles.fishImageStyleBlueDark : styles.fishImageStyleBlue)
+                                    : (darkMode ? styles.fishImageStyleGreenDark : styles.fishImageStyleGreen)
                             ]} />
                             <Text style={[
                                 styles.fishText,
@@ -246,8 +248,13 @@ export default function WaterInfo({ route }) {
             >
                 <View style={{ flex: 1, justifyContent: "center", backgroundColor: darkMode ? "rgba(10,20,30,0.85)" : "rgba(0,0,0,0.5)" }}>
                     <View style={{ backgroundColor: darkMode ? "#232323" : "#fff", margin: 30, padding: 20, borderRadius: 10 }}>
-                        <Text style={[styles.h1, { color: '#1A3A91' }, darkMode && styles.textAccent]}>Opslaan in...</Text>
-
+                        <Text style={[
+                            styles.h1,
+                            { color: '#1A3A91' },
+                            darkMode && styles.textAccent
+                        ]}>
+                            Opslaan in...
+                        </Text>
                         {["favorites", "wantToGo"].map((type) => {
                             const label =
                                 type === "favorites" ? "❤️ Favorieten" :
@@ -268,7 +275,12 @@ export default function WaterInfo({ route }) {
                                     }}
                                     onPress={() => toggleItem(type)}
                                 >
-                                    <Text style={styles.checkboxLabel}>{label}</Text>
+                                    <Text style={[
+                                        styles.checkboxLabel,
+                                        darkMode && styles.textAccent
+                                    ]}>
+                                        {label}
+                                    </Text>
                                     <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
                                         {checked && <Text style={styles.checkmark}>✓</Text>}
                                     </View>
@@ -315,7 +327,7 @@ const styles = StyleSheet.create({
         color: '#eee',
     },
     textAccent: {
-        color: '#0096b2',
+        color: '#B9D9F0',
     },
     underline: {
         height: 2,
@@ -386,8 +398,19 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 50,
         borderWidth: 2,
-        borderColor: '#1A3A91',
         marginRight: 12,
+    },
+    fishImageStyleBlue: {
+        borderColor: '#1A3A91',
+    },
+    fishImageStyleBlueDark: {
+        borderColor: '#1A3A91',
+    },
+    fishImageStyleGreen: {
+        borderColor: '#4C6D4D',
+    },
+    fishImageStyleGreenDark: {
+        borderColor: '#4C6D4D',
     },
     fishText: {
         fontSize: 18,

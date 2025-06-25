@@ -157,7 +157,13 @@ export default function LocationsScreen({ navigation }) {
                     onPress={() => toggleFishList(spot.id)}
                 >
                     <Text style={[styles.toggleFishListText, darkMode ? styles.toggleFishListTextDark : styles.toggleFishListTextLight]}>
-                        Vissen ({getFishCountText(spot.fishCatches?.length || 0)}) {expandedFishLists[spot.id] ? '▲' : '▼'}
+                        Vissen ({getFishCountText(spot.fishCatches?.length || 0)}){' '}
+                        <Ionicons
+                            name={expandedFishLists[spot.id] ? "chevron-up" : "chevron-down"}
+                            size={18}
+                            color={darkMode ? "#eee" : "#005f99"}
+                            style={{ marginLeft: 2, marginBottom: -2 }}
+                        />
                     </Text>
                 </Pressable>
 

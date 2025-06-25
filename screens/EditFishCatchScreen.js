@@ -195,7 +195,7 @@ const EditFishCatchScreen = ({ route }) => {
             >
                 <View style={[styles.modalOverlay, darkMode && styles.modalOverlayDark]}>
                     <View style={[styles.spotPickerModalContent, darkMode && styles.spotPickerModalContentDark]}>
-                        <Text style={[styles.spotPickerModalTitle, darkMode && { color: '#0096b2' }]}>Kies een Spot Locatie</Text>
+                        <Text style={[styles.spotPickerModalTitle, darkMode && { color: '#fff' }]}>Kies een Spot Locatie</Text>
                         <FlatList
                             data={markers}
                             keyExtractor={(item) => item.id}
@@ -208,18 +208,18 @@ const EditFishCatchScreen = ({ route }) => {
                                         setShowSpotPickerModal(false); // Sluit de modal na selectie
                                     }}
                                 >
-                                    <Text style={styles.spotPickerItemText}>{item.title}</Text>
+                                    <Text style={[styles.spotPickerItemText, darkMode && styles.spotPickerItemTextDark]}>{item.title}</Text>
                                     {selectedLocation === item.id && ( // Controleer of dit de geselecteerde is
                                         <Ionicons name="checkmark" size={20} color="#0096b2" />
                                     )}
                                 </TouchableOpacity>
                             )}
                             ListEmptyComponent={() => (
-                                <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
+                                <Text style={[styles.noSpotsText, darkMode && { color: '#fff' }]}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
                             )}
                         />
                         <TouchableOpacity style={[styles.spotPickerCloseButton, darkMode && styles.saveButtonDark]} onPress={() => setShowSpotPickerModal(false)}>
-                            <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
+                            <Text style={[styles.spotPickerCloseButtonText, darkMode && { color: '#fff' }]}>Sluiten</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -387,6 +387,9 @@ const styles = StyleSheet.create({
     spotPickerItemText: {
         fontSize: 16,
         color: '#333',
+    },
+    spotPickerItemTextDark: {
+        color: '#fff',
     },
     noSpotsText: {
         textAlign: 'center',

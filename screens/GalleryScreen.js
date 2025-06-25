@@ -382,32 +382,32 @@ export default function GalleryScreen({ navigation, route }) {
                             </TouchableOpacity>
                         </ScrollView>
                     ) : (
-                        <View style={styles.spotPickerModalContent}>
+                        <View style={[styles.spotPickerModalContent, darkMode && styles.spotPickerModalContentDark]}>
                             {/* Spot picker content */}
-                            <Text style={styles.spotPickerModalTitle}>Kies een Spot Locatie</Text>
+                            <Text style={[styles.spotPickerModalTitle, darkMode && styles.spotPickerModalTitleDark]}>Kies een Spot Locatie</Text>
                             <FlatList
                                 data={markers}
                                 keyExtractor={(item) => item.id}
                                 renderItem={({ item }) => (
                                     <TouchableOpacity
-                                        style={styles.spotPickerItem}
+                                        style={[styles.spotPickerItem, darkMode && styles.spotPickerItemDark]}
                                         onPress={() => {
                                             setFishInfo({ ...fishInfo, location: item.id });
                                             setModalMode('fish'); // Switch back to fish mode
                                         }}
                                     >
-                                        <Text style={styles.spotPickerItemText}>{item.title}</Text>
+                                        <Text style={[styles.spotPickerItemText, darkMode && styles.spotPickerItemTextDark]}>{item.title}</Text>
                                         {fishInfo.location === item.id && (
                                             <Ionicons name="checkmark" size={20} color="#0096b2" />
                                         )}
                                     </TouchableOpacity>
                                 )}
                                 ListEmptyComponent={() => (
-                                    <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
+                                    <Text style={[styles.noSpotsText, darkMode && styles.noSpotsTextDark]}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
                                 )}
                             />
-                            <TouchableOpacity style={styles.spotPickerCloseButton} onPress={() => setModalMode('fish')}>
-                                <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
+                            <TouchableOpacity style={[styles.spotPickerCloseButton, darkMode && styles.spotPickerCloseButtonDark]} onPress={() => setModalMode('fish')}>
+                                <Text style={[styles.spotPickerCloseButtonText, darkMode && styles.spotPickerCloseButtonTextDark]}>Sluiten</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -421,35 +421,67 @@ export default function GalleryScreen({ navigation, route }) {
                 onRequestClose={() => setSpotPickerModalVisible(false)}
             >
                 <TouchableOpacity
-                    style={styles.spotPickerModalOverlay}
+                    style={[styles.spotPickerModalOverlay, darkMode && styles.modalOverlayDark]}
                     activeOpacity={1}
-                    onPress={() => setSpotPickerModalVisible(false)} // Sluit modal bij tikken buiten
+                    onPress={() => setSpotPickerModalVisible(false)}
                 >
-                    <View style={styles.spotPickerModalContent}>
-                        <Text style={styles.spotPickerModalTitle}>Kies een Spot Locatie</Text>
+                    <View style={[
+                        styles.spotPickerModalContent,
+                        darkMode && styles.spotPickerModalContentDark
+                    ]}>
+                        <Text style={[
+                            styles.spotPickerModalTitle,
+                            darkMode && styles.spotPickerModalTitleDark
+                        ]}>
+                            Kies een Spot Locatie
+                        </Text>
                         <FlatList
                             data={markers}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
-                                    style={styles.spotPickerItem}
+                                    style={[
+                                        styles.spotPickerItem,
+                                        darkMode && styles.spotPickerItemDark
+                                    ]}
                                     onPress={() => {
                                         setFishInfo({ ...fishInfo, location: item.id });
                                         setSpotPickerModalVisible(false);
                                     }}
                                 >
-                                    <Text style={styles.spotPickerItemText}>{item.title}</Text>
+                                    <Text style={[
+                                        styles.spotPickerItemText,
+                                        darkMode && styles.spotPickerItemTextDark
+                                    ]}>
+                                        {item.title}
+                                    </Text>
                                     {fishInfo.location === item.id && (
                                         <Ionicons name="checkmark" size={20} color="#0096b2" />
                                     )}
                                 </TouchableOpacity>
                             )}
                             ListEmptyComponent={() => (
-                                <Text style={styles.noSpotsText}>Geen spots beschikbaar. Maak eerst een spot aan op de kaart.</Text>
+                                <Text style={[
+                                    styles.noSpotsText,
+                                    darkMode && styles.noSpotsTextDark
+                                ]}>
+                                    Geen spots beschikbaar. Maak eerst een spot aan op de kaart.
+                                </Text>
                             )}
                         />
-                        <TouchableOpacity style={styles.spotPickerCloseButton} onPress={() => setSpotPickerModalVisible(false)}>
-                            <Text style={styles.spotPickerCloseButtonText}>Sluiten</Text>
+                        <TouchableOpacity
+                            style={[
+                                styles.spotPickerCloseButton,
+                                darkMode && styles.spotPickerCloseButtonDark
+                            ]}
+                            onPress={() => setSpotPickerModalVisible(false)}
+                        >
+                            <Text style={[
+                                styles.spotPickerCloseButtonText,
+                                darkMode && styles.spotPickerCloseButtonTextDark
+                            ]}>
+                                Sluiten
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity>
@@ -519,6 +551,12 @@ const styles = StyleSheet.create({
     },
     addFishButtonLargeDark: {
         backgroundColor: '#00505e',
+    },
+    addFishButtonLargeText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 18,
+        marginLeft: 10,
     },
     photoGrid: {
         padding: 5,
@@ -760,15 +798,21 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 10,
         width: '80%',
-        maxHeight: '70%', // Max hoogte voor de lijst
+        maxHeight: '70%',
         padding: 15,
         alignItems: 'center',
+    },
+    spotPickerModalContentDark: {
+        backgroundColor: '#232323',
     },
     spotPickerModalTitle: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 15,
         color: '#004a99',
+    },
+    spotPickerModalTitleDark: {
+        color: '#fff',
     },
     spotPickerItem: {
         flexDirection: 'row',
@@ -780,15 +824,24 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
+    spotPickerItemDark: {
+        borderBottomColor: '#333',
+    },
     spotPickerItemText: {
         fontSize: 16,
         color: '#333',
+    },
+    spotPickerItemTextDark: {
+        color: '#fff',
     },
     noSpotsText: {
         fontSize: 14,
         color: '#888',
         textAlign: 'center',
         paddingVertical: 20,
+    },
+    noSpotsTextDark: {
+        color: '#fff',
     },
     spotPickerCloseButton: {
         marginTop: 20,
@@ -799,10 +852,15 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
     },
+    spotPickerCloseButtonDark: {
+        backgroundColor: '#00505e',
+    },
     spotPickerCloseButtonText: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
     },
-
+    spotPickerCloseButtonTextDark: {
+        color: '#fff',
+    },
 });

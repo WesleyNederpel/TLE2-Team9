@@ -130,12 +130,23 @@ export default function EventScreen({ route }) {
                     <View style={[styles.onderdelenSection, darkMode && styles.onderdelenSectionDark]}>
                         <Text style={[styles.onderdelenTitle, darkMode && styles.textAccent]}>Onderdelen:</Text>
                         {event.onderdelen.map((onderdeel, idx) => (
-                            <View key={idx} style={[styles.onderdeelItem, darkMode && styles.onderdeelItemDark]}>
-                                <Text style={[styles.onderdeelName, darkMode && styles.textLight]}>{onderdeel.naam}</Text>
-                                {onderdeel.niveau && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Niveau: {onderdeel.niveau}</Text>}
-                                {onderdeel.geslacht && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Geslacht: {onderdeel.geslacht}</Text>}
-                                {onderdeel.leeftijdsgroep && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Leeftijdsgroep: {onderdeel.leeftijdsgroep}</Text>}
-                                {onderdeel.inschrijfgeld_per_basisteamlid && <Text style={[styles.onderdeelDetail, darkMode && styles.textLight]}>Inschrijfgeld: {onderdeel.inschrijfgeld_per_basisteamlid}</Text>}
+                            <View
+                                key={idx}
+                                style={[
+                                    styles.onderdeelItem,
+                                    idx % 2 === 0
+                                        ? (darkMode ? styles.onderdeelItemDarkAlt : styles.onderdeelItemAlt)
+                                        : (darkMode ? styles.onderdeelItemDark : styles.onderdeelItem)
+                                ]}
+                            >
+                                <Text style={[
+                                    styles.onderdeelName,
+                                    darkMode && styles.onderdeelNameDark
+                                ]}>{onderdeel.naam}</Text>
+                                {onderdeel.niveau && <Text style={[styles.onderdeelDetail, darkMode && styles.onderdeelDetailDark]}>Niveau: {onderdeel.niveau}</Text>}
+                                {onderdeel.geslacht && <Text style={[styles.onderdeelDetail, darkMode && styles.onderdeelDetailDark]}>Geslacht: {onderdeel.geslacht}</Text>}
+                                {onderdeel.leeftijdsgroep && <Text style={[styles.onderdeelDetail, darkMode && styles.onderdeelDetailDark]}>Leeftijdsgroep: {onderdeel.leeftijdsgroep}</Text>}
+                                {onderdeel.inschrijfgeld_per_basisteamlid && <Text style={[styles.onderdeelDetail, darkMode && styles.onderdeelDetailDark]}>Inschrijfgeld: {onderdeel.inschrijfgeld_per_basisteamlid}</Text>}
                             </View>
                         ))}
                     </View>
@@ -279,12 +290,12 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#eee',
         paddingTop: 15,
+        backgroundColor: '#fff', // lichtgrijs
         marginBottom: 20,
-        backgroundColor: '#f9f9f9',
         borderRadius: 8,
     },
     onderdelenSectionDark: {
-        backgroundColor: '#181818',
+        backgroundColor: '#232323', // zwart
         borderTopColor: '#333',
     },
     onderdelenTitle: {
@@ -294,6 +305,14 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     onderdeelItem: {
+        backgroundColor: '#181818',
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: '#cce5ff',
+    },
+    onderdeelItemAlt: {
         backgroundColor: '#f9f9f9',
         padding: 10,
         borderRadius: 8,
@@ -302,7 +321,11 @@ const styles = StyleSheet.create({
         borderLeftColor: '#cce5ff',
     },
     onderdeelItemDark: {
-        backgroundColor: '#232323',
+        backgroundColor: '#232323', // zwart
+        borderLeftColor: '#0096b2',
+    },
+    onderdeelItemDarkAlt: {
+        backgroundColor: '#333', // donkergrijs
         borderLeftColor: '#0096b2',
     },
     onderdeelName: {
@@ -311,9 +334,16 @@ const styles = StyleSheet.create({
         color: '#333',
         marginBottom: 3,
     },
+    onderdeelNameDark: {
+        color: '#7fd6e7',
+    },
     onderdeelDetail: {
         fontSize: 14,
         color: '#555',
+        marginBottom: 2,
+    },
+    onderdeelDetailDark: {
+        color: '#eee',
     },
     websiteButton: {
         backgroundColor: '#0096b2', // Blauwgroene kleur

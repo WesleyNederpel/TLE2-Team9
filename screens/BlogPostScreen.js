@@ -42,7 +42,9 @@ export default function BlogPostScreen({ route }) {
             </View>
 
             {/* Inhoud van de blogpost */}
-            <Text style={[styles.blogContent, darkMode && styles.blogContentDark]}>{blog.content}</Text>
+            <View style={styles.blogContentWrapper}>
+                <Text style={[styles.blogContent, darkMode && styles.blogContentDark]}>{blog.content}</Text>
+            </View>
 
             {/* Reacties sectie */}
             {blog.comments && blog.comments.length > 0 && (
@@ -70,6 +72,10 @@ const styles = StyleSheet.create({
     scrollViewContainerDark: {
         backgroundColor: '#181818',
     },
+    contentContainer: {
+        padding: 20,
+        alignItems: 'center',
+    },
     blogPostHeader: {
         backgroundColor: '#ffffff',
         padding: 20,
@@ -80,9 +86,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 3,
+        width: '100%',
+        maxWidth: 600,
+        alignSelf: 'center',
     },
     blogPostHeaderDark: {
         backgroundColor: '#232323',
+    },
+    blogContentWrapper: {
+        width: '100%',
+        maxWidth: 600,
+        alignSelf: 'center',
     },
     blogTitle: {
         fontSize: 26,
