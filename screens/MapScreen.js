@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, View, Modal, Image, Text, TextInput, TouchableOpacity, Alert, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, AppState } from 'react-native';
 import MapView, { Polygon, Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -55,9 +55,12 @@ const MapScreen = ({ navigation }) => {
     const [currentLocation, setCurrentLocation] = useState(null);
     const [isPickingLocation, setIsPickingLocation] = useState(false);
     const [locationSource, SetLocationSource] = useState('current'); // 'current', 'picked', 'manual'
+    const [initialLocationSet, setInitialLocationSet] = useState(false);
+    const mapRef = useRef(null); // Reference to the MapView component
 
     const { showLocation, darkMode } = useLocationSetting();
 
+    // Default region (Rotterdam)
     const region = {
         latitude: 51.9225,
         longitude: 4.47917,
@@ -88,6 +91,18 @@ const MapScreen = ({ navigation }) => {
         }
     }, []);
 
+    // Center map on user location
+    const centerMapOnUserLocation = useCallback(() => {
+        if (currentLocation && mapRef.current) {
+            mapRef.current.animateToRegion({
+                latitude: currentLocation.coords.latitude,
+                longitude: currentLocation.coords.longitude,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
+            }, 1000); // Animation duration in ms
+        }
+    }, [currentLocation]);
+
     useEffect(() => {
         (async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
@@ -95,12 +110,23 @@ const MapScreen = ({ navigation }) => {
                 Alert.alert('Toegang geweigerd', 'Locatietoegang is nodig om uw positie te bepalen.');
                 return;
             }
+            
             let location = await Location.getCurrentPositionAsync({});
             setCurrentLocation(location);
+            
+            // Only center map on first load, not on subsequent location updates
+            if (!initialLocationSet && location && mapRef.current) {
+                mapRef.current.animateToRegion({
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                }, 1000);
+                setInitialLocationSet(true);
+            }
         })();
         loadMarkers(); // Laad markers bij opstarten
-    }, [loadMarkers]);
-
+    }, [loadMarkers, initialLocationSet]);
 
     const convertCoords = (coordsArray) => {
         if (!coordsArray || coordsArray.length === 0) return [];
@@ -223,7 +249,6 @@ const MapScreen = ({ navigation }) => {
         }
     };
 
-
     const startPickingLocation = () => {
         setAddMarkerModalVisible(false);
         setIsPickingLocation(true);
@@ -247,6 +272,7 @@ const MapScreen = ({ navigation }) => {
     return (
         <View style={[styles.container, darkMode && styles.containerDark]}>
             <MapView
+                ref={mapRef}
                 style={styles.map}
                 initialRegion={region}
                 onPress={handleMapPress}
@@ -275,18 +301,19 @@ const MapScreen = ({ navigation }) => {
                         description={m.description}
                     />
                 ))}
-                {/* Verwijder de custom blauwe marker voor de gebruiker */}
-                {/* {showLocation && currentLocation && (
-                    <Marker
-                        coordinate={{
-                            latitude: currentLocation.coords.latitude,
-                            longitude: currentLocation.coords.longitude,
-                        }}
-                        title="Mijn locatie"
-                        pinColor="#0096b2"
-                    />
-                )} */}
             </MapView>
+            
+            {/* Location center button */}
+            <TouchableOpacity
+                style={[
+                    styles.locationButton,
+                    darkMode && { backgroundColor: '#00505e' }
+                ]}
+                onPress={centerMapOnUserLocation}
+            >
+                <Ionicons name="locate" size={24} color="#fff" />
+            </TouchableOpacity>
+            
             <TouchableOpacity
                 style={[
                     styles.roundButton,
@@ -498,6 +525,22 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    locationButton: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        backgroundColor: '#0096b2',
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 5,
