@@ -110,10 +110,10 @@ const MapScreen = ({ navigation }) => {
                 Alert.alert('Toegang geweigerd', 'Locatietoegang is nodig om uw positie te bepalen.');
                 return;
             }
-            
+
             let location = await Location.getCurrentPositionAsync({});
             setCurrentLocation(location);
-            
+
             // Only center map on first load, not on subsequent location updates
             if (!initialLocationSet && location && mapRef.current) {
                 mapRef.current.animateToRegion({
@@ -289,6 +289,7 @@ const MapScreen = ({ navigation }) => {
                     setAddMarkerModalVisible(true);
                 }}
                 showsUserLocation={showLocation}
+                showsMyLocationButton={false}
                 mapType="standard"
                 customMapStyle={darkMode ? darkMapStyle : []}
             >
